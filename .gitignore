@@ -1,6 +1,6 @@
 .project
 .idea
-.setting
+.settings
 .DS_Store
 .classpath
 DDC.iml
