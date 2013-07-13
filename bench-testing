@@ -1,0 +1,16 @@
+#!/bin/sh
+
+
+touch std-out.log.txt
+touch std-err.log.txt
+
+echo "" > std-out.log.txt
+echo "" > std-err.log.txt
+
+cd ./target
+i=0
+while [ $i -lt 100 ]; do
+	java -Dnio.process=$i -classpath DDC-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
+	just.foor.ClientTester 1>>../std-out.log.txt 2>>../std-err.log.txt &
+	((i=i+1))
+done

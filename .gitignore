@@ -1,0 +1,8 @@
+.project
+.idea
+.setting
+.DS_Store
+.classpath
+DDC.iml
+DDC.ipr
+DDC.iws
