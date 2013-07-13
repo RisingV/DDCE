@@ -1,0 +1,106 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<repositories>
+       <repository>
+			 <id>maven-net-bdcom</id>
+			 <name>Bdcom Mirror</name>
+			 <url>http://172.16.21.220:8081/nexus/content/groups/public/</url>
+			 <releases>
+				 <enabled>true</enabled>
+			 </releases>
+			 <snapshots>
+				 <enabled>false</enabled>
+			 </snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		 <pluginRepository>
+			 <id>maven-net-bdcom</id>
+			 <name>Bdcom Mirror</name>
+			 <url>http://172.16.21.220:8081/nexus/content/groups/public/</url>
+			 <releases>
+				 <enabled>true</enabled>
+			 </releases>
+			 <snapshots>
+				 <enabled>false</enabled>
+			 </snapshots>
+		 </pluginRepository>
+   </pluginRepositories>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.bdcom</groupId>
+  <artifactId>DDC</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>DDC</name>
+  <description>DataDispenseClient</description>
+  
+  <build>
+  	 <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+       <plugin> 
+          <artifactId>maven-assembly-plugin</artifactId> 
+          <configuration> 
+              <archive> 
+                  <manifest> 
+                      <mainClass>com.bdcom.clientview.ViewManager</mainClass> 
+                  </manifest> 
+              <!--
+                  <manifest> 
+                      <mainClass>com.bdcom.dataparser.CMDParser</mainClass> 
+                  </manifest> 
+                  <manifest> 
+                      <mainClass>com.bdcom.datadispacher.LocalTalker</mainClass> 
+                  </manifest> 
+                -->
+                    <!--ViewManager is for GUI Client, i.e. the exe version  -->
+                    <!--CMDParser is for CLI Client, i.e. the jar version -->
+              </archive> 
+              <descriptorRefs> 
+                  <descriptorRef>jar-with-dependencies</descriptorRef> 
+              </descriptorRefs> 
+          </configuration> 
+          <executions>
+          	<execution>
+          		<id>pack</id>
+          		<phase>package</phase>
+          		<goals>
+          			<goal>assembly</goal>
+          		</goals>
+          	</execution>
+          </executions>
+       </plugin> 
+      </plugins>
+  </build>
+  
+  <dependencies>
+	  <dependency>
+	  	<groupId>dom4j</groupId>
+	  	<artifactId>dom4j</artifactId>
+	  	<version>1.6.1</version>
+	  </dependency>
+	  <dependency>
+	  	<groupId>org.apache.httpcomponents</groupId>
+	  	<artifactId>httpclient</artifactId>
+	  	<version>4.2.3</version>
+	  </dependency>
+	  <dependency>
+	  	<groupId>org.json</groupId>
+	  	<artifactId>json</artifactId>
+	  	<version>20090211</version>
+	  </dependency>
+  </dependencies>
+</project>
