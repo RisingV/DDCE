@@ -23,15 +23,17 @@ import java.util.*;
 public class ScriptMgr
         implements ScriptXmlConfConstants, CommunicateStatus, DefaultCrtSessions {
 
+    private static final String SPT = File.separator;
+
     private static final DateFormat DATE_FORMAT = Application.DATE_FORMAT;
 
     private static final long FILE_LENGTH_LIMIT = 1024*1024*6;
 
     private static final String ANY_SCRIPT = "*";
 
-    private static final String CONFIG_DIR_LOCAL = "Local" + ConfigPath._SPT;
+    private static final String CONFIG_DIR_LOCAL = "Local" + SPT;
 
-    private static final String CONFIG_DIR_SCRIPT = "Script"+ConfigPath._SPT;
+    private static final String CONFIG_DIR_SCRIPT = "Script"+ SPT;
 
     private static final String LOCAL_CONFIG_FILE_NAME = "script-config";
 
@@ -45,7 +47,7 @@ public class ScriptMgr
 
     private Map<String, File> fileAssociater;
 
-    private File _defaultConfFile = null;
+    private File defaultConfFile = null;
 
     private boolean isDefaultConfigFileExists;
 
@@ -53,7 +55,7 @@ public class ScriptMgr
 
     private String rawDataPath = null;
 
-    private String _defaultIptPath = null;
+    private String defaultIptPath = null;
 
     private String interactorType = null;
 
@@ -91,12 +93,12 @@ public class ScriptMgr
     }
 
     private void loadScripts() {
-        _defaultConfFile = getLocalConfigFile();
+        defaultConfFile = getLocalConfigFile();
 
-        if ( _defaultConfFile.exists() ) {
-            interactorType = getDefaultConfigedInteractorType(_defaultConfFile);
-            _defaultIptPath = getDefaultConfigedIptPath(_defaultConfFile);
-            String rawDataPathSetted = getDefaultConfigedRawDataPath(_defaultConfFile);
+        if ( defaultConfFile.exists() ) {
+            interactorType = getDefaultConfigedInteractorType(defaultConfFile);
+            defaultIptPath = getDefaultConfigedIptPath(defaultConfFile);
+            String rawDataPathSetted = getDefaultConfigedRawDataPath(defaultConfFile);
             if ( StringUtil.isNotBlank(rawDataPathSetted) &&
                     StringUtil.isVaildFilePath(rawDataPathSetted)
                     ) {
@@ -113,7 +115,7 @@ public class ScriptMgr
                     rawDataPath = rawDataPathSetted;
                 }
             }
-            assemblyCrtSessions(_defaultConfFile);
+            assemblyCrtSessions(defaultConfFile);
         }
 
         File[] confFiles = getScriptConfigFiles();
@@ -209,7 +211,7 @@ public class ScriptMgr
     public String getCrtSession(String name) {
         String path = crtSessionContainer.get(name);
         if ( !StringUtil.isNotBlank(path) ) {
-            return _defaultIptPath;
+            return defaultIptPath;
         } else {
             return path;
         }
@@ -245,12 +247,12 @@ public class ScriptMgr
             }
         }
 
-        if ( !_defaultConfFile.exists() ) {
-            _defaultConfFile = getLocalConfigFile();
+        if ( !defaultConfFile.exists() ) {
+            defaultConfFile = getLocalConfigFile();
         }
 
-        if ( _defaultConfFile.exists() ) {
-            return addCrtSession(iname, ipath, _defaultConfFile);
+        if ( defaultConfFile.exists() ) {
+            return addCrtSession(iname, ipath, defaultConfFile);
         } else {
             return _CONF_FILE_CREATE_FAIL;
         }
@@ -263,15 +265,15 @@ public class ScriptMgr
             return _INVAILD_PATH;
         }
 
-        if ( !_defaultConfFile.exists() ) {
-            _defaultConfFile = getLocalConfigFile();
+        if ( !defaultConfFile.exists() ) {
+            defaultConfFile = getLocalConfigFile();
         }
-        if ( _defaultConfFile.exists() ) {
+        if ( defaultConfFile.exists() ) {
             String[] elemChain = {DEFAULT_IPT_PATH};
-            status = XmlUtil.setElemText(elemChain, path, _defaultConfFile);
+            status = XmlUtil.setElemText(elemChain, path, defaultConfFile);
 
             if ( status > 0 ) {
-                _defaultIptPath = path;
+                defaultIptPath = path;
                 return _DIR_SAVE_SUCCESS;
             } else {
                 return status;
@@ -295,12 +297,12 @@ public class ScriptMgr
             }
         }
 
-        if ( !_defaultConfFile.exists() ) {
-            _defaultConfFile = getLocalConfigFile();
+        if ( !defaultConfFile.exists() ) {
+            defaultConfFile = getLocalConfigFile();
         }
-        if ( _defaultConfFile.exists() ) {
+        if ( defaultConfFile.exists() ) {
             String[] elemChain = {RAW_DATA_PATH};
-            status = XmlUtil.setElemText(elemChain, path, _defaultConfFile);
+            status = XmlUtil.setElemText(elemChain, path, defaultConfFile);
 
             if ( status > 0 ) {
                 rawDataPath = path;
@@ -372,10 +374,10 @@ public class ScriptMgr
     }
 
     public String getDefaultConfigedIptPath() {
-        if ( null == _defaultIptPath ) {
+        if ( null == defaultIptPath) {
             return "";
         }
-        return _defaultIptPath;
+        return defaultIptPath;
     }
 
     private String getDefaultConfigedIptPath(File xmlFile) {
@@ -433,8 +435,8 @@ public class ScriptMgr
                 if ( StringUtil.isNotBlank(path) ) {
                     crtSessionContainer.put(name, path);
                 } else {
-                    if ( StringUtil.isNotBlank(_defaultIptPath) ) {
-                        crtSessionContainer.put(name, _defaultIptPath);
+                    if ( StringUtil.isNotBlank(defaultIptPath) ) {
+                        crtSessionContainer.put(name, defaultIptPath);
                     } else {
                         crtSessionContainer.put(name, "");
                     }
