@@ -1,7 +1,8 @@
 package com.bdcom.datadispacher;
 
+import com.bdcom.sys.config.ServerInfoConstants;
 import com.bdcom.util.log.ErrorLogger;
-import com.bdcom.service.ConfigPath;
+import com.bdcom.sys.ConfigPath;
 import com.bdcom.util.XmlUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

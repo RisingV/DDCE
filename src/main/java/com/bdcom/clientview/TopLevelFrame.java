@@ -1,6 +1,6 @@
 package com.bdcom.clientview;
 
-import com.bdcom.service.Application;
+import com.bdcom.sys.gui.GuiInterface;
 
 import javax.swing.*;
 
@@ -14,9 +14,15 @@ public abstract class TopLevelFrame extends JFrame implements AbstractFrame {
 
     abstract public void display0();
 
+    private final GuiInterface gui;
+
+    public TopLevelFrame(GuiInterface gui) {
+        this.gui = gui;
+    }
+
     @Override
     public void display() {
-        Application.registerCurrentDisplay( this );
+        gui.registerCurrentDisplay( this );
         display0();
     }
 }

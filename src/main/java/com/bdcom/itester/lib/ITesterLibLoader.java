@@ -1,14 +1,9 @@
 package com.bdcom.itester.lib;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
+import com.bdcom.sys.config.PathConfig;
 import com.bdcom.util.log.ErrorLogger;
-import com.bdcom.service.ConfigPath;
+
+import java.io.*;
 
 /**
  * @author francis yuan <br>
@@ -23,10 +18,10 @@ public class ITesterLibLoader {
 	
 	private static native void loadITesterDllLib(String path);
 	
-	private static void registerNatives() {
-		String itesterDllPath = extractLibFromJar( "/","iTesterLib" );
+	public static void registerNatives(PathConfig pathConfig) {
+		String itesterDllPath = extractLibFromJar( pathConfig, "/","iTesterLib" );
 		if ( null != itesterDllPath ) {
-			String navtiveLibPath = extractLibFromJar( "/", "iTestLibLoader" );
+			String navtiveLibPath = extractLibFromJar( pathConfig, "/", "iTestLibLoader" );
 			if ( null != navtiveLibPath ) {
 				System.load( navtiveLibPath );
 				loadITesterDllLib( itesterDllPath );
@@ -34,11 +29,11 @@ public class ITesterLibLoader {
 		}
 	}
 	
-	private static String extractLibFromJar(String pathInJar, String libName) {
+	private static String extractLibFromJar(PathConfig pathConfig, String pathInJar, String libName) {
 		if ( libName.indexOf(DLL_EXT) < 0 ) {
 			libName = libName + DLL_EXT;
 		}
-		File dllFile = new File( ConfigPath.getDllLibPath() + libName  );
+		File dllFile = new File( pathConfig.getDllLibPath() + libName  );
 		boolean extractSuccess = dllFile.exists();
 		if ( !extractSuccess ) {
 			InputStream in = ITesterLibLoader.class.getResourceAsStream( pathInJar + libName );
@@ -83,11 +78,7 @@ public class ITesterLibLoader {
 			return null;
 		}
 	}
-	
-	static {
-		registerNatives();
-	}
-	
+
 	/**
 	 * @param ipAddr iTesterServer IP Address 
 	 * */

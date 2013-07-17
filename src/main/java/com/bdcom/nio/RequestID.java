@@ -35,4 +35,12 @@ public interface RequestID {
     //This is the biggest RequestID! Because of the fact that RequestID stores in 1 byte!
     public static final int TERMINAL = Byte.MAX_VALUE;
 
+    abstract class LOCAL {
+
+        public static final int READ_EXTRA_INFO = 101;
+
+        public static final int REPORT_SENDING_RESULT = 102;
+
+    }
+
 }

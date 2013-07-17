@@ -1,5 +1,11 @@
 package com.bdcom.clientview;
 
+import com.bdcom.biz.pojo.BaseTestRecord;
+import com.bdcom.biz.pojo.Scenario;
+import com.bdcom.biz.scenario.ScenarioMgr;
+import com.bdcom.biz.scenario.ScenarioUtil;
+import com.bdcom.biz.script.ScriptExecutor;
+import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.clientview.util.GBC;
 import com.bdcom.clientview.util.Hook;
 import com.bdcom.clientview.util.MessageUtil;
@@ -8,14 +14,8 @@ import com.bdcom.datadispacher.CommunicateStatus;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
 import com.bdcom.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
-import com.bdcom.pojo.BaseTestRecord;
-import com.bdcom.pojo.Scenario;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
-import com.bdcom.service.scenario.ScenarioMgr;
-import com.bdcom.service.scenario.ScenarioUtil;
-import com.bdcom.service.script.ScriptExecutor;
-import com.bdcom.service.script.ScriptMgr;
+import com.bdcom.sys.ApplicationConstants;
+import com.bdcom.sys.gui.GuiInterface;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.StringUtil;
 
@@ -137,18 +137,13 @@ public class SubmitFrame extends JPanel implements
 	
 	private Scenario currentSce;
 
-//	public static void main(String[] args) {
-//		SubmitFrame scemf = new SubmitFrame();
-//		JFrame frame = new JFrame();
-//		Container con = frame.getContentPane();
-//		con.add(scemf);
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		frame.setResizable(false);
-//		frame.pack();
-//		frame.setVisible(true);
-//	}
-	
-	public SubmitFrame() {
+    private final GuiInterface app;
+
+    private final ClientProxy clientProxy;
+
+	public SubmitFrame(ClientProxy clientProxy, GuiInterface app) {
+        this.clientProxy = clientProxy;
+        this.app = app;
 		generalInit();
 	} 
 	
@@ -229,7 +224,7 @@ public class SubmitFrame extends JPanel implements
 
     private void initScriptExecutor() {
         scriptExecutor = (ScriptExecutor)
-                Application.getAttribute(COMPONENT.SCRIPT_EXECUTOR);
+                app.getAttribute(COMPONENT.SCRIPT_EXECUTOR);
     }
 	
 	private void initIndexPanel() {
@@ -280,7 +275,7 @@ public class SubmitFrame extends JPanel implements
 		if ( fcAdded ) {
 			return;
 		}
-		if ( Application.getUserInfo().isSupervisor() ) {
+		if ( app.getUserInfo().isSupervisor() ) {
 			initFcCompos();
 //			indexPanel.add(fcLabel, new GBC(0, 1)
 //						.setInsets(10, 10, 5, 10)
@@ -330,7 +325,7 @@ public class SubmitFrame extends JPanel implements
 							} else {
 								isFC = false;
 							}
-                            Application.addAttribute(
+                            app.addAttribute(
                                     BASE_TEST.IS_FC, Boolean.valueOf(isFC));
 						}
 					}
@@ -640,7 +635,7 @@ public class SubmitFrame extends JPanel implements
 											MsgDialogUtil.showErrorDialog(
                                                     MessageUtil.getMessageByStatusCode(status - 1)
                                             );
-                                            Application.logOut();
+                                            app.logout();
 										}
 									}
 									indexBt.setEnabled(true);
@@ -652,13 +647,13 @@ public class SubmitFrame extends JPanel implements
 											);
 									//fire event and make all related status change!
                                     ScenarioMgr scenarioMgr = (ScenarioMgr)
-                                            Application.getAttribute(COMPONENT.SCENARIO_MGR);
+                                            app.getAttribute(COMPONENT.SCENARIO_MGR);
 									Scenario sce = scenarioMgr.getScenarioBySerial(serial);
 									if ( null == sce ) {
 										String msg = getLocalName(NO_MATCHING_SCE);
 										MsgDialogUtil.showErrorDialog( msg );
                                         MsgTable msgTable = (MsgTable)
-                                                Application.getAttribute(COMPONENT.MSG_TABLE);
+                                                app.getAttribute(COMPONENT.MSG_TABLE);
 										msgTable.addErrMsg(serial + " " + msg);
 										
 										int ok = JOptionPane.showConfirmDialog(
@@ -723,7 +718,7 @@ public class SubmitFrame extends JPanel implements
 										public void run() {
 											syncBt.setEnabled(false);
                                             ScenarioMgr scenarioMgr = (ScenarioMgr)
-                                                    Application.getAttribute(COMPONENT.SCENARIO_MGR);
+                                                    app.getAttribute(COMPONENT.SCENARIO_MGR);
 											Set<String> nameSet = scenarioMgr.getScenarioNameList();
 											Scenario[] sces =
 													new Scenario[nameSet.size()];
@@ -838,15 +833,7 @@ public class SubmitFrame extends JPanel implements
 				);
 		int status = submit(currDataRec);
 		String msg = getMessageByStatusCode(status);
-//		if ( status < 0 ) {
-//			handMode.setSelected(true); 
-//			changeStatusOfTextFieldGroup();
-//			MsgDialogUtil.showErrorDialog( msg );
-//		} else if ( status > 0 ) {
-//			MsgDialogUtil.showMsgDialog(msg);
-//			autoMode.setSelected(true);
-//			currDataRec = null;
-//		}
+
 		if ( status < 0 ) {
 			MsgDialogUtil.showErrorDialog( msg );
 		} else if ( status > 0 ) {
@@ -858,7 +845,7 @@ public class SubmitFrame extends JPanel implements
 		updateAllCompoStatus();
 
         MsgTable msgTable = (MsgTable)
-                Application.getAttribute(COMPONENT.MSG_TABLE);
+                app.getAttribute(COMPONENT.MSG_TABLE);
 		
 		msgTable.addMsg(status);
 	}
@@ -1381,7 +1368,7 @@ public class SubmitFrame extends JPanel implements
 		String jtfName = jtf.getName();
 		
 		if (TEST_NUM.equals(jtfName)) {
-            String userNum = Application.getUserInfo().getUserNum();
+            String userNum = app.getUserInfo().getUserNum();
 			jtf.setEditable(false);
 			jtf.setText( userNum );
 			jtf.setForeground(Color.GREEN);
@@ -1397,20 +1384,20 @@ public class SubmitFrame extends JPanel implements
 
 	private Scenario getScenarioByName(String sceName) {
         ScenarioMgr scenarioMgr = (ScenarioMgr)
-                Application.getAttribute(COMPONENT.SCENARIO_MGR);
+                app.getAttribute(COMPONENT.SCENARIO_MGR);
 
         return scenarioMgr.getScenarioByName(sceName);
 	}
 	
 	private Set<String> getScenarioList() {
         ScenarioMgr scenarioMgr = (ScenarioMgr)
-                Application.getAttribute( COMPONENT.SCENARIO_MGR );
+                app.getAttribute( COMPONENT.SCENARIO_MGR );
         return scenarioMgr.getScenarioNameList();
 	}
 
 	private Set<String> getCrtSessions() {
         ScriptMgr scriptMgr =
-                (ScriptMgr) Application.getAttribute(COMPONENT.SCRIPT_MGR);
+                (ScriptMgr) app.getAttribute(COMPONENT.SCRIPT_MGR);
 		return scriptMgr.getCrtSessions();
 	}
 	
@@ -1423,10 +1410,9 @@ public class SubmitFrame extends JPanel implements
 	}
 	
 	private int submit(BaseTestRecord dataRec) {
-        ClientProxy proxy = Application.getNioClientProxy();
         int status = -1;
         try {
-            status = proxy.sendBaseTestRecord( dataRec );
+            status = clientProxy.sendBaseTestRecord( dataRec );
         } catch (IOException e) {
             //TODO warning!
             e.printStackTrace();

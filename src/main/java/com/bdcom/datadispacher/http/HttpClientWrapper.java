@@ -1,9 +1,9 @@
 package com.bdcom.datadispacher.http;
 
 import com.bdcom.datadispacher.ServerInfo;
-import com.bdcom.pojo.BaseTestRecordForDebug;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
+import com.bdcom.biz.pojo.BaseTestRecordForDebug;
+import com.bdcom.sys.gui.Application;
+import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.StringUtil;
 import com.bdcom.util.log.ErrorLogger;
@@ -163,7 +163,7 @@ public class HttpClientWrapper implements ApplicationConstants {
 	}
 	
 	private String getUserName() {
-        return Application.getStringAttr( USER.USER_NUM );
+        return Application.instance.getStringAttr( USER.USER_NUM );
 	}
 	
 	private static String fixJsonStr(String str) {

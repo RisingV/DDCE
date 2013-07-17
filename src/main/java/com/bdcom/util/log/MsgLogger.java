@@ -1,7 +1,6 @@
 package com.bdcom.util.log;
 
-import com.bdcom.service.Application;
-import com.bdcom.service.ConfigPath;
+import com.bdcom.sys.gui.Application;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,7 +18,7 @@ import java.util.Date;
 
 public abstract class MsgLogger {
 
-    private static final String _SPT = ConfigPath._SPT;
+    private static final String _SPT = File.separator;
 	
 	private static final String CURRENT_DIR = Application.CURRENT_DIR;
 	

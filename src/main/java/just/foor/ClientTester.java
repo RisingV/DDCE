@@ -1,9 +1,12 @@
 package just.foor;
 
+import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.DataType;
 import com.bdcom.nio.RequestID;
 import com.bdcom.nio.client.ClientProxy;
+import com.bdcom.sys.gui.Application;
+import com.bdcom.sys.config.PathConfig;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 public class ClientTester {
     public static void main(String[] s) {
         String proID = System.getProperty("nio.process");
-        ClientProxy proxy = new ClientProxy("127.0.0.1", 9999);
+        ServerConfig serverConfig = new ServerConfig( new PathConfig(Application.CURRENT_DIR) );
+
+        ClientProxy proxy = new ClientProxy(serverConfig);
         try {
             for ( int i = 0; i < 100; i++ ) {
                 sendingEcho( proxy, i, proID );

@@ -2,9 +2,9 @@ package com.bdcom.nio;
 
 import com.bdcom.exception.ResponseException;
 import com.bdcom.nio.server.Message;
-import com.bdcom.pojo.BaseTestRecord;
-import com.bdcom.pojo.ITesterRecord;
-import com.bdcom.pojo.LoginAuth;
+import com.bdcom.biz.pojo.BaseTestRecord;
+import com.bdcom.biz.pojo.ITesterRecord;
+import com.bdcom.biz.pojo.LoginAuth;
 import com.bdcom.util.SerializeUtil;
 
 import java.io.*;

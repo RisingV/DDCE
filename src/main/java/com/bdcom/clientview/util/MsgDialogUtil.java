@@ -1,7 +1,7 @@
 package com.bdcom.clientview.util;
 
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
+import com.bdcom.sys.gui.Application;
+import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.util.LocaleUtil;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ import java.awt.*;
 public abstract class MsgDialogUtil implements ApplicationConstants {
 	
 	public static void showErrorDialog(String msg) {
-        JComponent current = (JComponent) Application.getCurrentDisplay();
+        JComponent current = (JComponent) Application.instance.getCurrentDisplay();
 		showDialog( current,
 				msg, _ERROR, JOptionPane.ERROR_MESSAGE);
 	}
@@ -40,7 +40,7 @@ public abstract class MsgDialogUtil implements ApplicationConstants {
 	}
 	
 	public static void showMsgDialog(String msg) {
-        JComponent current = (JComponent) Application.getCurrentDisplay();
+        JComponent current = (JComponent) Application.instance.getCurrentDisplay();
 		showDialog( current,
 				msg, _MESSAGE, JOptionPane.INFORMATION_MESSAGE);
 	}

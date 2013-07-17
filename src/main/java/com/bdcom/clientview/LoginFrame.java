@@ -1,14 +1,14 @@
 package com.bdcom.clientview;
 
+import com.bdcom.biz.pojo.LoginAuth;
 import com.bdcom.clientview.util.GBC;
 import com.bdcom.clientview.util.MessageUtil;
 import com.bdcom.clientview.util.MsgDialogUtil;
-import com.bdcom.datadispacher.ServerInfo;
 import com.bdcom.exception.LoginException;
 import com.bdcom.nio.client.ClientProxy;
-import com.bdcom.pojo.LoginAuth;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
+import com.bdcom.sys.ApplicationConstants;
+import com.bdcom.sys.config.ServerConfig;
+import com.bdcom.sys.gui.GuiInterface;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.StringUtil;
 import com.bdcom.util.log.ErrorLogger;
@@ -57,16 +57,30 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 	
 	private Image image;
 
-	public static void main(String[] args) {
-		LoginFrame frame = new LoginFrame();
-		frame.display();
-	}
-	
-	public LoginFrame() {
+    private final ClientProxy clientProxy;
+
+    private final GuiInterface app;
+
+    private ServerConfig serverConfig;
+
+    private AbstractFrame frameAfterLogin;
+
+
+	public LoginFrame(ClientProxy clientProxy, GuiInterface app) {
+        super(app);
+        this.app = app;
+
+        this.clientProxy = clientProxy;
+        this.serverConfig = clientProxy.getServerConfig();
+
 		initCompos();
 		initLayout();
 	}
-	
+
+    public void setFrameAfterLogin(AbstractFrame frame) {
+        frameAfterLogin = frame;
+    }
+
 	public void setImage(Image image) {
 		this.image = image;
 	}
@@ -179,12 +193,12 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 		portTextField.setPreferredSize( new Dimension(160, 20) );
 		usrTextField.setPreferredSize( new Dimension(160, 20) );
 		pwdTextField.setPreferredSize( new Dimension(160, 20) );
-		
+
 		ipTextField.setText(
-				ServerInfo.getInetAddr().getHostAddress()
+                serverConfig.getInetAddr().getHostAddress()
 				);
 		portTextField.setText(
-				String.valueOf( ServerInfo.getPort() )
+				String.valueOf( serverConfig.getPort() )
 				);
 		
 		loginBt = new JButton();
@@ -281,21 +295,26 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 		auth.setUserName(usrName);
 		auth.setUserPasswd(passwd);
 
-        Application.setNioClientProxy(ip, port);
-
+        clientProxy.getServerConfig()
+                .writeToConfigFile(ip, port);
+        boolean isSuccess = true;
 		int status = -1;
-        ClientProxy proxy = Application.getNioClientProxy();
 
         try {
-            status = proxy.sendLoginAuth( auth );
+            status = clientProxy.sendLoginAuth( auth );
         } catch (IOException e) {
             String msg = e.getMessage();
-            MsgDialogUtil.showErrorDialog( msg );
+            MsgDialogUtil.showErrorDialog(msg);
             ErrorLogger.log(msg);
+            isSuccess = false;
         } catch (LoginException e) {
             String msg = e.getMessage();
             MsgDialogUtil.showMsgDialog( msg );
             ErrorLogger.log(msg);
+        } finally {
+            if ( !isSuccess ) {
+                clientProxy.shutdown();
+            }
         }
 
         if ( status <= 0 ) {
@@ -304,39 +323,35 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 					);
 		} else {
 			registerUser(usrName, status);
-			showMainFrame();
+            showFrameAfterLogin();
 		}
 	}
 	
 	private void doExit() {
-        ClientProxy proxy = Application.getNioClientProxy();
-        if ( null != proxy ) {
-            proxy.shutdown();
-        }
+        clientProxy.shutdown();
 		System.exit(0);
 	}
-	
-	private void showMainFrame() {
-		thisFrame.setVisible(false);
-        AbstractFrame mainFrame = (AbstractFrame)
-                Application.getAttribute(COMPONENT.MAIN_FRAME);
 
-        mainFrame.display();
-        mainFrame.refresh();
+	private void showFrameAfterLogin() {
+		thisFrame.setVisible(false);
+
+        frameAfterLogin.display();
+        frameAfterLogin.refresh();
 	}
 	
 	private void registerUser(String userName, int status) {
-        Application.addAttribute( USER.USER_NUM, userName );
+        app.addAttribute( USER.USER_NUM, userName );
         if ( LOGIN.ROOT == status ) {
-            Application.addAttribute( USER.USER_RANK, USER.ROOT );
+            app.addAttribute( USER.USER_RANK, USER.ROOT );
         } else {
-            Application.addAttribute( USER.USER_RANK, USER.COMMON_USER );
+            app.addAttribute( USER.USER_RANK, USER.COMMON_USER );
         }
 
 		String loginMsg = LocaleUtil.getLocalName(LOGIN_MSG);
-        MsgTable msgTable = (MsgTable) Application.getAttribute(COMPONENT.MSG_TABLE);
+        MsgTable msgTable = (MsgTable) app.getAttribute(COMPONENT.MSG_TABLE);
         msgTable.addSysMsg( userName + loginMsg );
 	}
+
 
 	@Override
 	public void refresh() {

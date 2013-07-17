@@ -3,9 +3,8 @@ package com.bdcom.nio.server;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
-import com.bdcom.nio.ServerContent;
-import com.bdcom.pojo.Scenario;
-import com.bdcom.service.scenario.ScenarioMgr;
+import com.bdcom.biz.pojo.Scenario;
+import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.util.SerializeUtil;
 
 import java.io.IOException;
@@ -16,11 +15,11 @@ import java.io.IOException;
  * Date: 13-7-11    <br/>
  * Time: 17:31  <br/>
  */
-public class ScenarioDownloadHandler extends CommonHandler {
+public class ScenarioDownloadHandler extends ScenarioHandler {
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
         int requestID = bdPacket.getRequestID();
-        ScenarioMgr scenarioMgr = ServerContent.getScenarioMgr();
+        ScenarioMgr scenarioMgr = getScenarioMgr();
         BDPacket response = null;
         if (DataType.STRING == bdPacket.getDataType() ) {
             String name = new String(bdPacket.getData());
@@ -58,4 +57,5 @@ public class ScenarioDownloadHandler extends CommonHandler {
 
         return response;
     }
+
 }

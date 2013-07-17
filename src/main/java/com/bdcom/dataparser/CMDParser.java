@@ -1,12 +1,14 @@
 package com.bdcom.dataparser;
 
 import com.bdcom.datadispacher.DataSender;
-import com.bdcom.datadispacher.ServerInfo;
+import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
 import com.bdcom.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
-import com.bdcom.pojo.BaseTestRecord;
-import com.bdcom.service.AppSession;
+import com.bdcom.biz.pojo.BaseTestRecord;
+import com.bdcom.sys.AppSession;
+import com.bdcom.sys.gui.Application;
+import com.bdcom.sys.config.PathConfig;
 import com.bdcom.util.SerializeUtil;
 import org.jargp.*;
 
@@ -85,10 +87,10 @@ public class CMDParser {
 	}
 
     private static void commitRecord(BaseTestRecord record) {
-        ClientProxy client = new ClientProxy(
-                ServerInfo.getIpAddrStr(),
-                ServerInfo.getPort()
-        );
+        PathConfig pathConfig = new PathConfig(Application.CURRENT_DIR);
+        ServerConfig serverConfig = new ServerConfig( pathConfig );
+
+        ClientProxy client = new ClientProxy(serverConfig);
 
         int status = 0;
         try {

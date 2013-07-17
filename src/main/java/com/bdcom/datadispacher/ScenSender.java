@@ -1,6 +1,6 @@
 package com.bdcom.datadispacher;
 
-import com.bdcom.service.ConfigPath;
+import com.bdcom.sys.ConfigPath;
 
 import java.io.*;
 import java.net.InetAddress;

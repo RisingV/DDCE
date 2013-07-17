@@ -16,6 +16,8 @@ public interface DataType {
 
     public static final int FILE = 3;
 
+    public static final int MAP = 4;
+
     public static final int LOGIN_AUTH = 10;
 
     public static final int BASE_TEST_RECORD = 11;

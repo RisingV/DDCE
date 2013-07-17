@@ -5,8 +5,8 @@ import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
 import com.bdcom.nio.RequestID;
-import com.bdcom.pojo.Scenario;
-import com.bdcom.service.scenario.ScenarioMgr;
+import com.bdcom.biz.pojo.Scenario;
+import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.util.SerializeUtil;
 

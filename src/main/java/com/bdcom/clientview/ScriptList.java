@@ -1,9 +1,9 @@
 package com.bdcom.clientview;
 
 import com.bdcom.clientview.util.GBC;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
-import com.bdcom.service.script.ScriptMgr;
+import com.bdcom.sys.Applicable;
+import com.bdcom.sys.ApplicationConstants;
+import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.StringUtil;
 
@@ -25,9 +25,6 @@ import java.util.List;
 
 public class ScriptList extends JPanel implements ViewTab, ApplicationConstants {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2938062870489203264L;
 
 	private JTable table;
@@ -37,8 +34,11 @@ public class ScriptList extends JPanel implements ViewTab, ApplicationConstants 
 	private JScrollPane span;
 	
 	private JButton refBt;
+
+    private Applicable app;
 	
-	public ScriptList() {
+	public ScriptList(Applicable app) {
+        this.app = app;
 		model = new TableModel();
 		table = new JTable(model);
 		table.setBackground(Color.white);
@@ -67,7 +67,7 @@ public class ScriptList extends JPanel implements ViewTab, ApplicationConstants 
 	public void refresh() {
 		clearAll();
         ScriptMgr scriptMgr =
-                (ScriptMgr) Application.getAttribute(COMPONENT.SCRIPT_MGR);
+                (ScriptMgr) app.getAttribute(COMPONENT.SCRIPT_MGR);
         Set<String> set = scriptMgr.indexingSerials("");
 		List<String> list = new ArrayList<String>();
 		if ( null != set && !set.isEmpty()) {

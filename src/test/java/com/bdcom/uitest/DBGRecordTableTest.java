@@ -1,8 +1,5 @@
 package com.bdcom.uitest;
 
-import com.bdcom.clientview.DebugRecordTable;
-import com.bdcom.pojo.BaseTestRecordForDebug;
-
 /**
  * @author francis yuan <br>
  * E-mail: yuanjiajun@bdcom.com.cn <br>
@@ -12,33 +9,34 @@ import com.bdcom.pojo.BaseTestRecordForDebug;
 
 public class DBGRecordTableTest {
 
-	private DebugRecordTable dbgTable;
+//	private DebugRecordTable dbgTable;
+//
+//	private BaseTestRecordForDebug[] dbgArray;
+//
+//	public DBGRecordTableTest() {
+//		dbgTable = new DebugRecordTable(Application.instance);
+//		dbgArray = new BaseTestRecordForDebug[2];
+//		BaseTestRecordForDebug dbg1 = new BaseTestRecordForDebug();
+//		BaseTestRecordForDebug dbg2 = new BaseTestRecordForDebug();
+//		dbg1.setSerialNumber("123456");
+//		dbg2.setSerialNumber("654321");
+//		dbg1.setRandomID("abcdefg");
+//		dbg2.setRandomID("hijklmn");
+//
+//		dbgArray[0] = dbg1;
+//		dbgArray[1] = dbg2;
+//	}
+//
+//	public void display() {
+//		dbgTable.addRow(dbgArray[0]);
+//		dbgTable.addRow(dbgArray[1]);
+//		dbgTable.pack();
+//		dbgTable.setVisible(true);
+//	}
 	
-	private BaseTestRecordForDebug[] dbgArray;
-	
-	public DBGRecordTableTest() {
-		dbgTable = new DebugRecordTable();
-		dbgArray = new BaseTestRecordForDebug[2];
-		BaseTestRecordForDebug dbg1 = new BaseTestRecordForDebug();
-		BaseTestRecordForDebug dbg2 = new BaseTestRecordForDebug();
-		dbg1.setSerialNumber("123456");
-		dbg2.setSerialNumber("654321");
-		dbg1.setRandomID("abcdefg");
-		dbg2.setRandomID("hijklmn");
-		
-		dbgArray[0] = dbg1;
-		dbgArray[1] = dbg2;
-	}
-	
-	public void display() {
-		dbgTable.addRow(dbgArray[0]); 
-		dbgTable.addRow(dbgArray[1]); 
-		dbgTable.pack();
-		dbgTable.setVisible(true);
-	}
-	
-	public static void main(String[] args) {
-		DBGRecordTableTest dtt = new DBGRecordTableTest();
-		dtt.display();
-	}
+//	public static void main(String[] args) {
+//		DBGRecordTableTest dtt = new DBGRecordTableTest();
+//		dtt.display();
+//	}
+
 }

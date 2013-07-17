@@ -4,7 +4,7 @@ import com.bdcom.nio.ServerContent;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
-import com.bdcom.pojo.LoginAuth;
+import com.bdcom.biz.pojo.LoginAuth;
 import com.bdcom.util.SerializeUtil;
 
 import java.io.IOException;

@@ -1,5 +1,6 @@
 package com.bdcom.nio.client;
 
+import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.nio.BDPacket;
 import naga.NIOService;
@@ -19,10 +20,9 @@ import java.util.concurrent.LinkedBlockingDeque;
  * Date: 13-7-4
  * Time: 14:04
  */
-public class NIOClient {
+public class NIOClient implements ClientPackChan {
 
-    private final String host;
-    private final int port;
+    private final ServerConfig serverConfig;
 
     private NIOService nioService;
     private NIOSocket nioSocket;
@@ -33,11 +33,14 @@ public class NIOClient {
     private RollingDaemon rollingDaemon;
     private boolean started = false;
 
-    public NIOClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public NIOClient(ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
         inChan = new LinkedBlockingDeque<BDPacket>();
         outChan = new LinkedBlockingDeque<BDPacket>();
+    }
+
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 
     public void sendPacket(BDPacket packet) {
@@ -49,6 +52,9 @@ public class NIOClient {
     }
 
     private void init() throws IOException {
+
+        String host = serverConfig.getIpAddrStr();
+        int port = serverConfig.getPort();
 
         nioService = new NIOService();
         nioSocket = nioService.openSocket( host, port );

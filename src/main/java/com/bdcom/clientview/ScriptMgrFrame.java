@@ -1,16 +1,16 @@
 package com.bdcom.clientview;
 
+import com.bdcom.biz.scenario.ScenarioMgr;
+import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.clientview.util.*;
 import com.bdcom.datadispacher.CommunicateStatus;
 import com.bdcom.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
-import com.bdcom.service.scenario.ScenarioMgr;
-import com.bdcom.util.log.ErrorLogger;
-import com.bdcom.service.script.ScriptMgr;
+import com.bdcom.sys.ApplicationConstants;
+import com.bdcom.sys.gui.GuiInterface;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.StringUtil;
+import com.bdcom.util.log.ErrorLogger;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -110,19 +110,16 @@ public class ScriptMgrFrame extends JPanel
     private ScriptMgr scriptMgr;
 
     private MsgTable msgTable;
-	
-//	public static void main(String[] args) {
-//		ScriptMgrFrame scemf = new ScriptMgrFrame();
-//		JFrame frame = new JFrame();
-//		Container con = frame.getContentPane();
-//		con.add(scemf);
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		frame.setResizable(false);
-//		frame.pack();
-//		frame.setVisible(true);
-//	}
-	
-	public ScriptMgrFrame() {
+
+    private GuiInterface app;
+
+    private ClientProxy clientProxy;
+
+	public ScriptMgrFrame( ClientProxy clientProxy, GuiInterface app) {
+
+        this.clientProxy = clientProxy;
+        this.app = app;
+
 		init();
 	}
 	
@@ -138,8 +135,8 @@ public class ScriptMgrFrame extends JPanel
 	}
 
     private void initGlobalCompo() {
-        scriptMgr = (ScriptMgr) Application.getAttribute(COMPONENT.SCRIPT_MGR);
-        msgTable = (MsgTable) Application.getAttribute(COMPONENT.MSG_TABLE);
+        scriptMgr = (ScriptMgr) app.getAttribute(COMPONENT.SCRIPT_MGR);
+        msgTable = (MsgTable) app.getAttribute(COMPONENT.MSG_TABLE);
     }
 
 	private void initLayout() {
@@ -582,8 +579,7 @@ public class ScriptMgrFrame extends JPanel
                                             downloadSuccess = false;
                                         } finally {
                                             if ( downloadSuccess ) {
-                                                AbstractFrame mainFrame = (AbstractFrame)
-                                                        Application.getAttribute( COMPONENT.MAIN_FRAME );
+                                                AbstractFrame mainFrame = app.getFrame( COMPONENT.MAIN_FRAME );
                                                 mainFrame.refresh();
                                                 msg = getLocalName(_DOWNLD_DONE_SCRIPT);
                                                 MsgDialogUtil.showMsgDialog(msg);
@@ -684,7 +680,7 @@ public class ScriptMgrFrame extends JPanel
 								String path = scriptTextField.getText();
 								String beginIndex = beginIndexTextField.getText();
                                 ScenarioMgr scenarioMgr = (ScenarioMgr)
-                                        Application.getAttribute( COMPONENT.SCENARIO_MGR );
+                                        app.getAttribute( COMPONENT.SCENARIO_MGR );
 								
 								if ( !StringUtil.isNotBlank(serial) ) {
 									showMsgDialog(NULL_SERIAL);
@@ -784,13 +780,11 @@ public class ScriptMgrFrame extends JPanel
 	}
 
     private void uploadScriptConfig(ScriptMgr scriptMgr) throws IOException {
-        ClientProxy client = Application.getNioClientProxy();
-        client.uploadScriptConfig(scriptMgr);
+        clientProxy.uploadScriptConfig(scriptMgr);
     }
 
     private void downloadScriptConfig(ScriptMgr scriptMgr) throws IOException, ResponseException {
-        ClientProxy client = Application.getNioClientProxy();
-        client.downloadScriptConfig(scriptMgr);
+        clientProxy.downloadScriptConfig(scriptMgr);
     }
 	
 	private void showMsgDialog(String msg) {

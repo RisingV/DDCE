@@ -1,6 +1,6 @@
 package com.bdcom.datadispacher;
 
-import com.bdcom.service.AppSession;
+import com.bdcom.sys.AppSession;
 import com.bdcom.util.log.ErrorLogger;
 
 import java.io.BufferedReader;

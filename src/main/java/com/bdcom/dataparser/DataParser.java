@@ -1,6 +1,6 @@
 package com.bdcom.dataparser;
 
-import com.bdcom.pojo.BaseTestRecord;
+import com.bdcom.biz.pojo.BaseTestRecord;
 
 public interface DataParser {
 	

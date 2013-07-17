@@ -1,17 +1,17 @@
 package com.bdcom.clientview;
 
+import com.bdcom.biz.pojo.Scenario;
+import com.bdcom.biz.scenario.ScenarioMgr;
+import com.bdcom.biz.scenario.ScenarioUtil;
+import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.clientview.util.GBC;
 import com.bdcom.clientview.util.Hook;
 import com.bdcom.clientview.util.LimitedDocument;
 import com.bdcom.clientview.util.MsgDialogUtil;
 import com.bdcom.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
-import com.bdcom.pojo.Scenario;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
-import com.bdcom.service.scenario.ScenarioMgr;
-import com.bdcom.service.scenario.ScenarioUtil;
-import com.bdcom.service.script.ScriptMgr;
+import com.bdcom.sys.ApplicationConstants;
+import com.bdcom.sys.gui.GuiInterface;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.StringUtil;
 import com.bdcom.util.log.ErrorLogger;
@@ -96,25 +96,26 @@ public class ScenarioMgrFrame extends JPanel implements
     private ScenarioMgr scenarioMgr;
 
     private MsgTable msgTable;
-	
-	public static void main(String[] args) {
-		ScenarioMgrFrame scemf = new ScenarioMgrFrame();
-		JFrame frame = new JFrame();
-		Container con = frame.getContentPane();
-		con.add(scemf);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.pack();
-		frame.setVisible(true);
-	}
+
+    private final GuiInterface app;
+
+    private final ClientProxy clientProxy;
+
+    public ScenarioMgrFrame(ClientProxy clientProxy, GuiInterface app) {
+        this.clientProxy = clientProxy;
+        this.app = app;
+        initGlobalCompo();
+        composGeneralInit();
+        layoutGeneralInit();
+    }
 
     private void initGlobalCompo() {
         scenarioMgr = (ScenarioMgr)
-                Application.getAttribute(COMPONENT.SCENARIO_MGR);
+                app.getAttribute(COMPONENT.SCENARIO_MGR);
         scenarioMgr.reloadScenarios();
 
         msgTable = (MsgTable)
-                Application.getAttribute(COMPONENT.MSG_TABLE);
+                app.getAttribute(COMPONENT.MSG_TABLE);
     }
 	
 	public void setScenarioListRefreshHook(Hook scenarioListRefreshHook) {
@@ -128,12 +129,6 @@ public class ScenarioMgrFrame extends JPanel implements
 		return localScelistRefreshHook;
 	}
 
-	public ScenarioMgrFrame() {
-        initGlobalCompo();
-		composGeneralInit();
-		layoutGeneralInit();
-	}
-	
 	public void composGeneralInit() {
 		initPanels();
 		initCompoGroups();
@@ -660,8 +655,7 @@ public class ScenarioMgrFrame extends JPanel implements
                                         } finally {
                                             if ( downloadSuccess ) {
                                                 msg = getLocalName(_DOWNLD_DONE_SCE);
-                                                AbstractFrame mainFrame = (AbstractFrame)
-                                                        Application.getAttribute(COMPONENT.MAIN_FRAME);
+                                                AbstractFrame mainFrame = app.getFrame(COMPONENT.MAIN_FRAME);
                                                 mainFrame.refresh();
                                                 MsgDialogUtil.showMsgDialog(msg);
                                             } else {
@@ -723,7 +717,7 @@ public class ScenarioMgrFrame extends JPanel implements
 	
 	private boolean validationBeforeSaving() {
         ScriptMgr scriptMgr =
-                (ScriptMgr) Application.getAttribute(COMPONENT.SCRIPT_MGR);
+                (ScriptMgr) app.getAttribute(COMPONENT.SCRIPT_MGR);
 
 		if ( scenarioMgr.isScenarioNameReduplicated(currentSce) ) {
 			MsgDialogUtil.showErrorDialogLocalised(SCE_NAME_REDUPLICATED);
@@ -856,13 +850,11 @@ public class ScenarioMgrFrame extends JPanel implements
 	}
 
     private void uploadScenarios(ScenarioMgr scenarioMgr) throws IOException {
-        ClientProxy client = Application.getNioClientProxy();
-        client.uploadScenarios(scenarioMgr);
+        clientProxy.uploadScenarios(scenarioMgr);
     }
 
     private void downloadScenarios(ScenarioMgr scenarioMgr) throws IOException, ResponseException {
-        ClientProxy client = Application.getNioClientProxy();
-        client.downloadScenarios(scenarioMgr);
+        clientProxy.downloadScenarios(scenarioMgr);
     }
 
 	private void selectFocusedAttrBoxs(Scenario sce) {

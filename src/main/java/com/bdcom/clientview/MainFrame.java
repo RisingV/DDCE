@@ -3,8 +3,8 @@ package com.bdcom.clientview;
 import com.bdcom.clientview.util.Hook;
 import com.bdcom.clientview.util.ViewUtil;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
+import com.bdcom.sys.ApplicationConstants;
+import com.bdcom.sys.gui.GuiInterface;
 import com.bdcom.util.LocaleUtil;
 
 import javax.swing.*;
@@ -51,8 +51,12 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 	private JCheckBoxMenuItem debugRec;
 	
 	private JMenuItem logoutMi;
+
+    private final GuiInterface app;
 	
-	public MainFrame() {
+	public MainFrame(GuiInterface app) {
+        super(app);
+        this.app = app;
 		preInit();
 	}
 	
@@ -65,7 +69,6 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 	}
 
 	private void preInit() {
-		msgTable = new MsgTable();
 		mb = new JMenuBar();
 		menu = new JMenu(
 				LocaleUtil.getLocalName(_OTHER)
@@ -80,6 +83,8 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 				new ItemListener() {
 					@Override
 					public void itemStateChanged(ItemEvent e) {
+                        AbstractFrame msgTable =
+                                app.getFrame( COMPONENT.MSG_TABLE );
 						if ( cbmi.isSelected() ) {
 							msgTable.display();
 						} else {
@@ -92,7 +97,7 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 				new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-                        Application.logOut();
+                        app.logout();
 					}
 				}
 			);
@@ -119,11 +124,11 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 					JOptionPane.YES_NO_OPTION);
 			if ( ok == 0) {
 				thisFrame.setVisible( true );
-				if ( Application.getUserInfo().isSupervisor() ) {
+				if ( app.getUserInfo().isSupervisor() ) {
 					HttpClientWrapper.getInstance()
 						.clearDebugRecordsViaHttp();
 				}
-                Application.terminal();
+                app.terminal();
 			} else {
 				return;
 			}
@@ -153,7 +158,7 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 			}
 		}
 		
-		if ( null != rtabs && Application.getUserInfo().isSupervisor() ) {
+		if ( null != rtabs && app.getUserInfo().isSupervisor() ) {
 			for (ViewTab viewTab : rtabs ) {
 				mainPanel.addTab(
 						viewTab.getTabTitle(),
@@ -164,9 +169,9 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 			}
 		}
 		
-		if ( Application.getUserInfo().isSupervisor() ) {
+		if ( app.getUserInfo().isSupervisor() ) {
 			if ( null == drTable ) {
-				drTable = new DebugRecordTable();
+				drTable = new DebugRecordTable(app);
 				drTable.setImage(image);
 				drTable.addWindowListener(
 						new WindowAdapter() {

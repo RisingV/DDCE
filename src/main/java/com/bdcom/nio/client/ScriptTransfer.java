@@ -6,7 +6,7 @@ import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
 import com.bdcom.nio.RequestID;
 import com.bdcom.util.log.ErrorLogger;
-import com.bdcom.service.script.ScriptMgr;
+import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.util.SerializeUtil;
 
 import java.io.File;

@@ -1,9 +1,9 @@
 package com.bdcom.clientview;
 
 import com.bdcom.clientview.util.MessageUtil;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
-import com.bdcom.service.script.ScriptExecutor;
+import com.bdcom.sys.Applicable;
+import com.bdcom.sys.ApplicationConstants;
+import com.bdcom.biz.script.ScriptExecutor;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.util.log.MsgLogger;
@@ -43,23 +43,18 @@ public class MsgTable extends JFrame implements ApplicationConstants {
 	private JScrollPane span;
 	
 	private Thread listener;
+
+    private final Applicable app;
 	
-	public MsgTable() {
+	public MsgTable(Applicable app) {
+        this.app = app;
 		init();
 	}
 	
 	public void setImage(Image image) {
 		this.image = image;
 	}
-	
-//	public static void main(String[] args) {
-//		MsgTable mt = new MsgTable();
-//		for (int i=89; i > 0; i--) {
-//			mt.addSysMsg("test message! num"+i);
-//		}
-//		mt.display();
-//	}
-	
+
 	private void init() {
 		this.setTitle(
 				LocaleUtil.getLocalName(MSG_LIST)
@@ -89,7 +84,7 @@ public class MsgTable extends JFrame implements ApplicationConstants {
 		
 		StringBuffer sb = new StringBuffer();
 
-        String testerNum = Application.getStringAttr(USER.USER_NUM);
+        String testerNum = app.getStringAttr(USER.USER_NUM);
 		sb.append(testerNum)
 		  .append(_TAB)
 		  .append(msgType)
@@ -106,7 +101,7 @@ public class MsgTable extends JFrame implements ApplicationConstants {
 		String msgType = LocaleUtil.getLocalName(_ERROR);
 		addMsg(msgType, msg, time);
 
-        String testerNum = Application.getStringAttr(USER.USER_NUM);
+        String testerNum = app.getStringAttr(USER.USER_NUM);
 		StringBuffer sb = new StringBuffer();
 		sb.append(testerNum)
 		  .append(_TAB)
@@ -134,7 +129,7 @@ public class MsgTable extends JFrame implements ApplicationConstants {
 		Date time = new Date();
 		addMsg(msgType, msg, time);
 
-        String testerNum = Application.getStringAttr(USER.USER_NUM);
+        String testerNum = app.getStringAttr(USER.USER_NUM);
 		StringBuffer sb = new StringBuffer();
 		sb.append(testerNum)
 		  .append(_TAB)
@@ -158,7 +153,7 @@ public class MsgTable extends JFrame implements ApplicationConstants {
 							int timecounter = 0;
 							while ( true ) {
                                 ScriptExecutor scriptExecutor = (ScriptExecutor)
-                                        Application.getAttribute( COMPONENT.SCRIPT_EXECUTOR );
+                                        app.getAttribute( COMPONENT.SCRIPT_EXECUTOR );
 								status = scriptExecutor.getSendResult();
 								if ( NO_RUNNING_SCRIPT == status ) {
 									try {

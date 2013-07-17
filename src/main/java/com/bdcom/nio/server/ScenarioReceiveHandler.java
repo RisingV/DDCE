@@ -3,8 +3,8 @@ package com.bdcom.nio.server;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.ServerContent;
-import com.bdcom.pojo.Scenario;
-import com.bdcom.service.scenario.ScenarioMgr;
+import com.bdcom.biz.pojo.Scenario;
+import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.util.SerializeUtil;
 
 import java.io.IOException;
@@ -15,9 +15,7 @@ import java.io.IOException;
  * Date: 13-7-11    <br/>
  * Time: 15:34  <br/>
  */
-public class ScenarioReceiveHandler extends CommonHandler {
-
-    private static byte[] lock = new byte[0];
+public class ScenarioReceiveHandler extends ScenarioHandler {
 
     private static ScenarioMgr scenarioMgr;
 
@@ -44,12 +42,8 @@ public class ScenarioReceiveHandler extends CommonHandler {
     }
 
     private void save(Scenario scenario) {
-        synchronized ( lock ) {
-            if ( null == scenarioMgr ) {
-                scenarioMgr = ServerContent.getScenarioMgr();
-                scenarioMgr.reloadScenarios();
-            }
-            scenarioMgr.addScenario(scenario);
+        synchronized ( ServerContent.GLOBAL_LOCK0) {
+            getScenarioMgr().addScenario(scenario);
         }
     }
 

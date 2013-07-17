@@ -1,9 +1,13 @@
 package com.bdcom.nio;
 
-import com.bdcom.pojo.BaseTestRecord;
-import com.bdcom.pojo.ITesterRecord;
-import com.bdcom.pojo.LoginAuth;
-import com.bdcom.service.scenario.ScenarioMgr;
+import com.bdcom.biz.pojo.BaseTestRecord;
+import com.bdcom.biz.pojo.ITesterRecord;
+import com.bdcom.biz.pojo.LoginAuth;
+import com.bdcom.sys.config.PathConfig;
+
+import java.io.File;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,7 +17,30 @@ import com.bdcom.service.scenario.ScenarioMgr;
  */
 public abstract class ServerContent {
 
-    private static ScenarioMgr scenarioMgr;
+    public static final byte[] GLOBAL_LOCK0 = new byte[0];
+    public static final byte[] GLOBAL_LOCK1 = new byte[0];
+
+    public static final String BASE_TEST = System.getProperty( "user.dir" )
+            + File.separator + "Base_Test_Storage";
+
+    private static Map<String, Object> content = new ConcurrentHashMap<String, Object>();
+
+    private static PathConfig pathConfig;
+
+    public synchronized static PathConfig getPathConfig() {
+       if ( null == pathConfig ) {
+           pathConfig = new PathConfig(BASE_TEST);
+       }
+       return pathConfig;
+    }
+
+    public static void addContent(String name, Object obj) {
+        content.put(name, obj);
+    }
+
+    public static Object getContent(String name) {
+        return content.get( name );
+    }
 
     public static int getNIOServerPort() {
         //TODO
@@ -38,18 +65,6 @@ public abstract class ServerContent {
     public static int SaveITesterRecord(ITesterRecord record) {
         //TODO
         return 1;
-    }
-
-    public static ScenarioMgr getScenarioMgr() {
-        if ( null == scenarioMgr ) {
-            synchronized ( ServerContent.class ) {
-                if ( null == scenarioMgr ) {
-                    scenarioMgr = new ScenarioMgr();
-                    scenarioMgr.reloadScenarios();
-                }
-            }
-        }
-        return scenarioMgr;
     }
 
 }

@@ -2,9 +2,9 @@ package com.bdcom.clientview;
 
 import com.bdcom.clientview.util.MsgDialogUtil;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
-import com.bdcom.pojo.BaseTestRecordForDebug;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
+import com.bdcom.biz.pojo.BaseTestRecordForDebug;
+import com.bdcom.sys.Applicable;
+import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.util.LocaleUtil;
 
 import javax.swing.*;
@@ -42,8 +42,11 @@ public class DebugRecordTable extends JFrame implements ApplicationConstants {
 	private JButton delBt;
 	
 	private HttpClientWrapper httpClient;
+
+    private final Applicable app;
 	
-	public DebugRecordTable() {
+	public DebugRecordTable(Applicable app) {
+        this.app = app;
 		model = new TableModel();
 		table = new JTable(model);
 		table.setBackground(Color.white);
@@ -97,7 +100,7 @@ public class DebugRecordTable extends JFrame implements ApplicationConstants {
 
                     @SuppressWarnings("unchecked")
                     Set<String> serialNumSet =
-                            (Set<String>) Application.getAttribute(CONTENT.SERIAL_NUM_SET);
+                            (Set<String>) app.getAttribute(CONTENT.SERIAL_NUM_SET);
                     if ( null == serialNumSet || serialNumSet.isEmpty() ) {
 						MsgDialogUtil.showMsgDialogLocalised(null, NO_DBG_DATA);
 						return;	
@@ -143,7 +146,7 @@ public class DebugRecordTable extends JFrame implements ApplicationConstants {
 							} else {
                                 @SuppressWarnings("unchecked")
                                 Set<String> serialNumSet =
-                                        (Set<String>) Application.getAttribute(CONTENT.SERIAL_NUM_SET);
+                                        (Set<String>) app.getAttribute(CONTENT.SERIAL_NUM_SET);
 								if ( null == serialNumSet || serialNumSet.isEmpty() ) {
 									return;	
 								} else {

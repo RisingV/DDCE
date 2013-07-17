@@ -1,5 +1,6 @@
 package com.bdcom.nio.client;
 
+import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.util.log.ErrorLogger;
@@ -28,8 +29,8 @@ public class ClientWrapper {
 
     private boolean isRunning = false;
 
-    public ClientWrapper(String ip, int port) {
-        client = new NIOClient(ip, port);
+    public ClientWrapper(ServerConfig serverConfig) {
+        client = new NIOClient(serverConfig);
         responseContainer = new ConcurrentHashMap<Integer, BlockingQueue<BDPacket>>();
         restartSortingThreadHook = new Hook() {
             @Override
@@ -39,6 +40,10 @@ public class ClientWrapper {
                 st.start();
             }
         };
+    }
+
+    public ServerConfig getServerConfig() {
+        return client.getServerConfig();
     }
 
     public BDPacket send(BDPacket packet) throws InterruptedException, IOException {

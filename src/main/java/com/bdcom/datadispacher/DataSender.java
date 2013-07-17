@@ -1,9 +1,9 @@
 package com.bdcom.datadispacher;
 
 import com.bdcom.util.log.ErrorLogger;
-import com.bdcom.pojo.BaseTestRecord;
-import com.bdcom.pojo.LoginAuth;
-import com.bdcom.service.AppSession;
+import com.bdcom.biz.pojo.BaseTestRecord;
+import com.bdcom.biz.pojo.LoginAuth;
+import com.bdcom.sys.AppSession;
 import com.bdcom.util.StringUtil;
 
 import java.io.BufferedReader;

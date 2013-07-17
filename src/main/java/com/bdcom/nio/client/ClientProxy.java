@@ -1,16 +1,17 @@
 package com.bdcom.nio.client;
 
+import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.exception.LoginException;
 import com.bdcom.exception.ResponseException;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.RequestID;
-import com.bdcom.pojo.BaseTestRecord;
-import com.bdcom.pojo.ITesterRecord;
-import com.bdcom.pojo.LoginAuth;
-import com.bdcom.service.scenario.ScenarioMgr;
+import com.bdcom.biz.pojo.BaseTestRecord;
+import com.bdcom.biz.pojo.ITesterRecord;
+import com.bdcom.biz.pojo.LoginAuth;
+import com.bdcom.biz.scenario.ScenarioMgr;
+import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.util.log.ErrorLogger;
-import com.bdcom.service.script.ScriptMgr;
 
 import java.io.IOException;
 
@@ -28,10 +29,14 @@ public class ClientProxy {
 
     ScriptTransfer scriptTransfer;
 
-    public ClientProxy(String ip, int port) {
-        client = new ClientWrapper(ip, port);
+    public ClientProxy(ServerConfig serverConfig) {
+        client = new ClientWrapper(serverConfig);
         scenarioTransfer = new ScenarioTransfer(client);
         scriptTransfer = new ScriptTransfer(client);
+    }
+
+    public ServerConfig getServerConfig() {
+        return client.getServerConfig();
     }
 
     public BDPacket sendRawPacket(BDPacket packet) throws IOException, InterruptedException {

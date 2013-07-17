@@ -1,9 +1,9 @@
 package com.bdcom.datadispacher;
 
-import com.bdcom.pojo.Scenario;
+import com.bdcom.biz.pojo.Scenario;
 import com.bdcom.util.log.ErrorLogger;
-import com.bdcom.service.AppSession;
-import com.bdcom.service.scenario.ScenarioUtil;
+import com.bdcom.sys.AppSession;
+import com.bdcom.biz.scenario.ScenarioUtil;
 import com.bdcom.util.StringUtil;
 
 import java.io.BufferedReader;

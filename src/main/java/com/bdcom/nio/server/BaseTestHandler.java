@@ -4,7 +4,7 @@ import com.bdcom.nio.ServerContent;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
-import com.bdcom.pojo.BaseTestRecord;
+import com.bdcom.biz.pojo.BaseTestRecord;
 import com.bdcom.util.SerializeUtil;
 
 import java.io.IOException;

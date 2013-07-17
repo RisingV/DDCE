@@ -1,8 +1,8 @@
 package com.bdcom.clientview;
 
 import com.bdcom.clientview.util.ViewUtil;
-import com.bdcom.service.Application;
-import com.bdcom.service.ApplicationConstants;
+import com.bdcom.sys.Applicable;
+import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.log.ErrorLogger;
 
@@ -32,12 +32,12 @@ public class ViewManager implements ApplicationConstants {
 	
 	private ScriptList scriptListTab;
 
-	public ViewManager() {
-		long ms = System.currentTimeMillis();
+    private final Applicable app;
+
+	public ViewManager( Applicable app ) {
+        this.app = app;
 		setLookAndFeel();
 		init();
-		long ms2 = System.currentTimeMillis();
-		System.out.println("UI init time(ms):" + (ms2 - ms) );
 	}
 	
 	public void display() {
@@ -124,7 +124,7 @@ public class ViewManager implements ApplicationConstants {
 	}
 
     private Object getCompo(String name) {
-        return Application.getAttribute( name );
+        return app.getAttribute( name );
     }
 	
 }
