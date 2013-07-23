@@ -1,7 +1,7 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
-import com.bdcom.clientview.util.Hook;
-import com.bdcom.clientview.util.ViewUtil;
+import com.bdcom.view.util.Hook;
+import com.bdcom.view.util.ViewUtil;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.sys.gui.GuiInterface;
@@ -69,6 +69,8 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 	}
 
 	private void preInit() {
+        msgTable = (MsgTable) app.getAttribute( COMPONENT.MSG_TABLE );
+
 		mb = new JMenuBar();
 		menu = new JMenu(
 				LocaleUtil.getLocalName(_OTHER)

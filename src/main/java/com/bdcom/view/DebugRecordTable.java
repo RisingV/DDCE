@@ -1,6 +1,6 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
-import com.bdcom.clientview.util.MsgDialogUtil;
+import com.bdcom.view.util.MsgDialogUtil;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
 import com.bdcom.biz.pojo.BaseTestRecordForDebug;
 import com.bdcom.sys.Applicable;
@@ -26,9 +26,7 @@ import java.util.Vector;
 public class DebugRecordTable extends JFrame implements ApplicationConstants {
 
 	private static final long serialVersionUID = -100242882200232794L;
-	
-//	private JFrame thisFrame = this;
-	
+
 	private Image image;
 
 	private JTable table;

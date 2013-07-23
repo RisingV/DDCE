@@ -1,4 +1,4 @@
-package com.bdcom.clientview.util;
+package com.bdcom.view.util;
 
 import com.bdcom.util.log.ErrorLogger;
 

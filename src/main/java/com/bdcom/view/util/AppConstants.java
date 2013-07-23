@@ -1,4 +1,4 @@
-package com.bdcom.clientview.util;
+package com.bdcom.view.util;
 
 /**
  * @author francis yuan <br>

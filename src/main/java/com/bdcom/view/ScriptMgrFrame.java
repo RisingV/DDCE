@@ -1,8 +1,8 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
 import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.script.ScriptMgr;
-import com.bdcom.clientview.util.*;
+import com.bdcom.view.util.*;
 import com.bdcom.datadispacher.CommunicateStatus;
 import com.bdcom.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
@@ -109,8 +109,6 @@ public class ScriptMgrFrame extends JPanel
 
     private ScriptMgr scriptMgr;
 
-    private MsgTable msgTable;
-
     private GuiInterface app;
 
     private ClientProxy clientProxy;
@@ -136,7 +134,6 @@ public class ScriptMgrFrame extends JPanel
 
     private void initGlobalCompo() {
         scriptMgr = (ScriptMgr) app.getAttribute(COMPONENT.SCRIPT_MGR);
-        msgTable = (MsgTable) app.getAttribute(COMPONENT.MSG_TABLE);
     }
 
 	private void initLayout() {
@@ -538,7 +535,7 @@ public class ScriptMgrFrame extends JPanel
                                             uploadBt.setText(
                                                     getLocalName(_UPLOAD)
                                             );
-                                            msgTable.addSysMsg(msg);
+                                            getMsgTable().addSysMsg(msg);
                                         }
 									}
 								}	
@@ -590,7 +587,7 @@ public class ScriptMgrFrame extends JPanel
                                             downldBt.setText(
                                                     getLocalName(_DOWNLD)
                                             );
-                                            msgTable.addSysMsg(msg);
+                                            getMsgTable().addSysMsg(msg);
                                         }
 									}
 								}	
@@ -785,6 +782,10 @@ public class ScriptMgrFrame extends JPanel
 
     private void downloadScriptConfig(ScriptMgr scriptMgr) throws IOException, ResponseException {
         clientProxy.downloadScriptConfig(scriptMgr);
+    }
+
+    private MsgTable getMsgTable() {
+        return (MsgTable) app.getFrame( COMPONENT.MSG_TABLE );
     }
 	
 	private void showMsgDialog(String msg) {

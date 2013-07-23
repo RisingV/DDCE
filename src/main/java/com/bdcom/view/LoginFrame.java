@@ -1,9 +1,9 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
 import com.bdcom.biz.pojo.LoginAuth;
-import com.bdcom.clientview.util.GBC;
-import com.bdcom.clientview.util.MessageUtil;
-import com.bdcom.clientview.util.MsgDialogUtil;
+import com.bdcom.view.util.GBC;
+import com.bdcom.view.util.MessageUtil;
+import com.bdcom.view.util.MsgDialogUtil;
 import com.bdcom.exception.LoginException;
 import com.bdcom.nio.client.ClientProxy;
 import com.bdcom.sys.ApplicationConstants;
@@ -19,8 +19,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-import static com.bdcom.clientview.util.Messages.BLANK_PASSWD;
-import static com.bdcom.clientview.util.Messages.BLANK_USR_NAME;
+import static com.bdcom.view.util.Messages.BLANK_PASSWD;
+import static com.bdcom.view.util.Messages.BLANK_USR_NAME;
 
 /**
  * @author francis yuan <br>

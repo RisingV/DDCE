@@ -1,13 +1,13 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
 import com.bdcom.biz.pojo.Scenario;
 import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.scenario.ScenarioUtil;
 import com.bdcom.biz.script.ScriptMgr;
-import com.bdcom.clientview.util.GBC;
-import com.bdcom.clientview.util.Hook;
-import com.bdcom.clientview.util.LimitedDocument;
-import com.bdcom.clientview.util.MsgDialogUtil;
+import com.bdcom.view.util.GBC;
+import com.bdcom.view.util.Hook;
+import com.bdcom.view.util.LimitedDocument;
+import com.bdcom.view.util.MsgDialogUtil;
 import com.bdcom.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
 import com.bdcom.sys.ApplicationConstants;
@@ -95,8 +95,6 @@ public class ScenarioMgrFrame extends JPanel implements
 
     private ScenarioMgr scenarioMgr;
 
-    private MsgTable msgTable;
-
     private final GuiInterface app;
 
     private final ClientProxy clientProxy;
@@ -113,9 +111,12 @@ public class ScenarioMgrFrame extends JPanel implements
         scenarioMgr = (ScenarioMgr)
                 app.getAttribute(COMPONENT.SCENARIO_MGR);
         scenarioMgr.reloadScenarios();
+    }
 
-        msgTable = (MsgTable)
+    private MsgTable getMsgTable() {
+        MsgTable msgTable = (MsgTable)
                 app.getAttribute(COMPONENT.MSG_TABLE);
+        return msgTable;
     }
 	
 	public void setScenarioListRefreshHook(Hook scenarioListRefreshHook) {
@@ -610,7 +611,7 @@ public class ScenarioMgrFrame extends JPanel implements
                                             uploadBt.setText(
                                                     getLocalName(_UPLOAD)
                                             );
-                                            msgTable.addSysMsg(msg);
+                                            getMsgTable().addSysMsg(msg);
                                         }
 									}
 								}	
@@ -665,7 +666,7 @@ public class ScenarioMgrFrame extends JPanel implements
                                             downldBt.setText(
                                                     getLocalName(_DOWNLD)
                                             );
-                                            msgTable.addSysMsg(msg);
+                                            getMsgTable().addSysMsg(msg);
                                         }
 									}
 								}	

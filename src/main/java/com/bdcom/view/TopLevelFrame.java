@@ -1,4 +1,4 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
 import com.bdcom.sys.gui.GuiInterface;
 

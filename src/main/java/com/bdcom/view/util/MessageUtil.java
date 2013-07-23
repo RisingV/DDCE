@@ -1,7 +1,7 @@
-package com.bdcom.clientview.util;
+package com.bdcom.view.util;
 
 import static com.bdcom.datadispacher.CommunicateStatus.*;
-import static com.bdcom.clientview.util.Messages.*;
+import static com.bdcom.view.util.Messages.*;
 
 import java.util.HashMap;
 import java.util.Map;

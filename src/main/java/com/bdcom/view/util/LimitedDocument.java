@@ -1,4 +1,4 @@
-package com.bdcom.clientview.util;
+package com.bdcom.view.util;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;

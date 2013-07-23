@@ -1,4 +1,4 @@
-package com.bdcom.clientview.util;
+package com.bdcom.view.util;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;

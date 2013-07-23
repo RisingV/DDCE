@@ -1,6 +1,6 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
-import com.bdcom.clientview.util.ViewUtil;
+import com.bdcom.view.util.ViewUtil;
 import com.bdcom.sys.Applicable;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.util.LocaleUtil;
@@ -55,7 +55,7 @@ public class ViewManager implements ApplicationConstants {
 		loginFrame = (LoginFrame) getCompo(COMPONENT.LOGIN_FRAME);
 		smTab = (ScenarioMgrFrame) getCompo(COMPONENT.SCENARIO_MGR_FRAME);
 		submitTab = (SubmitFrame) getCompo(COMPONENT.SUBMIT_FRAME);
-		scmTab = (ScriptMgrFrame) getCompo(COMPONENT.SCENARIO_MGR_FRAME);
+		scmTab = (ScriptMgrFrame) getCompo(COMPONENT.SCRIPT_MGR_FRAME );
 		scriptListTab = (ScriptList) getCompo(COMPONENT.SCRIPT_LIST);
 		
 		smTab.setScenarioListRefreshHook(

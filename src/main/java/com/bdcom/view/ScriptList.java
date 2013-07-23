@@ -1,6 +1,6 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
-import com.bdcom.clientview.util.GBC;
+import com.bdcom.view.util.GBC;
 import com.bdcom.sys.Applicable;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.biz.script.ScriptMgr;

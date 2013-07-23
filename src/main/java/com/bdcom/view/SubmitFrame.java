@@ -1,4 +1,4 @@
-package com.bdcom.clientview;
+package com.bdcom.view;
 
 import com.bdcom.biz.pojo.BaseTestRecord;
 import com.bdcom.biz.pojo.Scenario;
@@ -6,10 +6,10 @@ import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.scenario.ScenarioUtil;
 import com.bdcom.biz.script.ScriptExecutor;
 import com.bdcom.biz.script.ScriptMgr;
-import com.bdcom.clientview.util.GBC;
-import com.bdcom.clientview.util.Hook;
-import com.bdcom.clientview.util.MessageUtil;
-import com.bdcom.clientview.util.MsgDialogUtil;
+import com.bdcom.view.util.GBC;
+import com.bdcom.view.util.Hook;
+import com.bdcom.view.util.MessageUtil;
+import com.bdcom.view.util.MsgDialogUtil;
 import com.bdcom.datadispacher.CommunicateStatus;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
 import com.bdcom.exception.ResponseException;
