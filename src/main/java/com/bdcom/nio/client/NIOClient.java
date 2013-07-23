@@ -1,15 +1,18 @@
 package com.bdcom.nio.client;
 
-import com.bdcom.sys.config.ServerConfig;
-import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.nio.BDPacket;
+import com.bdcom.nio.DataType;
+import com.bdcom.nio.RequestID;
+import com.bdcom.sys.config.ServerConfig;
+import com.bdcom.util.SerializeUtil;
+import com.bdcom.util.log.ErrorLogger;
+import com.bdcom.util.log.MsgLogger;
 import naga.NIOService;
 import naga.NIOSocket;
 import naga.SocketObserver;
 import naga.packetreader.RegularPacketReader;
 import naga.packetwriter.RegularPacketWriter;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -29,14 +32,21 @@ public class NIOClient implements ClientPackChan {
 
     private BlockingQueue<BDPacket> inChan;
     private BlockingQueue<BDPacket> outChan;
+    private ConnectionHandler connectionHandler;
 
     private RollingDaemon rollingDaemon;
+    private WritingDaemon writingDaemon;
+
     private boolean started = false;
+    private boolean rollingStarted = false;
+    private boolean writingStarted = false;
+
 
     public NIOClient(ServerConfig serverConfig) {
         this.serverConfig = serverConfig;
         inChan = new LinkedBlockingDeque<BDPacket>();
         outChan = new LinkedBlockingDeque<BDPacket>();
+        connectionHandler = new ConnectionHandler(inChan, outChan);
     }
 
     public ServerConfig getServerConfig() {
@@ -52,23 +62,25 @@ public class NIOClient implements ClientPackChan {
     }
 
     private void init() throws IOException {
-
         String host = serverConfig.getIpAddrStr();
         int port = serverConfig.getPort();
+
+        System.out.println("host:" +host);
+        System.out.println("port:" + port);
 
         nioService = new NIOService();
         nioSocket = nioService.openSocket( host, port );
 
-        nioSocket.setPacketReader(new RegularPacketReader(4, true));
-        nioSocket.setPacketWriter(new RegularPacketWriter(4, true));
+        nioSocket.setPacketReader( new RegularPacketReader(4, true) );
+        nioSocket.setPacketWriter( new RegularPacketWriter(4, true)) ;
 
-        nioSocket.listen( new ConnectionHandler(inChan, outChan) );
+        nioSocket.listen( connectionHandler );
     }
 
     public void start() throws IOException {
         if ( !started ) {
             init();
-            startClientDaemon(nioService);
+            startRollingDaemon(nioService);
             startWritingDaemon(nioSocket, inChan);
             started = true;
         }
@@ -76,37 +88,41 @@ public class NIOClient implements ClientPackChan {
 
     public void shutdown() {
         if ( started ) {
-             rollingDaemon.stopNIOService();
-            //nioSocket.close();
+            stopRollingDaemon();
+            stopWritingDaemon();
+            started = false;
         }
     }
 
-    private void startClientDaemon(final NIOService nioService) {
-        rollingDaemon = new RollingDaemon( nioService );
-        rollingDaemon.start();
+    private void startRollingDaemon(NIOService nioService) {
+        if ( !rollingStarted ) {
+            rollingDaemon = new RollingDaemon( nioService );
+            rollingDaemon.start();
+            rollingStarted = true;
+        }
     }
 
-    private void startWritingDaemon(final NIOSocket socket, final BlockingQueue<BDPacket> inChan) {
-        Thread writingThread = new Thread() {
-            {
-                setDaemon( true );
-            }
-            @Override
-            public void run() {
-                BDPacket pack0 = null;
-                try {
-                    while ( true ) {
-                        pack0 = inChan.take();
-                        socket.write( pack0.toBytes() );
-                    }
-                } catch (InterruptedException e) {
-                    ErrorLogger.log("InChan interrupted: " + e.getMessage());
-                } catch (IOException e) {
-                    ErrorLogger.log("NIOSocket write fail: " + e.getMessage());
-                }
-            }
-        };
-        writingThread.start();
+    private void startWritingDaemon(NIOSocket socket, BlockingQueue<BDPacket> inChan) {
+        if ( !writingStarted ) {
+            writingDaemon = new WritingDaemon(socket, inChan);
+            writingDaemon.start();
+            writingStarted = true;
+        }
+    }
+
+
+    private void stopRollingDaemon() {
+        if ( rollingStarted ) {
+            rollingDaemon.terminal();
+            rollingStarted = false;
+        }
+    }
+
+    private void stopWritingDaemon() {
+        if ( writingStarted ) {
+            writingDaemon.terminal();
+            writingStarted = false;
+        }
     }
 
 }
@@ -114,9 +130,9 @@ public class NIOClient implements ClientPackChan {
 
 class ConnectionHandler implements SocketObserver {
 
-    private final BlockingQueue<BDPacket> inChan;
+    private BlockingQueue<BDPacket> inChan;
 
-    private final BlockingQueue<BDPacket> outChan;
+    private BlockingQueue<BDPacket> outChan;
 
     ConnectionHandler(BlockingQueue<BDPacket> inChan, BlockingQueue<BDPacket> outChan) {
         this.inChan = inChan;
@@ -130,26 +146,29 @@ class ConnectionHandler implements SocketObserver {
 
     @Override
     public void connectionBroken(NIOSocket nioSocket, Exception e) {
-        StringBuilder sb = new StringBuilder();
-        String proID =System.getProperty("nio.process");
-        sb.append("ProcessID: ").append(proID).append(" ");
+        //if server is closed. e will be EOFException!
         if ( null == e ) {
+            StringBuilder sb = new StringBuilder();
             sb.append( "Client: " )
               .append(nioSocket)
               .append(" exit normally!");
-            System.out.println( sb.toString() );
-        } else if ( e instanceof EOFException ) {
-            sb.append( "Client: ")
-                    .append( nioSocket )
-                    .append("reach EOF!");
-            System.out.println(sb.toString());
+            MsgLogger.log(sb.toString());
         } else {
-            sb.append( "Connection [ " )
-              .append( nioSocket )
-              .append( " ] has broken! due to: ")
-              .append( e.getMessage() );
-            ErrorLogger.log(sb.toString());
+            byte[] data = null;
+            try {
+                data = SerializeUtil.serializeToByteArray( e );
+            } catch (IOException e1 ) {
+                ErrorLogger.log(
+                        "IOException when broadcast connection broken exception:"
+                                + e.getMessage() );
+            }
+            BDPacket pack = BDPacket.newPacket( RequestID.BROADCAST );
+            pack.setDataType( DataType.GLOBAL_EXCEPTION );
+            pack.setData( data );
+
+            outChan.add( pack );
         }
+
     }
 
     @Override
@@ -164,15 +183,45 @@ class ConnectionHandler implements SocketObserver {
 
     @Override
     public void packetSent(NIOSocket socket, Object tag) {
-        String proID =System.getProperty("nio.process");
-        System.out.println("ProcessID: " +proID + " packet sent from client: " + socket );
+        System.out.println(" packet sent from client: " + socket );
+    }
+}
+
+class WritingDaemon extends Thread {
+    private NIOSocket socket;
+    private BlockingQueue<BDPacket> inChan;
+    private boolean keepOn = true;
+
+    WritingDaemon(NIOSocket socket, BlockingQueue<BDPacket> inChan ) {
+        this.socket = socket;
+        this.inChan = inChan;
+        setDaemon( true );
+    }
+
+    @Override
+    public void run() {
+        BDPacket pack0 = null;
+        try {
+            while ( keepOn ) {
+                pack0 = inChan.take();
+                socket.write( pack0.toBytes() );
+            }
+        } catch (InterruptedException e) {
+            ErrorLogger.log("InChan interrupted: " + e.getMessage());
+        } catch (IOException e) {
+            ErrorLogger.log("NIOSocket write fail: " + e.getMessage());
+        }
+    }
+
+    public void terminal() {
+        keepOn = false;
     }
 }
 
 class RollingDaemon extends Thread {
 
     private final NIOService nioService;
-    private boolean keepON = true;
+    private boolean keepOn = true;
 
     public RollingDaemon(NIOService nioService) {
         this.nioService = nioService;
@@ -181,7 +230,7 @@ class RollingDaemon extends Thread {
 
     @Override
     public void run() {
-        while( keepON ) {
+        while( keepOn ) {
             try {
                 nioService.selectBlocking();
             } catch (IOException e) {
@@ -190,8 +239,9 @@ class RollingDaemon extends Thread {
         }
     }
 
-    public void stopNIOService() {
-        keepON = false;
+    public void terminal() {
+        keepOn = false;
     }
 
 }
+

@@ -31,9 +31,11 @@ public class ServerStarter implements Runnable {
                 put( RequestID.UPLOAD_SCENARIO, new ScenarioReceiveHandler() );
                 put( RequestID.GET_SCENARIO_NAME_LIST, new ScenarioNameListHandler() );
                 put( RequestID.DOWNLOAD_SCENARIO, new ScenarioDownloadHandler() );
+                put( RequestID.DELETE_BACKUP_SCENARIOS, new ScenarioDeleteHandler() );
                 put( RequestID.UPLOAD_SCRIPT, new ScriptReceiveHandler() );
                 put( RequestID.GET_SCRIPT_FILE_LIST, new ScriptFileListHandler() );
                 put( RequestID.DOWNLOAD_SCRIPT, new ScriptDownloadHandler() );
+                put( RequestID.DELETE_BACKUP_SCRIPTS, new ScriptDeleteHandler() );
                 put( RequestID.ECHO, new EchoHandler() );
                 put( RequestID.TERMINAL, new TerminalHandler() );
             }

@@ -1,18 +1,18 @@
 package com.bdcom.nio.client;
 
-import com.bdcom.exception.ResponseException;
+import com.bdcom.biz.pojo.Scenario;
+import com.bdcom.biz.scenario.ScenarioMgr;
+import com.bdcom.nio.exception.GlobalException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
 import com.bdcom.nio.RequestID;
-import com.bdcom.biz.pojo.Scenario;
-import com.bdcom.biz.scenario.ScenarioMgr;
-import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.util.SerializeUtil;
+import com.bdcom.util.log.ErrorLogger;
 
 import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -28,28 +28,41 @@ public class ScenarioTransfer {
         this.client = client;
     }
 
-    public void upload(ScenarioMgr scenarioMgr) throws IOException {
+    public void upload(ScenarioMgr scenarioMgr) throws IOException, GlobalException {
         Set<String> nameSet = scenarioMgr.getScenarioNameList();
-        BlockingQueue<BDPacket> responseQueue = null;
+        if ( null == nameSet || nameSet.isEmpty() ) {
+            return;
+        }
+
+        try {
+            deleteBackupOnServer();
+        } catch (InterruptedException e) {
+            // mostly not happen
+            ErrorLogger.log(e.getMessage());
+        }
+
+        UniChannel<BDPacket> responseChan = null;
         for(String name : nameSet ) {
             Scenario sce = scenarioMgr.getScenarioByName(name);
             BDPacket pack = encapsulateUploadReq(sce);
-            responseQueue = client.asyncSend(pack);
+            responseChan = client.asyncSend(pack);
         }
 
         int responseNum = nameSet.size();
         try {
             for ( int i = 0; responseNum > i; i++ ) {
-                responseQueue.take();
+                BDPacket response = responseChan.take();
+                BDPacketUtil.globalExceptionCheck( response );
             }
         } catch (InterruptedException e) {
             ErrorLogger.log(e.getMessage());
         }
     }
 
-    public void download(ScenarioMgr scenarioMgr) throws IOException, ResponseException {
+    public void download(ScenarioMgr scenarioMgr) throws IOException,
+            ResponseException, GlobalException {
         String[] names = null;
-        BlockingQueue<BDPacket> responseQueue = null;
+        UniChannel<BDPacket> responseChan = null;
         int num = 0;
 
         try {
@@ -61,13 +74,13 @@ public class ScenarioTransfer {
         num = names.length;
         for ( int i = 0; i < num; i++ ) {
             BDPacket request = encapsulateDownloadReq(names[i]);
-            responseQueue = client.asyncSend(request);
+            responseChan = client.asyncSend(request);
         }
 
         Scenario[] scenarios = new Scenario[num];
         try {
             for (int i = 0; i < num; i++ ) {
-                BDPacket pack = responseQueue.take();
+                BDPacket pack = responseChan.take();
                 scenarios[i] = unpack( pack );
             }
         } catch (InterruptedException e) {
@@ -79,14 +92,24 @@ public class ScenarioTransfer {
         for ( Scenario sce : scenarios ) {
             scenarioMgr.addScenario( sce );
         }
+        scenarioMgr.reloadScenarios();
     }
 
-    public String[] getScenarioNameList() throws IOException, InterruptedException, ResponseException {
+    public String[] getScenarioNameList() throws IOException,
+            InterruptedException, ResponseException, GlobalException {
         BDPacket request = BDPacket.newPacket( RequestID.GET_SCENARIO_NAME_LIST );
         BDPacket response = client.send( request );
 
         String[] names = BDPacketUtil.parseStringArrayResponse(response, request.getRequestID());
         return names;
+    }
+
+    public void deleteBackupOnServer()
+            throws IOException, InterruptedException, GlobalException {
+        BDPacket request = BDPacket.newPacket( RequestID.DELETE_BACKUP_SCENARIOS );
+        BDPacket response = client.send( request );
+
+        BDPacketUtil.globalExceptionCheck( response );
     }
 
     private BDPacket encapsulateUploadReq(Scenario scenario) throws IOException {
@@ -108,7 +131,7 @@ public class ScenarioTransfer {
             return null;
         }
 
-        if ( RequestID.UPLOAD_SCENARIO != packet.getRequestID() ) {
+        if ( RequestID.DOWNLOAD_SCENARIO != packet.getRequestID() ) {
             throw new ResponseException("Response with wrong requestID!");
         }
 

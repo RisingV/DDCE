@@ -74,7 +74,7 @@ public class ScriptExecutor implements CommunicateStatus, ApplicationConstants {
 			return _SCRIPT_FILE_NOT_FOUND;
 		}
 		
-		if ( app.getUserInfo().isSupervisor() ) {
+		if ( app.getBoolAttr( USER.SUPERVISOR ) ) {
 			if ( null == serialNumSet ) {
 				serialNumSet = new HashSet<String>();
 				addToAppContent(serialNumSet);
@@ -151,12 +151,7 @@ public class ScriptExecutor implements CommunicateStatus, ApplicationConstants {
 		}
 		return running;
 	}
-	
-//	public static void main(String[] args) {
-//		int status = getSendResult();
-//		System.out.println("result: " + status);
-//	}
-	
+
 	public void setSendResult(boolean _rsGot, String _rs) {
 		rsGot = _rsGot;
 		msgQue.offer(_rs);

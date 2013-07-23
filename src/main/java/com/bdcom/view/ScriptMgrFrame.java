@@ -2,9 +2,10 @@ package com.bdcom.view;
 
 import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.script.ScriptMgr;
+import com.bdcom.nio.exception.GlobalException;
 import com.bdcom.view.util.*;
 import com.bdcom.datadispacher.CommunicateStatus;
-import com.bdcom.exception.ResponseException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.sys.gui.GuiInterface;
@@ -777,11 +778,21 @@ public class ScriptMgrFrame extends JPanel
 	}
 
     private void uploadScriptConfig(ScriptMgr scriptMgr) throws IOException {
-        clientProxy.uploadScriptConfig(scriptMgr);
+        try {
+            clientProxy.uploadScriptConfig(scriptMgr);
+        } catch (GlobalException e) {
+            MsgDialogUtil.reportGlobalException( e );
+            app.logout();
+        }
     }
 
     private void downloadScriptConfig(ScriptMgr scriptMgr) throws IOException, ResponseException {
-        clientProxy.downloadScriptConfig(scriptMgr);
+        try {
+            clientProxy.downloadScriptConfig(scriptMgr);
+        } catch (GlobalException e) {
+            MsgDialogUtil.reportGlobalException( e );
+            app.logout();
+        }
     }
 
     private MsgTable getMsgTable() {

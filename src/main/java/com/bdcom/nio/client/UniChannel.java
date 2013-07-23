@@ -6,5 +6,8 @@ package com.bdcom.nio.client;
  * Date: 13-7-18    <br/>
  * Time: 17:11  <br/>
  */
-public interface UniChannel {
+public interface UniChannel<T> {
+
+    public T take() throws InterruptedException;
+
 }

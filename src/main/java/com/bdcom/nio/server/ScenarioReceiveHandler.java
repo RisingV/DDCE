@@ -42,7 +42,7 @@ public class ScenarioReceiveHandler extends ScenarioHandler {
     }
 
     private void save(Scenario scenario) {
-        synchronized ( ServerContent.GLOBAL_LOCK0) {
+        synchronized ( ServerContent.GLOBAL_LOCK0 ) {
             getScenarioMgr().addScenario(scenario);
         }
     }

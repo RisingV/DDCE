@@ -1,17 +1,17 @@
 package com.bdcom.nio.client;
 
-import com.bdcom.exception.ResponseException;
+import com.bdcom.biz.script.ScriptMgr;
+import com.bdcom.nio.exception.GlobalException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
 import com.bdcom.nio.RequestID;
-import com.bdcom.util.log.ErrorLogger;
-import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.util.SerializeUtil;
+import com.bdcom.util.log.ErrorLogger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -27,26 +27,34 @@ public class ScriptTransfer {
         this.client = client;
     }
 
-    public void upload(ScriptMgr scriptMgr) throws IOException {
+    public void upload(ScriptMgr scriptMgr) throws IOException, GlobalException {
         File[] files = scriptMgr.getScriptConfFiles();
         if ( null == files || files.length == 0 ) {
             return;
         }
 
-        BlockingQueue<BDPacket> responseQueue = null;
+        try {
+            deleteBackupOnServer();
+        } catch (InterruptedException e) {
+            // mostly not happen
+            ErrorLogger.log(e.getMessage());
+        }
+
+        UniChannel<BDPacket> responseChan = null;
         int count = 0;
         for ( File file : files ) {
             if ( null == file ) {
                 continue;
             }
             BDPacket request = encapsulateUploadReq(file);
-            responseQueue = client.asyncSend( request );
+            responseChan = client.asyncSend( request );
             count++;
         }
 
         try {
             for ( int i=0; i < count; i++ ) {
-                responseQueue.take();
+                BDPacket response = responseChan.take();
+                BDPacketUtil.globalExceptionCheck(response);
             }
         } catch (InterruptedException e) {
             ErrorLogger.log(e.getMessage());
@@ -54,7 +62,8 @@ public class ScriptTransfer {
 
     }
 
-    public void download(ScriptMgr scriptMgr) throws IOException, ResponseException {
+    public void download(ScriptMgr scriptMgr)
+            throws IOException, ResponseException, GlobalException {
         String[] names = null;
         try {
             names = getScriptFileNameList();
@@ -62,20 +71,22 @@ public class ScriptTransfer {
             ErrorLogger.log(e.getMessage());
         }
 
-        BlockingQueue<BDPacket> responseQueue = null;
+        UniChannel<BDPacket> responseChan = null;
         int count = 0;
         for(String name: names ) {
             if ( null == name ) {
                 continue;
             }
             BDPacket req = encapsulateDownloadReq( name );
-            responseQueue = client.asyncSend( req );
+            responseChan = client.asyncSend( req );
             count++;
         }
 
+        scriptMgr.removeAll();
         try {
             for ( int i = 0; i < count; i++ ) {
-                BDPacket response = responseQueue.take();
+                BDPacket response = responseChan.take();
+                BDPacketUtil.globalExceptionCheck( response );
                 File newFile = scriptMgr.newEmptyScriptConfFile("-"+i+"-");
                 writeToFile(response,newFile);
             }
@@ -86,12 +97,21 @@ public class ScriptTransfer {
         scriptMgr.reloadScripts();
     }
 
-    public String[] getScriptFileNameList() throws IOException, InterruptedException, ResponseException {
+    public String[] getScriptFileNameList() throws
+            IOException, InterruptedException, ResponseException, GlobalException {
+
         BDPacket request = BDPacket.newPacket( RequestID.GET_SCRIPT_FILE_LIST );
         BDPacket response = client.send( request );
 
         String[] names = BDPacketUtil.parseStringArrayResponse(response, request.getRequestID());
         return names;
+    }
+
+    public void deleteBackupOnServer()
+            throws IOException, InterruptedException, GlobalException {
+        BDPacket request = BDPacket.newPacket( RequestID.DELETE_BACKUP_SCRIPTS );
+        BDPacket response = client.send( request );
+        BDPacketUtil.globalExceptionCheck( response );
     }
 
 

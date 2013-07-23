@@ -1,11 +1,9 @@
 package com.bdcom.nio.client;
 
-import com.bdcom.exception.TimeoutException;
 import com.bdcom.nio.BDPacket;
-import com.bdcom.util.log.ErrorLogger;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -15,20 +13,24 @@ import java.util.concurrent.TimeUnit;
  */
 public class TimeoutWrapper {
 
-    private final ClientWrapper client;
+    private ClientWrapper client;
+    private final ExecutorService exec = Executors.newFixedThreadPool(1);
 
     public TimeoutWrapper(ClientWrapper client) {
         this.client = client;
     }
 
     public BDPacket send(BDPacket request, long timeout)
-            throws TimeoutException, IOException, InterruptedException {
+            throws IOException, InterruptedException, TimeoutException {
         BDPacket response = null;
         if ( timeout > 0 ) {
-            TimeoutThread counting = new TimeoutThread( timeout );
-            counting.start();
-            response = client.send( request );
-            counting.cancel();
+            TimerTask<BDPacket> task = new TimerTask<BDPacket>(client,request);
+            Future<BDPacket> future = exec.submit( task );
+            try {
+                response = future.get( timeout, TimeUnit.SECONDS );
+            } catch (ExecutionException e) {
+                throw new TimeoutException( e.getMessage() );
+            }
         } else {
             response = client.send( request );
         }
@@ -38,30 +40,20 @@ public class TimeoutWrapper {
 
 }
 
-class TimeoutThread extends Thread {
+class TimerTask<T> implements Callable<T> {
 
-    private boolean cancel = false;
+    private ClientWrapper client;
+    private BDPacket request;
 
-    private final long timeout;
-
-    TimeoutThread(long timeout) {
-        this.timeout = timeout;
-    }
-
-    public synchronized void cancel() {
-        cancel = true;
+    TimerTask(ClientWrapper client, BDPacket request) {
+        this.client = client;
+        this.request = request;
     }
 
     @Override
-    public void run() {
-        try {
-            TimeUnit.SECONDS.sleep( timeout );
-        } catch (InterruptedException e) {
-            ErrorLogger.log("time counting fail!: " + e.getMessage());
-        }
-        if ( !cancel ) {
-            throw new TimeoutException();
-        }
+    public T call() throws Exception {
+        return (T) client.send(request);
     }
+
 }
 

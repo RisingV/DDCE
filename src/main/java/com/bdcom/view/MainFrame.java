@@ -126,7 +126,7 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 					JOptionPane.YES_NO_OPTION);
 			if ( ok == 0) {
 				thisFrame.setVisible( true );
-				if ( app.getUserInfo().isSupervisor() ) {
+				if ( app.getBoolAttr( USER.SUPERVISOR ) ) {
 					HttpClientWrapper.getInstance()
 						.clearDebugRecordsViaHttp();
 				}
@@ -160,7 +160,7 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 			}
 		}
 		
-		if ( null != rtabs && app.getUserInfo().isSupervisor() ) {
+		if ( null != rtabs && app.getBoolAttr( USER.SUPERVISOR ) ) {
 			for (ViewTab viewTab : rtabs ) {
 				mainPanel.addTab(
 						viewTab.getTabTitle(),
@@ -171,7 +171,7 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 			}
 		}
 		
-		if ( app.getUserInfo().isSupervisor() ) {
+		if ( app.getBoolAttr( USER.SUPERVISOR )) {
 			if ( null == drTable ) {
 				drTable = new DebugRecordTable(app);
 				drTable.setImage(image);

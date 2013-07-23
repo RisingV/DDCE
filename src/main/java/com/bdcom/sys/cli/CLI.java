@@ -201,11 +201,5 @@ public class CLI extends AppContentAdaptor implements Applicable, ApplicationCon
         //do nothing
     }
 
-    @Override
-    public UserInfo getUserInfo() {
-        //do nothing
-        return null;
-    }
-
 }
 

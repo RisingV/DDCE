@@ -1,9 +1,10 @@
 package com.bdcom.dataparser;
 
 import com.bdcom.datadispacher.DataSender;
+import com.bdcom.nio.exception.GlobalException;
 import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
-import com.bdcom.exception.ResponseException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
 import com.bdcom.biz.pojo.BaseTestRecord;
 import com.bdcom.sys.AppSession;
@@ -99,6 +100,8 @@ public class CMDParser {
             e.printStackTrace();
         } catch (ResponseException e) {
             e.printStackTrace();
+        } catch (GlobalException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 

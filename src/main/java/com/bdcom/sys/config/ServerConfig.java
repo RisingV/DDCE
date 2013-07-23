@@ -116,43 +116,6 @@ public class ServerConfig implements ServerInfoConstants {
         hasInit = true;
     }
 
-//	private static InputStream getXmlStream() {
-//		String packageDirName = "com/bdcom/datadispacher";
-//		Enumeration<URL> dirs;
-//		try {
-//			dirs = Thread.currentThread().getContextClassLoader().getResources(
-//					packageDirName);
-//			while (dirs.hasMoreElements()) {
-//				URL url = dirs.nextElement();
-//				String protocol = url.getProtocol();
-//				if ("file".equals(protocol)) {
-//					InputStream in = ServerInfo.class
-//							.getResourceAsStream("/com/bdcom/datadispacher/server.xml");
-//					if (null != in) {
-//						return in;
-//					}
-//				} else if ("jar".equals(protocol)) {
-//					JarFile jar;
-//					jar = ((JarURLConnection) url.openConnection())
-//							.getJarFile();
-//					Enumeration<JarEntry> entries = jar.entries();
-//					while (entries.hasMoreElements()) {
-//						JarEntry entry = entries.nextElement();
-//						String name = entry.getName();
-//						if (name.endsWith("server.xml")) {
-//							InputStream in = jar.getInputStream(entry);
-//							if (null != in) {
-//								return in;
-//							}
-//						}
-//					}
-//				}
-//			}
-//		} catch (IOException e) {
-//		}
-//		return null;
-//	}
-
     public String getIpAddrStr() {
         if ( !hasInit) {
             loadConfigFile();
@@ -201,6 +164,7 @@ public class ServerConfig implements ServerInfoConstants {
         } catch (IOException e) {
             ErrorLogger.log(e.getMessage());
         }
+        ipAddrStr = ip;
     }
 
     public void setInetAddr(InetAddress ia) {

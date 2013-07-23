@@ -1,8 +1,10 @@
 package com.bdcom.nio.client;
 
-import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
+import com.bdcom.nio.DataType;
+import com.bdcom.nio.RequestID;
+import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.util.log.ErrorLogger;
 
 import java.io.IOException;
@@ -23,11 +25,13 @@ public class ClientWrapper {
 
     private Map<Integer, BlockingQueue<BDPacket>> responseContainer;
 
-    private Thread responseSortingThread;
+    private SortingThread responseSortingThread;
 
     private Hook restartSortingThreadHook;
 
     private boolean isRunning = false;
+
+    private boolean sortThreadRunning = false;
 
     public ClientWrapper(ServerConfig serverConfig) {
         client = new NIOClient(serverConfig);
@@ -35,9 +39,9 @@ public class ClientWrapper {
         restartSortingThreadHook = new Hook() {
             @Override
             public void call() {
-                SortingThread st = newSortingThread();
-                st.setRestartHook( restartSortingThreadHook );
-                st.start();
+                responseSortingThread = newSortingThread();
+                responseSortingThread.setRestartHook(restartSortingThreadHook);
+                responseSortingThread.start();
             }
         };
     }
@@ -51,21 +55,41 @@ public class ClientWrapper {
         int requestID = packet.getRequestID();
         client.sendPacket( packet );
 
-        return  getResponseByRequestID( requestID );
+        BDPacket response = null;
+        while( true ) {
+            response = getResponseByRequestID( requestID );
+            if ( DataType.GLOBAL_EXCEPTION != response.getDataType() ) {
+                break;
+            } else {
+                if ( responseSortingThread.hasUnhandledException() ) {
+                    responseSortingThread.handledRecentException();
+                    break;
+                } else {
+                    continue;
+                }
+            }
+        }
+
+        return response;
     }
 
-    public BlockingQueue<BDPacket> asyncSend(BDPacket packet) throws IOException {
+    public  UniChannel<BDPacket> asyncSend(BDPacket packet) throws IOException {
         start();
         int requestID = packet.getRequestID();
         client.sendPacket( packet );
 
-        return getResponseQueue( requestID );
+        BlockingQueue<BDPacket> responseQueue = getResponseQueue( requestID );
+
+        return new FilterQueue<BDPacket>( responseQueue );
     }
 
     public void shutdown() {
         if ( isRunning ) {
+            stopResponseSortingThread();
             client.sendPacket( BDPacketUtil.terminalRequest() );
             client.shutdown();
+            clearBlockingQueue( responseContainer );
+            isRunning = false;
         }
     }
 
@@ -91,28 +115,52 @@ public class ClientWrapper {
     }
 
     private void startResponseSortingThread() {
-        SortingThread st = newSortingThread();
-        st.setRestartHook( restartSortingThreadHook );
-        st.start();
+        if ( !sortThreadRunning ) {
+            responseSortingThread = newSortingThread();
+            responseSortingThread.setRestartHook(restartSortingThreadHook);
+            responseSortingThread.start();
+            sortThreadRunning = true;
+        }
+    }
+
+    private void stopResponseSortingThread() {
+        if ( sortThreadRunning ) {
+            responseSortingThread.terminal();
+            sortThreadRunning = false;
+        }
     }
 
     private SortingThread newSortingThread() {
         return new SortingThread(client, responseContainer);
     }
 
-    public synchronized static BlockingQueue allocateBlockingQueue(Integer ID,
+    private synchronized static BlockingQueue allocateBlockingQueue(Integer ID,
                       Map<Integer, BlockingQueue<BDPacket>> queueContainer) {
-        BlockingQueue<BDPacket> queue = new LinkedBlockingDeque<BDPacket>();
 
-        queueContainer.put( ID, queue );
+        BlockingQueue<BDPacket> queue = queueContainer.get(ID);
+        if ( null == queue ) { //double checking!!
+            queue = new LinkedBlockingDeque<BDPacket>();
+            queueContainer.put( ID, queue );
+        }
 
         return queue;
+    }
+
+    private synchronized static void clearBlockingQueue(
+            Map<Integer,BlockingQueue<BDPacket>> queueContainer) {
+        if ( null != queueContainer ) {
+            queueContainer.clear();
+        }
     }
 
     static class SortingThread extends Thread {
         private static final int MAX_INTERRUPTED_TIMES = 3;
         private static int interruptedCount = 0;
         private Hook restartHook;
+        private boolean keepRunning;
+
+        private static byte[] sharedLock = new byte[0];
+        private static int exceptionOccurs = 0;
 
         private final NIOClient client;
         private final Map<Integer, BlockingQueue<BDPacket>> packetContainer;
@@ -122,23 +170,36 @@ public class ClientWrapper {
             this.client = client;
             this.packetContainer = packetContainer;
             setDaemon( true );
+            keepRunning = true;
         }
 
         void setRestartHook(Hook restartHook) {
             this.restartHook = restartHook;
         }
 
+        void terminal() {
+            this.keepRunning = false;
+        }
+
         @Override
         public void run() {
-            while( true ) {
+            while( keepRunning ) {
                 try {
                     BDPacket packet = client.receivePacket();
-                    int requestID = packet.getRequestID();
-                    BlockingQueue packQueue = packetContainer.get( requestID );
-                    if ( null == packQueue ) {
-                        packQueue = allocateBlockingQueue( requestID, packetContainer );
+
+                    if ( null == packet ) {
+                        continue;
                     }
-                    packQueue.add( packet );
+                    if  (RequestID.BROADCAST == packet.getRequestID() ) {
+                        if (DataType.GLOBAL_EXCEPTION == packet.getDataType() ) {
+                            broadcastException( packet );
+                        } else {
+                            broadcast( packet );
+                        }
+                    } else {
+                        dispatch(packet);
+                    }
+
                 } catch (InterruptedException e) {
                     int count = plusInterruptedCount();
                     ErrorLogger.log("SortingThread interrupted: "
@@ -155,9 +216,88 @@ public class ClientWrapper {
             }
         }
 
+        public boolean hasUnhandledException() {
+            synchronized ( sharedLock ) {
+                return exceptionOccurs > 0;
+            }
+        }
+
+        private void addExceptionCount() {
+            synchronized ( sharedLock ) {
+                exceptionOccurs++;
+            }
+        }
+
+        public void handledRecentException() {
+            synchronized ( sharedLock ) {
+                exceptionOccurs--;
+            }
+        }
+
+        private void dispatch(BDPacket packet) {
+            int requestID = packet.getRequestID();
+            BlockingQueue packQueue = packetContainer.get( requestID );
+            if ( null == packQueue ) {
+                packQueue = allocateBlockingQueue( requestID, packetContainer );
+            }
+            packQueue.add( packet );
+        }
+
+        private void broadcastException(BDPacket packet) {
+            addExceptionCount();
+            broadcast(packet);
+        }
+
+        private void broadcast(BDPacket packet) {
+            for ( Map.Entry<Integer, BlockingQueue<BDPacket>> e :
+                    packetContainer.entrySet() ) {
+
+                BlockingQueue<BDPacket> queue = e.getValue();
+                Integer id = e.getKey();
+                if ( null != queue )  {
+                    BDPacket clonedPack = BDPacket.clone( packet );
+                    clonedPack.setRequestID( id.intValue() );
+
+                    queue.add( clonedPack );
+                }
+
+            }
+        }
+
         private synchronized int plusInterruptedCount() {
             return ++interruptedCount;
         }
+
+    }
+
+    private final class FilterQueue<T> implements UniChannel<T> {
+
+        private final BlockingQueue<T> queue;
+
+        public FilterQueue(BlockingQueue<T> queue) {
+            this.queue = queue;
+        }
+
+        @Override
+        public T take() throws InterruptedException {
+            BDPacket response = null;
+            while( true ) {
+                response = (BDPacket) queue.take();
+                if ( DataType.GLOBAL_EXCEPTION != response.getDataType() ) {
+                    break;
+                } else {
+                    if ( responseSortingThread.hasUnhandledException() ) {
+                        responseSortingThread.handledRecentException();
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+            }
+
+            return (T) response;
+        }
+
     }
 
     interface Hook {
@@ -165,3 +305,4 @@ public class ClientWrapper {
     }
 
 }
+

@@ -1,23 +1,25 @@
 package com.bdcom.view;
 
 import com.bdcom.biz.pojo.LoginAuth;
-import com.bdcom.view.util.GBC;
-import com.bdcom.view.util.MessageUtil;
-import com.bdcom.view.util.MsgDialogUtil;
-import com.bdcom.exception.LoginException;
 import com.bdcom.nio.client.ClientProxy;
+import com.bdcom.nio.exception.GlobalException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.sys.gui.GuiInterface;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.StringUtil;
 import com.bdcom.util.log.ErrorLogger;
+import com.bdcom.view.util.GBC;
+import com.bdcom.view.util.MessageUtil;
+import com.bdcom.view.util.MsgDialogUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 import static com.bdcom.view.util.Messages.BLANK_PASSWD;
 import static com.bdcom.view.util.Messages.BLANK_USR_NAME;
@@ -226,7 +228,7 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 					new ActionListener() {
 
 						public void actionPerformed(ActionEvent e) {
-							doExit();
+                            app.terminal();
 						}
 						
 					}
@@ -297,39 +299,49 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 
         clientProxy.getServerConfig()
                 .writeToConfigFile(ip, port);
+
         boolean isSuccess = true;
 		int status = -1;
 
         try {
             status = clientProxy.sendLoginAuth( auth );
+        } catch (TimeoutException e) {
+            isSuccess = false;
+            String msg = "Login Request Time Out!";
+            MsgDialogUtil.showErrorDialog( msg );
+            ErrorLogger.log(msg);
         } catch (IOException e) {
+            isSuccess = false;
             String msg = e.getMessage();
             MsgDialogUtil.showErrorDialog(msg);
             ErrorLogger.log(msg);
             isSuccess = false;
-        } catch (LoginException e) {
+        } catch (ResponseException e) {
+            isSuccess = false;
             String msg = e.getMessage();
             MsgDialogUtil.showMsgDialog( msg );
             ErrorLogger.log(msg);
+        } catch (GlobalException e) {
+            isSuccess = false;
+            MsgDialogUtil.reportGlobalException( e );
+            ErrorLogger.log(e.getMessage());
         } finally {
             if ( !isSuccess ) {
                 clientProxy.shutdown();
             }
         }
 
-        if ( status <= 0 ) {
-			MsgDialogUtil.showErrorDialog(
-					MessageUtil.getMessageByStatusCode(status)
-					);
-		} else {
-			registerUser(usrName, status);
+        if ( isSuccess ) {
+            registerUser(usrName, status);
             showFrameAfterLogin();
-		}
-	}
-	
-	private void doExit() {
-        clientProxy.shutdown();
-		System.exit(0);
+        }
+
+//        if ( status <= 0 ) {
+//			MsgDialogUtil.showErrorDialog(
+//					MessageUtil.getMessageByStatusCode(status)
+//					);
+//		} else {
+//		}
 	}
 
 	private void showFrameAfterLogin() {
@@ -343,8 +355,10 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
         app.addAttribute( USER.USER_NUM, userName );
         if ( LOGIN.ROOT == status ) {
             app.addAttribute( USER.USER_RANK, USER.ROOT );
+            app.addAttribute( USER.SUPERVISOR, Boolean.TRUE );
         } else {
             app.addAttribute( USER.USER_RANK, USER.COMMON_USER );
+            app.addAttribute( USER.SUPERVISOR, Boolean.FALSE );
         }
 
 		String loginMsg = LocaleUtil.getLocalName(LOGIN_MSG);

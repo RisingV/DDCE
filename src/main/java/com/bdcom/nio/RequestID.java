@@ -22,12 +22,18 @@ public interface RequestID {
 
     public static final int DOWNLOAD_SCENARIO = 6;
 
-    public static final int UPLOAD_SCRIPT = 7;
+    public static final int DELETE_BACKUP_SCENARIOS = 7;
 
-    public static final int GET_SCRIPT_FILE_LIST = 8;
+    public static final int UPLOAD_SCRIPT = 8;
 
-    public static final int DOWNLOAD_SCRIPT = 9;
+    public static final int GET_SCRIPT_FILE_LIST = 9;
 
+    public static final int DOWNLOAD_SCRIPT = 10;
+
+    public static final int DELETE_BACKUP_SCRIPTS = 11;
+
+    //rarely used
+    public static final int BROADCAST = Byte.MAX_VALUE - 2;
 
     //For debug!
     public static final int ECHO = Byte.MAX_VALUE - 1;

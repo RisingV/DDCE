@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static com.bdcom.sys.ApplicationConstants.USER;
+
 /**
  * @author francis yuan <br>
  * E-mail: yuanjiajun@bdcom.com.cn <br>
@@ -360,7 +362,7 @@ public class BaseTestRecord implements Serializable {
 
     public static BaseTestRecord newRecord() {
         BaseTestRecord record = new BaseTestRecord();
-        String userNum = Application.instance.getUserInfo().getUserNum();
+        String userNum = Application.instance.getStringAttr( USER.USER_NUM );
         record.setTesterNum(userNum);
         return record;
     }

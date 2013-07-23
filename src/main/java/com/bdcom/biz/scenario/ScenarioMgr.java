@@ -180,6 +180,7 @@ public class ScenarioMgr {
     }
 
     public void removeAll() {
+        reloadScenarios();
         for (String name : getScenarioNameList() ) {
             removeScenario(name);
         }

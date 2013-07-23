@@ -3,7 +3,9 @@
 .settings
 .DS_Store
 .classpath
+Base_Test_Storage
+LocalConfig
+Config
+log
 target
-DDC.iml
-DDC.ipr
-DDC.iws
+DDC.*

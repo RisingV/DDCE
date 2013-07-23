@@ -4,11 +4,12 @@ import com.bdcom.biz.pojo.Scenario;
 import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.scenario.ScenarioUtil;
 import com.bdcom.biz.script.ScriptMgr;
+import com.bdcom.nio.exception.GlobalException;
 import com.bdcom.view.util.GBC;
 import com.bdcom.view.util.Hook;
 import com.bdcom.view.util.LimitedDocument;
 import com.bdcom.view.util.MsgDialogUtil;
-import com.bdcom.exception.ResponseException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.sys.gui.GuiInterface;
@@ -851,11 +852,22 @@ public class ScenarioMgrFrame extends JPanel implements
 	}
 
     private void uploadScenarios(ScenarioMgr scenarioMgr) throws IOException {
-        clientProxy.uploadScenarios(scenarioMgr);
+        try {
+            clientProxy.uploadScenarios(scenarioMgr);
+        } catch (GlobalException e) {
+            MsgDialogUtil.reportGlobalException( e );
+            app.logout();
+        }
     }
 
-    private void downloadScenarios(ScenarioMgr scenarioMgr) throws IOException, ResponseException {
-        clientProxy.downloadScenarios(scenarioMgr);
+    private void downloadScenarios(ScenarioMgr scenarioMgr)
+            throws IOException, ResponseException {
+        try {
+            clientProxy.downloadScenarios(scenarioMgr);
+        } catch (GlobalException e) {
+            MsgDialogUtil.reportGlobalException( e );
+            app.logout();
+        }
     }
 
 	private void selectFocusedAttrBoxs(Scenario sce) {

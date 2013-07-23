@@ -1,7 +1,5 @@
 package com.bdcom.sys;
 
-import com.bdcom.biz.pojo.UserInfo;
-
 /**
  * Created with IntelliJ IDEA. <br/>
  * User: francis    <br/>
@@ -12,6 +10,5 @@ public interface Applicable extends AppContent {
 
     public void terminal();
     public void logout();
-    public UserInfo getUserInfo();
 
 }

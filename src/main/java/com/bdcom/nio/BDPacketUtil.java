@@ -1,11 +1,13 @@
 package com.bdcom.nio;
 
-import com.bdcom.exception.ResponseException;
+import com.bdcom.nio.exception.GlobalException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.nio.server.Message;
 import com.bdcom.biz.pojo.BaseTestRecord;
 import com.bdcom.biz.pojo.ITesterRecord;
 import com.bdcom.biz.pojo.LoginAuth;
 import com.bdcom.util.SerializeUtil;
+import com.bdcom.util.log.ErrorLogger;
 
 import java.io.*;
 
@@ -135,10 +137,12 @@ public abstract class BDPacketUtil {
         return packet;
     }
 
-    public static int parseIntResponse(BDPacket packet, int requestID) throws ResponseException {
+    public static int parseIntResponse(BDPacket packet, int requestID)
+            throws ResponseException, GlobalException {
         if ( requestID != packet.getRequestID() ) {
             throw new ResponseException("Invalid Response!");
         }
+        globalExceptionCheck(packet);
 
         int status = 0;
         if ( DataType.INTEGER == packet.getDataType() ) {
@@ -152,13 +156,15 @@ public abstract class BDPacketUtil {
         return status;
     }
 
-    public static String[] parseStringArrayResponse(BDPacket packet, int requestID) throws ResponseException {
+    public static String[] parseStringArrayResponse(BDPacket packet, int requestID)
+            throws ResponseException, GlobalException {
         if ( null == packet ) {
             return null;
         }
         if ( requestID != packet.getRequestID() ) {
             throw new ResponseException("Invalid Response!");
         }
+        globalExceptionCheck(packet);
 
         String[] strArray = null;
         if ( DataType.STRING_ARRAY == packet.getDataType() ) {
@@ -190,6 +196,25 @@ public abstract class BDPacketUtil {
         return data;
     }
 
+    public static void globalExceptionCheck(BDPacket pack) throws GlobalException {
+        if ( null == pack ||
+                DataType.GLOBAL_EXCEPTION != pack.getDataType() ) {
+            return;
+        }
+
+        Exception e = null;
+        try {
+            e = (Exception) SerializeUtil
+                    .deserializeFromByteArray(pack.getData());
+        } catch (IOException e1) {
+            ErrorLogger.log( e1.getMessage());
+        } catch (ClassNotFoundException e1) {
+            ErrorLogger.log( e1.getMessage());
+        }
+
+        throw new GlobalException(e, e.getMessage());
+    }
+
     /**
      * only convert first 4 byte. if byte array is null, return 0.
      * */
@@ -202,7 +227,7 @@ public abstract class BDPacketUtil {
             len = bs.length;
         }
         int x = 0;
-        for ( int i = len; i > 0; i++ ) {
+        for ( int i = len-1; i >= 0; i-- ) {
             x <<= 8;
             x += bs[i];
         }

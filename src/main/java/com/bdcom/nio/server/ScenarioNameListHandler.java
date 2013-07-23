@@ -42,8 +42,9 @@ public class ScenarioNameListHandler extends ScenarioHandler {
 
     private String[] getNameList() {
 
-        synchronized ( ServerContent.GLOBAL_LOCK0) {
+        synchronized ( ServerContent.GLOBAL_LOCK0 ) {
             ScenarioMgr scenarioMgr = getScenarioMgr();
+            scenarioMgr.reloadScenarios();
             Set<String> nameList = scenarioMgr.getScenarioNameList();
             String[] strArray = new String[nameList.size()];
             strArray = nameList.toArray(strArray);

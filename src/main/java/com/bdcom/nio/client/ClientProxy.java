@@ -1,19 +1,20 @@
 package com.bdcom.nio.client;
 
-import com.bdcom.sys.config.ServerConfig;
-import com.bdcom.exception.LoginException;
-import com.bdcom.exception.ResponseException;
-import com.bdcom.nio.BDPacket;
-import com.bdcom.nio.BDPacketUtil;
-import com.bdcom.nio.RequestID;
 import com.bdcom.biz.pojo.BaseTestRecord;
 import com.bdcom.biz.pojo.ITesterRecord;
 import com.bdcom.biz.pojo.LoginAuth;
 import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.script.ScriptMgr;
+import com.bdcom.nio.BDPacket;
+import com.bdcom.nio.BDPacketUtil;
+import com.bdcom.nio.RequestID;
+import com.bdcom.nio.exception.GlobalException;
+import com.bdcom.nio.exception.ResponseException;
+import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.util.log.ErrorLogger;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -43,23 +44,26 @@ public class ClientProxy {
         return client.send( packet );
     }
 
-    public int sendLoginAuth(LoginAuth auth) throws IOException, LoginException {
+    public int sendLoginAuth(LoginAuth auth)
+            throws IOException, ResponseException, GlobalException, TimeoutException {
         int status = -1;
+        TimeoutWrapper timeoutWrapper = new TimeoutWrapper(client);
         try {
             BDPacket packet = BDPacketUtil.encapsulateToPacket(auth);
-            BDPacket response = client.send(packet);
+            BDPacket response = timeoutWrapper.send(packet, 2);
 
             status = BDPacketUtil.parseIntResponse(response, RequestID.LOGIN);
         } catch (InterruptedException e) {
             ErrorLogger.log(e.getMessage());
         } catch (ResponseException e) {
-            throw new LoginException( e.getMessage() );
+            throw new ResponseException( e.getMessage() );
         }
 
         return status;
     }
 
-    public int sendBaseTestRecord(BaseTestRecord record) throws IOException, ResponseException {
+    public int sendBaseTestRecord(BaseTestRecord record)
+            throws IOException, ResponseException, GlobalException {
         int status = -1;
         try {
             BDPacket packet = BDPacketUtil.encapsulateToPacket(record);
@@ -77,19 +81,21 @@ public class ClientProxy {
         return client.send(packet);
     }
 
-    public void uploadScenarios(ScenarioMgr scenarioMgr) throws IOException {
+    public void uploadScenarios(ScenarioMgr scenarioMgr) throws IOException, GlobalException {
         scenarioTransfer.upload(scenarioMgr);
     }
 
-    public void downloadScenarios(ScenarioMgr scenarioMgr) throws IOException, ResponseException {
+    public void downloadScenarios(ScenarioMgr scenarioMgr)
+            throws IOException, ResponseException, GlobalException {
         scenarioTransfer.download(scenarioMgr);
     }
 
-    public void uploadScriptConfig(ScriptMgr scriptMgr) throws IOException {
+    public void uploadScriptConfig(ScriptMgr scriptMgr) throws IOException, GlobalException {
         scriptTransfer.upload(scriptMgr);
     }
 
-    public void downloadScriptConfig(ScriptMgr scriptMgr) throws IOException, ResponseException {
+    public void downloadScriptConfig(ScriptMgr scriptMgr)
+            throws IOException, ResponseException, GlobalException {
         scriptTransfer.download(scriptMgr);
     }
 

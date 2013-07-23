@@ -650,8 +650,8 @@ public class ScriptMgr
     public void removeAll() {
         File[] files = getScriptConfFiles();
         for (File file : files ) {
-            if (  null != file ) {
-                file.deleteOnExit();
+            if (  null != file && file.exists() ) {
+                file.delete();
             }
         }
     }

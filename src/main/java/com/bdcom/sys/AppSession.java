@@ -1,9 +1,9 @@
 package com.bdcom.sys;
 
-import com.bdcom.clientview.AbstractFrame;
-import com.bdcom.clientview.MsgTable;
-import com.bdcom.clientview.ViewManager;
-import com.bdcom.clientview.util.AppConstants;
+import com.bdcom.view.AbstractFrame;
+import com.bdcom.view.MsgTable;
+import com.bdcom.view.ViewManager;
+import com.bdcom.view.util.AppConstants;
 import com.bdcom.datadispacher.DataSender;
 import com.bdcom.datadispacher.ServerInfo;
 import com.bdcom.biz.pojo.BaseTestRecord;

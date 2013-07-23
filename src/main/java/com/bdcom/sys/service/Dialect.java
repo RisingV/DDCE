@@ -1,8 +1,9 @@
 package com.bdcom.sys.service;
 
-import com.bdcom.clientview.util.MessageUtil;
-import com.bdcom.clientview.util.MsgDialogUtil;
-import com.bdcom.exception.ResponseException;
+import com.bdcom.biz.script.ScriptExecutor;
+import com.bdcom.nio.exception.GlobalException;
+import com.bdcom.view.util.MsgDialogUtil;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
@@ -121,18 +122,19 @@ public class Dialect implements ApplicationConstants {
                 isSuccess = false;
                 msg = e.getMessage();
                 ErrorLogger.log(msg);
+            } catch (GlobalException e) {
+                //TODO needs to be properly handled
+                e.printStackTrace();
             } finally {
                 if ( !isSuccess ) {
                     MsgDialogUtil.showErrorDialog( msg );
                 }
             }
 
-            msg = MessageUtil.getMessageByStatusCode(status);
-            if ( status < 0 ) {
-                MsgDialogUtil.showErrorDialog( msg );
-            } else if ( status > 0 ) {
-                MsgDialogUtil.showMsgDialog(msg);
-            }
+            //temporary solution!!!!
+            ScriptExecutor scriptExecutor =  (ScriptExecutor)
+                   app.getAttribute(COMPONENT.SCRIPT_EXECUTOR);
+            scriptExecutor.setSendResult( true, String.valueOf( status) );
 
             return BDPacketUtil.emptyResponse( bdPacket.getRequestID() );
         }

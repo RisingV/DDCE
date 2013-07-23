@@ -42,8 +42,9 @@ public class ScenarioDownloadHandler extends ScenarioHandler {
             response = BDPacketUtil.writeStringMsg( response, sb.toString() );
         } else {
             boolean serialSuccess = true;
+            byte[] data = null;
             try {
-                SerializeUtil.serializeToByteArray( scenario );
+                data = SerializeUtil.serializeToByteArray( scenario );
             } catch (IOException e) {
                 serialSuccess = false;
                 System.err.println( e.getMessage() );
@@ -51,6 +52,9 @@ public class ScenarioDownloadHandler extends ScenarioHandler {
                 if ( !serialSuccess ) {
                     response = BDPacketUtil.writeStringMsg( response, "Inner Server Error!" );
                     return response;
+                } else {
+                    response.setDataType( DataType.SCENARIO );
+                    response.setData( data );
                 }
             }
         }

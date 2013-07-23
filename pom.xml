@@ -56,19 +56,14 @@
           <configuration> 
               <archive> 
                   <manifest> 
-                      <mainClass>com.bdcom.clientview.ViewManager</mainClass> 
+                      <mainClass>com.bdcom.sys.gui.Application</mainClass>
                   </manifest> 
               <!--
                   <manifest> 
-                      <mainClass>com.bdcom.dataparser.CMDParser</mainClass> 
-                  </manifest> 
-                  <manifest> 
-                      <mainClass>com.bdcom.datadispacher.LocalTalker</mainClass> 
+                      <mainClass>com.bdcom.sys.cli.CLI</mainClass>
                   </manifest> 
                 -->
-                    <!--ViewManager is for GUI Client, i.e. the exe version  -->
-                    <!--CMDParser is for CLI Client, i.e. the jar version -->
-              </archive> 
+              </archive>
               <descriptorRefs> 
                   <descriptorRef>jar-with-dependencies</descriptorRef> 
               </descriptorRefs> 

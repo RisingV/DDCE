@@ -44,6 +44,7 @@ public class ScriptFileListHandler extends ScriptHandler {
         String[] fileNameList = null;
         synchronized (ServerContent.GLOBAL_LOCK1 ) {
             ScriptMgr scriptMgr = getScriptMgr();
+            scriptMgr.reloadScripts();
             File[] fileList = scriptMgr.getScriptConfFiles();
             int len = fileList.length;
             fileNameList = new String[len];

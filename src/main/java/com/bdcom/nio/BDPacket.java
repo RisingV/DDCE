@@ -48,13 +48,13 @@ public class BDPacket {
     }
 
     public void writeStringArray(String[] strArray) throws IOException {
-        if ( null == strArray || 0 == strArray.length ) {
-            return;
+        int num = 0;
+        if ( null != strArray ) {
+            num = strArray.length;
         }
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
 
-        int num = strArray.length;
         out.writeInt( num );
         for (int i = 0; i < num; i++) {
             String s = strArray[i];
@@ -107,5 +107,16 @@ public class BDPacket {
         newPack.setRequestID( requestID );
 
         return newPack;
+    }
+
+    public static BDPacket clone(BDPacket pack) {
+        if ( null == pack ) {
+            return null;
+        }
+        BDPacket cloned = newPacket( pack.getRequestID() );
+        cloned.setDataType( pack.getDataType() );
+        cloned.setData( pack.getData() );
+
+        return cloned;
     }
 }

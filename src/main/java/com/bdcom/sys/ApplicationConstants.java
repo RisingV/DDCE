@@ -253,6 +253,8 @@ public interface ApplicationConstants {
 
         public static final String COMMON_USER = "common user";
 
+        public static final String SUPERVISOR = "supervisor";
+
     }
 
     abstract class COMPONENT {
@@ -279,7 +281,7 @@ public interface ApplicationConstants {
 
         public static final String SCRIPT_MGR_FRAME = "Script Mgr Frame";
 
-        public static final String SCRIPT_LIST = "Script Mgr Frame";
+        public static final String SCRIPT_LIST = "Script List Frame";
 
         public static final String SCENARIO_MGR = "Scenario Mgr";
 

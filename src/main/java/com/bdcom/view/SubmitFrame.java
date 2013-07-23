@@ -6,13 +6,14 @@ import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.scenario.ScenarioUtil;
 import com.bdcom.biz.script.ScriptExecutor;
 import com.bdcom.biz.script.ScriptMgr;
+import com.bdcom.nio.exception.GlobalException;
 import com.bdcom.view.util.GBC;
 import com.bdcom.view.util.Hook;
 import com.bdcom.view.util.MessageUtil;
 import com.bdcom.view.util.MsgDialogUtil;
 import com.bdcom.datadispacher.CommunicateStatus;
 import com.bdcom.datadispacher.http.HttpClientWrapper;
-import com.bdcom.exception.ResponseException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.nio.client.ClientProxy;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.sys.gui.GuiInterface;
@@ -275,7 +276,7 @@ public class SubmitFrame extends JPanel implements
 		if ( fcAdded ) {
 			return;
 		}
-		if ( app.getUserInfo().isSupervisor() ) {
+		if ( app.getBoolAttr( USER.SUPERVISOR ) ) {
 			initFcCompos();
 //			indexPanel.add(fcLabel, new GBC(0, 1)
 //						.setInsets(10, 10, 5, 10)
@@ -1368,7 +1369,7 @@ public class SubmitFrame extends JPanel implements
 		String jtfName = jtf.getName();
 		
 		if (TEST_NUM.equals(jtfName)) {
-            String userNum = app.getUserInfo().getUserNum();
+            String userNum = app.getStringAttr( USER.USER_NUM );
 			jtf.setEditable(false);
 			jtf.setText( userNum );
 			jtf.setForeground(Color.GREEN);
@@ -1419,6 +1420,9 @@ public class SubmitFrame extends JPanel implements
         } catch (ResponseException e) {
             //TODO warning!
             e.printStackTrace();
+        } catch (GlobalException e) {
+            MsgDialogUtil.reportGlobalException( e );
+            app.logout();
         }
 
         return status;

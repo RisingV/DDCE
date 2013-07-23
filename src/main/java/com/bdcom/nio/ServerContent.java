@@ -54,7 +54,7 @@ public abstract class ServerContent {
 
     public static int login(LoginAuth auth) {
         //TODO
-        return 1;
+        return 2;
     }
 
     public static int SaveBaseTestRecord(BaseTestRecord record) {

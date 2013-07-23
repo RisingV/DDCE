@@ -1,6 +1,6 @@
 package com.bdcom.sys.gui;
 
-import com.bdcom.clientview.AbstractFrame;
+import com.bdcom.view.AbstractFrame;
 import com.bdcom.sys.Applicable;
 
 /**
