@@ -275,7 +275,7 @@ public class LibTest {
 	public int startCaptureTest( ITesterLibLoader itl, int socketId, int cardId, int portId) {
 		int status = itl.startCapture(socketId, cardId, portId);
 		
-		System.out.println( "startCapture status: " + status );
+		System.out.println( "StartCaptureReq status: " + status );
 		
 		return status;
 	}

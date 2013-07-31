@@ -9,7 +9,7 @@ package com.bdcom.itester.lib;
 
 public abstract class ConnectStatus {
 
-	private boolean connected;
+    private boolean connected;
 
 	public boolean isConnected() {
 		return connected;

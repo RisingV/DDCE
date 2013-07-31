@@ -1,16 +1,9 @@
 package com.bdcom.itester.lib;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import com.bdcom.sys.ApplicationConstants;
-import com.bdcom.sys.ConfigPath;
 import com.bdcom.sys.config.PathConfig;
 import com.bdcom.util.log.ErrorLogger;
+
+import java.io.*;
 
 /**
  * @author francis yuan <br>
@@ -86,11 +79,11 @@ public class ITesterLibLoader {
 		}
 	}
 
-    static {
-        String currDir = ApplicationConstants.RUN_TIME.CURRENT_DIR;
-        PathConfig pathConfig = new PathConfig(currDir);
-        registerNatives(pathConfig);
-    }
+//    static {
+//        String currDir = ApplicationConstants.RUN_TIME.CURRENT_DIR;
+//        PathConfig pathConfig = new PathConfig(currDir);
+//        registerNatives(pathConfig);
+//    }
 
 	/**
 	 * @param ipAddr iTesterServer IP Address 
