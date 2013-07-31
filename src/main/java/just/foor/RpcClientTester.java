@@ -22,7 +22,9 @@ public class RpcClientTester implements ApplicationConstants {
                 RUN_TIME.CURRENT_DIR + File.separator + "RPC-config" );
 
         ServerConfig serverConfig = new ServerConfig( pathConfig );
+        serverConfig.setDefaultIP("192.168.1.101");
         serverConfig.setDefaultPort( 7777 );
+        serverConfig.writeToConfigFile("192.168.1.101", "7777");
 
         ITesterAPI it = new RpcClient( serverConfig );
         CommuStatus commuStatus = it.connectToServer( "127.0.0.1" );

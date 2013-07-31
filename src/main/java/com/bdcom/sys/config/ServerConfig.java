@@ -139,6 +139,9 @@ public class ServerConfig implements ServerInfoConstants {
 
         Document document = null;
         try {
+            if ( null == serverConfigFile ) {
+                loadConfigFile();
+            }
             document = saxReader.read(serverConfigFile);
         } catch (final DocumentException e) {
             final String msg = "com.bdcom.datadispacher.ServerInfo" +

@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 public class RpcClient implements ITesterAPI {
 
-    private static final int RPC_REQUEST = Byte.MAX_VALUE;
+    private static final int RPC_REQUEST = Byte.MAX_VALUE / 2;
 
     private ClientWrapper client;
 

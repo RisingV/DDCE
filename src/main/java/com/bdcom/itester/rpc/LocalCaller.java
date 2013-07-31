@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 public class LocalCaller implements ApplicationConstants {
 
-    private static final int RPC_RESPONSE = Byte.MAX_VALUE;
+    private static final int RPC_RESPONSE = Byte.MAX_VALUE / 2;
 
     private static LocalCaller instance;
 
