@@ -186,16 +186,6 @@ public abstract class BDPacketUtil {
         return strArray;
     }
 
-    public static byte[] intToByteArray(int raw) {
-        byte[] data = new byte[4];
-        for( int i = 0; i < 4; i++ ) {
-            data[i] = (byte) (raw & 0xff);
-            raw >>= 8;
-        }
-
-        return data;
-    }
-
     public static void globalExceptionCheck(BDPacket pack) throws GlobalException {
         if ( null == pack ||
                 DataType.GLOBAL_EXCEPTION != pack.getDataType() ) {
@@ -227,11 +217,25 @@ public abstract class BDPacketUtil {
             len = bs.length;
         }
         int x = 0;
-        for ( int i = len-1; i >= 0; i-- ) {
+        for ( int i = len-1; i >= 0 ; i-- ) {
             x <<= 8;
-            x += bs[i];
+            x = (x & 0xffffff00) | (bs[i] & 0xff);
         }
         return x;
+    }
+
+    public static byte[] intToByteArray(int raw) {
+        byte[] data = new byte[4];
+        for( int i = 0; i < 4; i++ ) {
+            data[i] = (byte) (raw & 0xff);
+            if ( i != 3 ) {
+                raw >>= 8;
+            } else {
+                raw >>>= 8;
+            }
+        }
+
+        return data;
     }
 
 }
