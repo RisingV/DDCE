@@ -15,7 +15,7 @@ using namespace std;
 enum ETH_PHY_SPEED { SP_10M, SP_100M, SP_1000M, SP_1G };
 
 typedef int (__stdcall *ConnectToServer)( char*, UINT* );
-typedef int (__stdcall *DisConnectServer)( UINT );
+typedef int (__stdcall *DisconnectToServer)( UINT );
 typedef int (__stdcall *GetChassisInfo)( UINT, int*, int*, char** );
 typedef int (__stdcall *GetCardInfo)( UINT, int, int*, int*, char** );
 typedef int (__stdcall *GetEthernetPhysical)( UINT, int, int, int*, int*, enum ETH_PHY_SPEED*, int*, BOOL* );
@@ -44,7 +44,7 @@ typedef int (__stdcall *SetStreamLength)( UINT, int, int, int, int );
 
 HINSTANCE iTesterLibDll;
 ConnectToServer ConnectToServerFunc;
-DisConnectServer DisConnectServerFunc;
+DisconnectToServer DisconnectToServerFunc;
 GetChassisInfo GetChassisInfoFunc;
 GetCardInfo GetCardInfoFunc;
 GetEthernetPhysical GetEthernetPhysicalFunc;
@@ -184,8 +184,8 @@ JNIEXPORT void JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_loadITesterDl
   	if ( !ConnectToServerFunc ) {
 	  	ConnectToServerFunc = (ConnectToServer) GetProcAddress(iTesterLibDll, "ConnectToServer");
   	}
-  	if ( !DisConnectServerFunc ) {
-	  	DisConnectServerFunc = (DisConnectServer) GetProcAddress(iTesterLibDll, "DisConnectServer");
+  	if ( !DisconnectToServerFunc ) {
+	  	DisconnectToServerFunc = (DisconnectToServer) GetProcAddress(iTesterLibDll, "DisconnectToServer");
 	  }
   	if ( !GetChassisInfoFunc ) {
 	  	GetChassisInfoFunc = (GetChassisInfo) GetProcAddress(iTesterLibDll, "GetChassisInfo");
@@ -305,12 +305,17 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToS
   	else {
 		Print2File("ConnectToServerFunc is NULL");  	
   	}
+  	if ( NULL == setConnected ) {
+		Print2File("jMethodID setConnected is NULL");  	
+  	}
   	#endif
   	
-  	connected = (jboolean) !status;
- 	//if ( !status ) {
-	//	connected = ( jboolean ) 1; 	
-	//}
+  	//connected = (jboolean) status;
+ 	if ( status ) {
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
+	}
   	
   	env->CallVoidMethod( commuStatusObj, setConnected, connected );
   	env->CallVoidMethod( commuStatusObj, setSocketId, jsocketId );
@@ -321,16 +326,28 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToS
  JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_disconnectToServer
   (JNIEnv * env, jobject loader, jint socketId ) {
   	int status = 1;
-  	if ( socketId >=0 && NULL != DisConnectServerFunc ) {
-		status = DisConnectServerFunc((UINT) socketId); 	
+  	if ( socketId >=0 && NULL != DisconnectToServerFunc ) {
+		status = DisconnectToServerFunc( (UINT) socketId ); 
+		#ifdef _DEBUG
+  		{
+		  stringstream ss;
+  		  ss << "DisconnectToServerFunc called:"
+  		     << " socketId: "
+  		     << socketId
+  		     << " status: "
+  		     <<  status;
+	      std::string s = ss.str();
+		  Print2File( s.c_str() );	
+	    }
+   		#endif
     }
     #ifdef _DEBUG
 	else {
 		if ( socketId < 0 ) {
-			Print2File("DisConnectServerFunc: socketId < 0");
+			Print2File("DisconnectToServerFunc: socketId < 0");
 		}
-		if ( NULL == DisConnectServerFunc ) {
-			Print2File("DisConnectServerFunc is NULL");  	
+		if ( NULL == DisconnectToServerFunc ) {
+			Print2File("DisconnectToServerFunc is NULL");  	
 		}		
   	}
   	#endif
@@ -374,7 +391,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getChassis
   	}
   	#endif
 	if ( !status ) {
-		connected = ( jboolean ) 1; 	
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
 	
 	env->CallVoidMethod( chassisInfoObj, setChassisType, (jint) chassisType  );
@@ -411,6 +430,18 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getCardInf
   	if ( socketId >=0 && NULL != GetCardInfoFunc ) {
   		status = GetCardInfoFunc( (UINT) socketId, (int) cardId, &cardType, &portNum, &description ); 
   		jdescription = str2jstring( env, (std::string)description );
+		#ifdef _DEBUG
+  		{
+		  stringstream ss;
+  		  ss << "GetCardInfoFunc called:"
+  		     << " socketId: "
+  		     << socketId
+  		     << " status: "
+  		     <<  status;
+	      std::string s = ss.str();
+		  Print2File( s.c_str() );	
+	    }
+   		#endif
 	}
 	#ifdef _DEBUG
 	else {
@@ -423,7 +454,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getCardInf
   	}
   	#endif
 	if ( !status ) {
-		connected = ( jboolean ) 1; 	
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
 	
 	env->CallVoidMethod( CardInfoObj, setCardId, cardId );
@@ -475,7 +508,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getEtherne
   	}
   	#endif
 	if ( !status ) {
-		connected = ( jboolean ) 1; 	
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
   	
   	env->CallVoidMethod( EthPhyProperObj, setLinked, (jboolean) link );
@@ -669,8 +704,10 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
  		for ( int i = 0; i < (int) length; i++ ) {
 			elems[i] = (jint) stats[i];  	
  		}
- 		connected = (jboolean) 1;
- 	}
+ 		connected = JNI_TRUE; 	
+ 	} else {
+		connected = JNI_FALSE;
+	}
   
   	env->CallVoidMethod( PortStatsObj, setStats, jstats );
   	env->CallVoidMethod( PortStatsObj, setConnected, connected );
@@ -705,7 +742,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getLinkSta
   	}
   	#endif
 	if ( !status ) {
-		connected = (jboolean) 1;
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
 	
 	env->CallVoidMethod( linkStatusObj, setLinked, (jboolean) linkup );
@@ -741,7 +780,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getWorkInf
   	}
   	#endif
 	if ( !status ) {
-		connected = ( jboolean ) 1;
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
 	
 	env->CallVoidMethod( workInfoObj, setWorkNow, (jboolean) workNow );
@@ -797,7 +838,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getUsedSta
   	}
   	#endif
 	if ( !status ) {
-		connected = (jboolean) 1;
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
 	
 	env->CallVoidMethod( usedStateObj, setUsed, (jboolean) used );
@@ -939,7 +982,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getStreamS
   	}
   	#endif
 	if ( !status ) {
-		connected = ( jboolean ) 1;
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
 	
 	env->CallVoidMethod( streamInfoObj, setPacketCount, (jlong) packetCount );
@@ -976,7 +1021,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getStreamR
   	}
   	#endif
 	if ( !status ) {
-		connected = ( jboolean ) 1;
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
 	
 	env->CallVoidMethod( streamInfoObj, setPacketCount, (jlong) packetCount );
@@ -1034,7 +1081,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_stopCaptur
   	}
   	#endif
 	if ( !status ) {
-		connected = ( jboolean ) 1;
+		connected = JNI_TRUE; 	
+	} else {
+		connected = JNI_FALSE;
 	}
 	
 	env->CallVoidMethod( captureResultObj, setFrames, jframes );

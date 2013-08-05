@@ -2,6 +2,7 @@
 	<Project active="1">iTestLibLoader.cfp</Project>
 	<File active="0">C:\Program Files\Java\jdk1.6.0_33\include\win32\jni_md.h</File>
 	<File active="0">C:\PROGRA~1\Java\JDK16~1.0_3\include\jni.h</File>
-	<File active="1">iTestLibLoader.cpp</File>
-	<File active="0">iTestLibLoader.h</File>
+	<File active="0">iTestLibLoader.cpp</File>
+	<File active="1">iTestLibLoader.h</File>
+	<File active="0">C:\Program Files (x86)\C-Free 5\mingw\include\c++\3.4.5\bits\basic_string.h</File>
 </Projects>
