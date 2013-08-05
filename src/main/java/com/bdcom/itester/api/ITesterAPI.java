@@ -12,6 +12,8 @@ public interface ITesterAPI {
 
     public CommuStatus connectToServer(String ipAddr);
 
+    public int disconnectToServer(int socketId);
+
     public ChassisInfo getChassisInfo(int socketId);
 
     public CardInfo getCardInfo(int socketId, int cardId);

@@ -62,6 +62,27 @@ public class RpcClient implements ITesterAPI {
     }
 
     @Override
+    public int disconnectToServer(int socketId) {
+        byte[] data = BDPacketUtil.intToByteArray( socketId );
+
+        BDPacket request = BDPacket.newPacket( RpcID.DISCONNECT_TO_SERVER );
+        request.setDataType( RPC_REQUEST );
+        request.setData( data );
+
+        BDPacket response = null;
+        try {
+            response = client.send( request );
+        } catch (InterruptedException e) {
+            logException(e);
+        } catch (IOException e) {
+            logException(e);
+        }
+
+        int status = BDPacketUtil.byteArrayToInt( response.getData() );
+        return status;
+    }
+
+    @Override
     public ChassisInfo getChassisInfo(int socketId) {
         byte[] data = BDPacketUtil.intToByteArray( socketId );
 

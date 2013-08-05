@@ -3,6 +3,7 @@
 .settings
 .DS_Store
 .classpath
+RPC-config
 Base_Test_Storage
 LocalConfig
 Lib

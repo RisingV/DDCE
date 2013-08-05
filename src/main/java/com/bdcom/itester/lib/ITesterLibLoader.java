@@ -89,8 +89,13 @@ public class ITesterLibLoader {
 	 * @param ipAddr iTesterServer IP Address 
 	 * */
 	public final native CommuStatus connectToServer(String ipAddr);
-	
-	/**
+
+    /**
+     * @param socketId return by <code>connectToServer(String ipAddr)</code>
+     * */
+    public final native int disconnectToServer(int socketId);
+
+ 	/**
 	 * @param socketId return by <code>connectToServer(String ipAddr)</code>
 	 * */
 	public final native ChassisInfo getChassisInfo(int socketId);

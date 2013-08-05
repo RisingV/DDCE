@@ -64,6 +64,18 @@ public class LocalCaller implements ApplicationConstants {
         return response;
     }
 
+    public BDPacket disconnectToServer(BDPacket packet) {
+        int socketId = BDPacketUtil.byteArrayToInt( packet.getData() );
+        int status = iTesterLibLoader.disconnectToServer( socketId );
+
+        byte[] data = BDPacketUtil.intToByteArray( status );
+        BDPacket response = BDPacket.newPacket( packet.getRequestID() );
+        response.setDataType( RPC_RESPONSE );
+        response.setData( data );
+
+        return response;
+    }
+
     public BDPacket getChassisInfo(BDPacket packet) {
         int socketId = -1;
         try {

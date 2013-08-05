@@ -40,6 +40,13 @@ public class RpcServer extends Thread {
                     }
                 });
 
+                put( RpcID.DISCONNECT_TO_SERVER, new IHandler() {
+                    @Override
+                    public BDPacket handle(BDPacket bdPacket) {
+                        return  local.disconnectToServer(bdPacket);
+                    }
+                }
+                );
 
                 put( RpcID.GET_CHASSIS_INFO, new IHandler() {
                     @Override
