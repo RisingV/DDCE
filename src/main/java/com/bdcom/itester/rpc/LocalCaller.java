@@ -4,8 +4,6 @@ import com.bdcom.itester.lib.*;
 import com.bdcom.itester.rpc.req.*;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
-import com.bdcom.nio.exception.GlobalException;
-import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.sys.config.PathConfig;
 import com.bdcom.util.SerializeUtil;
@@ -78,14 +76,7 @@ public class LocalCaller implements ApplicationConstants {
 
     public BDPacket getChassisInfo(BDPacket packet) {
         int socketId = -1;
-        try {
-            socketId = BDPacketUtil.parseIntResponse( packet, RpcID.GET_CHASSIS_INFO );
-        } catch (ResponseException e) {
-            logExeception( e );
-        } catch (GlobalException e) {
-            logExeception( e );
-        }
-
+        socketId = BDPacketUtil.byteArrayToInt( packet.getData() );
         ChassisInfo chassisInfo = iTesterLibLoader.getChassisInfo( socketId );
         byte[] data = null;
         try {

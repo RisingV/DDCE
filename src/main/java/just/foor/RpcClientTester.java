@@ -1,7 +1,7 @@
 package just.foor;
 
 import com.bdcom.itester.api.ITesterAPI;
-import com.bdcom.itester.lib.CardInfo;
+import com.bdcom.itester.lib.ChassisInfo;
 import com.bdcom.itester.lib.CommuStatus;
 import com.bdcom.itester.rpc.RpcClient;
 import com.bdcom.sys.ApplicationConstants;
@@ -28,26 +28,24 @@ public class RpcClientTester implements ApplicationConstants {
         serverConfig.writeToConfigFile("172.16.22.222", "7777");
 
         ITesterAPI it = new RpcClient( serverConfig );
-        CommuStatus cs = it.connectToServer( "172.16.22.202" );
-        CardInfo cardInfo = it.getCardInfo(cs.getSocketId(), 1);
+        CommuStatus cs = it.connectToServer("172.16.22.202");
+        ChassisInfo ci = it.getChassisInfo( cs.getSocketId() );
+//        CardInfo cardInfo = it.getCardInfo(cs.getSocketId(), 1);
+
+        System.out.println( " isConnected: " + cs.isConnected() );
+        System.out.println( " socketID: " + cs.getSocketId() );
+        System.out.println( " CardNum: " + ci.getCardNum() );
+        System.out.println( " ChassisType: " + ci.getChassisType() );
+        System.out.println( " description: " + ci.getDescription() );
+
+
+//        System.out.println( "cardID:" + cardInfo.getCardId() );
+//        System.out.println( "cardType:" + cardInfo.getCardType() );
+//        System.out.println( "portNumber:" + cardInfo.getPortNumber() );
+//        System.out.println( "description:" + cardInfo.getDescription() );
+
         int status0 = it.disconnectToServer( cs.getSocketId() );
-        CommuStatus cs2 = it.connectToServer( "172.16.22.202" );
-        int status1 = it.disconnectToServer( cs2.getSocketId() );
-
-        System.out.println( "isConnected: " + cs.isConnected() );
-        System.out.println( "socketID: " + cs.getSocketId() );
-
-        System.out.println( "2 isConnected: " + cs2.isConnected() );
-        System.out.println( "2 socketID: " + cs2.getSocketId() );
-
         System.out.println( "status0: " + status0 );
-        System.out.println( "status1: " + status1 );
-
-        System.out.println( "cardID:" + cardInfo.getCardId() );
-        System.out.println( "cardType:" + cardInfo.getCardType() );
-        System.out.println( "portNumber:" + cardInfo.getPortNumber() );
-        System.out.println( "description:" + cardInfo.getDescription() );
-
     }
 
 }
