@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <jni.h>
 #include <win32/jni_md.h>
 #define _EXPORTDLL
@@ -11,10 +12,13 @@ using namespace std;
 
 //#define _DEBUG
 
-typedef int (__stdcall *ConnectToServer)( std::string, UINT* );
-typedef int (__stdcall *GetChassisInfo)( UINT, int*, int*, std::string* );
-typedef int (__stdcall *GetCardInfo)( UINT, int, int*, int*, std::string* );
-typedef int (__stdcall *GetEthernetPhysical)( UINT, int, int, int*, int*, int*, int*, BOOL* );
+enum ETH_PHY_SPEED { SP_10M, SP_100M, SP_1000M, SP_1G };
+
+typedef int (__stdcall *ConnectToServer)( char*, UINT* );
+typedef int (__stdcall *DisConnectServer)( UINT );
+typedef int (__stdcall *GetChassisInfo)( UINT, int*, int*, char** );
+typedef int (__stdcall *GetCardInfo)( UINT, int, int*, int*, char** );
+typedef int (__stdcall *GetEthernetPhysical)( UINT, int, int, int*, int*, enum ETH_PHY_SPEED*, int*, BOOL* );
 typedef int (__stdcall *ClearStatReliably)( UINT, int, int );
 typedef int (__stdcall *SetHeader)( UINT, int, int, int, int, byte[] );
 typedef int (__stdcall *SetPayload)( UINT, int, int, int, byte[], int );
@@ -40,6 +44,7 @@ typedef int (__stdcall *SetStreamLength)( UINT, int, int, int, int );
 
 HINSTANCE iTesterLibDll;
 ConnectToServer ConnectToServerFunc;
+DisConnectServer DisConnectServerFunc;
 GetChassisInfo GetChassisInfoFunc;
 GetCardInfo GetCardInfoFunc;
 GetEthernetPhysical GetEthernetPhysicalFunc;
@@ -179,6 +184,9 @@ JNIEXPORT void JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_loadITesterDl
   	if ( !ConnectToServerFunc ) {
 	  	ConnectToServerFunc = (ConnectToServer) GetProcAddress(iTesterLibDll, "ConnectToServer");
   	}
+  	if ( !DisConnectServerFunc ) {
+	  	DisConnectServerFunc = (DisConnectServer) GetProcAddress(iTesterLibDll, "DisConnectServer");
+	  }
   	if ( !GetChassisInfoFunc ) {
 	  	GetChassisInfoFunc = (GetChassisInfo) GetProcAddress(iTesterLibDll, "GetChassisInfo");
   	}
@@ -273,8 +281,25 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToS
   	std::string ip = jstring2str(env, ipAddr);
   	
   	if ( NULL !=  ConnectToServerFunc ) {
-	  	status = ConnectToServerFunc(ip , &socketId);
+  		char *ip_ptr = new char[ip.length() + 1];
+		strcpy(ip_ptr, ip.c_str());
+	  	status = ConnectToServerFunc(ip_ptr , &socketId);
+	  	delete ip_ptr;
 	  	jsocketId = (jint) socketId;
+  		#ifdef _DEBUG
+  		{
+		  stringstream ss;
+  		  ss << "ConnectToServerFunc called:"
+  		     << "ip: "
+  		     << ip
+  		     << " socketId: "
+  		     << socketId
+  		     << " status: "
+  		     <<  status;
+	      std::string s = ss.str();
+		  Print2File( s.c_str() );	
+	    }
+   		#endif
   	} 
   	#ifdef _DEBUG
   	else {
@@ -282,15 +307,35 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToS
   	}
   	#endif
   	
- 	if ( !status ) {
-		connected = ( jboolean ) 1; 	
-	}
+  	connected = (jboolean) !status;
+ 	//if ( !status ) {
+	//	connected = ( jboolean ) 1; 	
+	//}
   	
   	env->CallVoidMethod( commuStatusObj, setConnected, connected );
   	env->CallVoidMethod( commuStatusObj, setSocketId, jsocketId );
   	
   	return commuStatusObj;
  }
+ 
+ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_disconnectToServer
+  (JNIEnv * env, jobject loader, jint socketId ) {
+  	int status = 1;
+  	if ( socketId >=0 && NULL != DisConnectServerFunc ) {
+		status = DisConnectServerFunc((UINT) socketId); 	
+    }
+    #ifdef _DEBUG
+	else {
+		if ( socketId < 0 ) {
+			Print2File("DisConnectServerFunc: socketId < 0");
+		}
+		if ( NULL == DisConnectServerFunc ) {
+			Print2File("DisConnectServerFunc is NULL");  	
+		}		
+  	}
+  	#endif
+    return (jint) status;
+  }
 
 JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getChassisInfo
   (JNIEnv * env, jobject loader, jint socketId ) {
@@ -308,14 +353,15 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getChassis
 
 	int chassisType  = 0;
 	int cardNum = 0;
-	std::string description;
+	//std::string description;
+	char* description;
 	int status = 1;
 	jboolean connected = (jboolean) 0;
 	jstring jdescription;
 
 	if ( socketId >= 0 && NULL != GetChassisInfoFunc ) {
 		status = GetChassisInfoFunc( (UINT) socketId, &chassisType, &cardNum, &description ); 
-		jdescription = str2jstring( env, description );
+		jdescription = str2jstring( env, (std::string)description );
 	}
 	#ifdef _DEBUG
 	else {
@@ -357,13 +403,14 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getCardInf
   		
   	int cardType = 0;
   	int portNum = 0;
-  	std::string description;
+  	//std::string description;
+  	char* description;
   	int status = 1;
 	jboolean connected = (jboolean) 0;
 	jstring jdescription;
   	if ( socketId >=0 && NULL != GetCardInfoFunc ) {
   		status = GetCardInfoFunc( (UINT) socketId, (int) cardId, &cardType, &portNum, &description ); 
-  		jdescription = str2jstring( env, description );
+  		jdescription = str2jstring( env, (std::string)description );
 	}
 	#ifdef _DEBUG
 	else {
@@ -408,7 +455,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getEtherne
   	
   	int link = 0;
   	int nego = 0;
-  	int speed = 0;
+  	ETH_PHY_SPEED speed;
   	int duplex = 0;
   	int status = 1;
   	BOOL loopback;

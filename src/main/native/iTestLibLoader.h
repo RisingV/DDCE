@@ -25,6 +25,14 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToS
 
 /*
  * Class:     com_bdcom_itester_lib_ITesterLibLoader
+ * Method:    disconnectToServer
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_disconnectToServer
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_bdcom_itester_lib_ITesterLibLoader
  * Method:    getChassisInfo
  * Signature: (I)Lcom/bdcom/itester/lib/ChassisInfo;
  */
