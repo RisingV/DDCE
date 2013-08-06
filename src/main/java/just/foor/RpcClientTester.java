@@ -1,8 +1,7 @@
 package just.foor;
 
 import com.bdcom.itester.api.ITesterAPI;
-import com.bdcom.itester.lib.ChassisInfo;
-import com.bdcom.itester.lib.CommuStatus;
+import com.bdcom.itester.lib.*;
 import com.bdcom.itester.rpc.RpcClient;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.sys.config.PathConfig;
@@ -30,19 +29,36 @@ public class RpcClientTester implements ApplicationConstants {
         ITesterAPI it = new RpcClient( serverConfig );
         CommuStatus cs = it.connectToServer("172.16.22.202");
         ChassisInfo ci = it.getChassisInfo( cs.getSocketId() );
-//        CardInfo cardInfo = it.getCardInfo(cs.getSocketId(), 1);
 
         System.out.println( " isConnected: " + cs.isConnected() );
         System.out.println( " socketID: " + cs.getSocketId() );
         System.out.println( " CardNum: " + ci.getCardNum() );
         System.out.println( " ChassisType: " + ci.getChassisType() );
-        System.out.println( " description: " + ci.getDescription() );
+        System.out.println(" description: " + ci.getDescription());
+
+        for ( int num = 0 ; num < ci.getCardNum(); num++ ) {
+            CardInfo cardInfo = it.getCardInfo(cs.getSocketId(), num);
+            System.out.println( "connected(" + num+ "): " + cardInfo.getCardId() );
+            System.out.println( "cardID(" + num+ "): " + cardInfo.getCardId() );
+            System.out.println( "cardType(" + num+ "): " +  cardInfo.getCardType() );
+            System.out.println( "portNumber(" + num+ "): " + cardInfo.getPortNumber() );
+            System.out.println( "description(" + num+ "): " + cardInfo.getDescription() );
+            for ( int pid = 0; pid < cardInfo.getPortNumber(); pid++ ) {
+                EthPhyProper epp = it.getEthernetPhysical( cs.getSocketId(), num, pid );
+                UsedState us = it.getUsedState(cs.getSocketId(), num, pid);
+                System.out.println( "   EthPhyProper: " );
+                System.out.println( "       connected("+num+","+pid+"): "+ epp.isConnected() );
+                System.out.println( "       link("+num+","+pid+"): "+ epp.isLinked() );
+                System.out.println( "       nego("+num+","+pid+"): "+ epp.getNego() );
+                System.out.println( "       speed("+num+","+pid+"): "+ epp.getSpeed() );
+                System.out.println( "       fullDuplex(" +num+","+pid+"): "+ epp.getFullDuplex() );
+                System.out.println( "       loopback(" +num+","+pid+"): "+ epp.getLoopback() );
+                System.out.println( "   UsedState: " );
+                System.out.println( "       used("+num+","+pid+"): "+ us.isUsed() );
+            }
+        }
 
 
-//        System.out.println( "cardID:" + cardInfo.getCardId() );
-//        System.out.println( "cardType:" + cardInfo.getCardType() );
-//        System.out.println( "portNumber:" + cardInfo.getPortNumber() );
-//        System.out.println( "description:" + cardInfo.getDescription() );
 
         int status0 = it.disconnectToServer( cs.getSocketId() );
         System.out.println( "status0: " + status0 );
