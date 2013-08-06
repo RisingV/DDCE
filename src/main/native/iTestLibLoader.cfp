@@ -11,8 +11,8 @@
 </Folder>
 <Folder name="Other Files">
 </Folder>
-<Attribute topline="631" x="24" y="640">iTestLibLoader.cpp</Attribute>
-<Attribute topline="10" x="85" y="31">iTestLibLoader.h</Attribute>
+<Attribute topline="1530" x="26" y="1552">iTestLibLoader.cpp</Attribute>
+<Attribute topline="10" x="37" y="21">iTestLibLoader.h</Attribute>
 <FolderState>111</FolderState>
 <DefConfig>mingw5</DefConfig>
 <Builder name="mingw5" type="MinGW" version="1.0">
