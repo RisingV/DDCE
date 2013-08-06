@@ -46,6 +46,8 @@ public class RpcClientTester implements ApplicationConstants {
             for ( int pid = 0; pid < cardInfo.getPortNumber(); pid++ ) {
                 EthPhyProper epp = it.getEthernetPhysical( cs.getSocketId(), num, pid );
                 UsedState us = it.getUsedState(cs.getSocketId(), num, pid);
+                LinkStatus ls = it.getLinkStatus(cs.getSocketId(), num, pid);
+                PortStats ps = it.getPortAllStats(cs.getSocketId(), num, pid, 8);
                 System.out.println( "   EthPhyProper: " );
                 System.out.println( "       connected("+num+","+pid+"): "+ epp.isConnected() );
                 System.out.println( "       link("+num+","+pid+"): "+ epp.isLinked() );
@@ -54,7 +56,14 @@ public class RpcClientTester implements ApplicationConstants {
                 System.out.println( "       fullDuplex(" +num+","+pid+"): "+ epp.getFullDuplex() );
                 System.out.println( "       loopback(" +num+","+pid+"): "+ epp.getLoopback() );
                 System.out.println( "   UsedState: " );
+                System.out.println( "       connected("+num+","+pid+"): "+ us.isConnected() );
                 System.out.println( "       used("+num+","+pid+"): "+ us.isUsed() );
+                System.out.println( "   LinkStatus: " );
+                System.out.println( "       connected("+num+","+pid+"): "+ ls.isConnected() );
+                System.out.println( "       linkup("+num+","+pid+"): "+ ls.isLinked() );
+                System.out.println( "   PortStats: " );
+                System.out.println( "       connected("+num+","+pid+"): "+ ps.isConnected() );
+                System.out.println( "       stats("+num+","+pid+"): "+ ps.getStats() );
             }
         }
 

@@ -392,7 +392,7 @@ public class LocalCaller implements ApplicationConstants {
         LinkStatus linkStatus = iTesterLibLoader.getLinkStatus(
                 getLinkStatusReq.getSocketId(),
                 getLinkStatusReq.getCardId(),
-                getLinkStatusReq.getSocketId()
+                getLinkStatusReq.getPortId()
         );
 
         byte[] data = null;

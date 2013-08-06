@@ -420,6 +420,7 @@ public class RpcClient implements ITesterAPI {
         GetPortAllStatsReq getPortAllStatsReq = new GetPortAllStatsReq();
         getPortAllStatsReq.setSocketId( socketId );
         getPortAllStatsReq.setCardId( cardId );
+        getPortAllStatsReq.setPortId( portId );
         getPortAllStatsReq.setLength( length );
 
         byte[] data = null;

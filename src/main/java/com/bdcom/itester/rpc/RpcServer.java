@@ -90,6 +90,13 @@ public class RpcServer extends Thread {
                     }
                 });
 
+                put( RpcID.SET_DELAY_COUNT , new IHandler() {
+                    @Override
+                    public BDPacket handle(BDPacket bdPacket) {
+                        return local.setDelayCount(bdPacket);
+                    }
+                });
+
                 put( RpcID.SET_TX_MODE, new IHandler() {
                     @Override
                     public BDPacket handle(BDPacket bdPacket) {
