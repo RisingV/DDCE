@@ -13,7 +13,7 @@ public class PortStats implements Serializable {
 
     private static final long serialVersionUID = 7048552974621794245L;
 
-    private int[] stats;
+    private long[] stats;
 
     private boolean connected;
 
@@ -25,11 +25,11 @@ public class PortStats implements Serializable {
         this.connected = connected;
     }
 
-	public int[] getStats() {
+	public long[] getStats() {
 		return stats;
 	}
 
-	public void setStats(int[] stats) {
+	public void setStats(long[] stats) {
 		this.stats = stats;
 	}
 	

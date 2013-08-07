@@ -59,11 +59,11 @@ public class RpcClientTester implements ApplicationConstants {
                 System.out.println( "       connected("+num+","+pid+"): "+ us.isConnected() );
                 System.out.println( "       used("+num+","+pid+"): "+ us.isUsed() );
                 System.out.println( "   LinkStatus: " );
-                System.out.println( "       connected("+num+","+pid+"): "+ ls.isConnected() );
+                System.out.println("       connected(" + num + "," + pid + "): " + ls.isConnected());
                 System.out.println( "       linkup("+num+","+pid+"): "+ ls.isLinked() );
                 System.out.println( "   PortStats: " );
                 System.out.println( "       connected("+num+","+pid+"): "+ ps.isConnected() );
-                System.out.println( "       stats("+num+","+pid+"): "+ ps.getStats() );
+                System.out.println( "       stats("+num+","+pid+"): "+ printIntArray(ps.getStats()) );
             }
         }
 
@@ -71,6 +71,23 @@ public class RpcClientTester implements ApplicationConstants {
 
         int status0 = it.disconnectToServer( cs.getSocketId() );
         System.out.println( "status0: " + status0 );
+    }
+
+    private static String printIntArray(long[] a) {
+        if ( null == a ) {
+            return "null";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ ");
+        for ( int i = 0; i < a.length; i++ ) {
+            sb.append(a[i]).append(", ");
+            if ( i == a.length - 1 ) {
+                sb.append(a[i]);
+            }
+        }
+        sb.append(" ]");
+
+        return sb.toString();
     }
 
 }
