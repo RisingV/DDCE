@@ -26,7 +26,7 @@ typedef int (__stdcall *SetDelayCount)( UINT, int, int, UINT );
 typedef int (__stdcall *SetTxMode)( UINT, int, int, int, UINT );
 typedef int (__stdcall *StartPort)( UINT, int, int );
 typedef int (__stdcall *StopPort)( UINT, int, int );
-typedef int (__stdcall *GetPortAllStats)( UINT, int, int, int, UINT[] );
+typedef int (__stdcall *GetPortAllStats)( UINT, int, int, int, *ULONG );
 typedef int (__stdcall *GetLinkStatus)( UINT, int, int, int* );
 typedef int (__stdcall *GetWorkInfo)( UINT, int, int, int* );
 typedef int (__stdcall *SetUsedState)( UINT, int, int, int );
@@ -290,7 +290,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToS
   		{
 		  stringstream ss;
   		  ss << NowTime()
-			 << "ConnectToServerFunc called:"
+			 << ": ConnectToServerFunc called:"
   		     << "[ ip: "
   		     << ip
   		     << " ] socketId: "
@@ -379,7 +379,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getChassis
   		{
 		  stringstream ss;
   		  ss << NowTime()
-			 << "GetChassisInfoFunc called:"
+			 << ": GetChassisInfoFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " ] chassisType: "
@@ -511,7 +511,8 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getEtherne
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "GetEthernetPhysicalFunc called:"
+  		  ss << NowTime()
+			 << ": GetEthernetPhysicalFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -565,7 +566,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_clearStatReli
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "ClearStatReliablyFunc called:"
+  		  ss << NowTime()
+			 << ": ClearStatReliablyFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -605,7 +607,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "SetHeaderFunc called:"
+  		  ss << NowTime()
+			 << ": SetHeaderFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -651,7 +654,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setPayload
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "SetPayloadFunc called:"
+  		  ss << NowTime()
+			 << ": SetPayloadFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -693,7 +697,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setDelayCount
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "SetDelayCountFunc called:"
+  		  ss << NowTime()
+			 << ": SetDelayCountFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -731,7 +736,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setTxMode
   		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "SetTxModeFunc called:"
+  		  ss << NowTime()
+			 << ": SetTxModeFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -771,7 +777,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_startPort
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "StartPortFunc called:"
+  		  ss << NowTime()
+			 << ": StartPortFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -807,7 +814,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_stopPort
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "StopPortFunc called:"
+  		  ss << NowTime()
+			 << ": StopPortFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -841,21 +849,26 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
   	
   	jobject PortStatsObj = env->AllocObject( PortStatsClz );	
   	jmethodID setStats = FindMethodID( env, PortStatsClz, "portStats_setStats", 
-	  									"setStats", "([I)V" );
+	  									"setStats", "([J)V" );
   	jmethodID setConnected = FindMethodID( env, PortStatsClz, "portStats_setConnected",
 	  									"setConnected", "(Z)V" );
 	int status = 1; 
-	UINT stats[length];
+	ULONG stats[length];
+	/*
 	jintArray jstats = env->NewIntArray( (jsize) length );
 	jint *elems = env->GetIntArrayElements( jstats, NULL );
+	*/
+	jlongArray jstats = env->NewLongArray( (jsize) length );
+	jlong *elems = env->GetLongArrayElements( jstats, NULL );
 	jboolean connected = (jboolean) 0;
-  	if ( socketId >= 0 && NULL != GetPortAllStatsFunc ) {
+  	if ( socketId >= 0 && NULL != GetPortAllStatsFunc ) {		
 	  	status = GetPortAllStatsFunc( (UINT) socketId, (int) cardId,
 		  			 (int) portId, (int) length, stats );
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "GetPortAllStatsFunc called:"
+  		  ss << NowTime()
+			 << ": GetPortAllStatsFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -886,7 +899,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
   	connected = (jboolean) !status;
   	if ( connected ) {
  		for ( int i = 0; i < (int) length; i++ ) {
-			elems[i] = (jint) stats[i];  	
+			elems[i] = (jlong) stats[i];  	
  		}
  	}
   
@@ -909,12 +922,13 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getLinkSta
 	int status = 1;
 	int linkup = 0;
 	jboolean connected = (jboolean) 0;
-	if ( socketId >= 0 && NULL != GetLinkStatusFunc ) {
+	if ( socketId >= 0 && NULL != GetLinkStatusFunc ) {	
 		status = GetLinkStatusFunc( (UINT) socketId, (int) cardId, (int) portId, &linkup);
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "GetLinkStatusFunc called:"
+  		  ss << NowTime()
+			 << ": GetLinkStatusFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -966,7 +980,8 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getWorkInf
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "GetWorkInfoFunc called:"
+  		  ss << NowTime()
+			 << ": GetWorkInfoFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1009,7 +1024,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setUsedState
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "SetUsedStateFunc called:"
+  		  ss << NowTime()
+			 << ": SetUsedStateFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1056,7 +1072,8 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getUsedSta
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "GetUsedStateFunc called:"
+  		  ss << NowTime()
+			 << ": GetUsedStateFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1100,7 +1117,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setStreamId
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "SetStreamIdFunc called:"
+  		  ss << NowTime()
+			 << ": SetStreamIdFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1142,7 +1160,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setEthernetPh
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "SetEthernetPhysicalForATTFunc called:"
+  		  ss << NowTime()
+			 << ": SetEthernetPhysicalForATTFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1187,7 +1206,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setFramLength
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "SetFramLengthChangeFunc called:"
+  		  ss << NowTime()
+			 << ": SetFramLengthChangeFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1225,7 +1245,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_loadFPGA
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "LoadFpgaFunc called:"
+  		  ss << NowTime()
+			 << ": LoadFpgaFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1261,7 +1282,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_resetFPGA
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "ResetFpgaFunc called:"
+  		  ss << NowTime()
+			 << ": ResetFpgaFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1306,7 +1328,8 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getStreamS
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "GetStreamSendInfoFunc called:"
+  		  ss << NowTime()
+			 << ": GetStreamSendInfoFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1361,7 +1384,8 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getStreamR
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "GetStreamRecInfoFunc called:"
+  		  ss << NowTime()
+			 << ": GetStreamRecInfoFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1405,7 +1429,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_startCapture
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "StartCaptureFunc called:"
+  		  ss << NowTime()
+			 << ": StartCaptureFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1453,7 +1478,8 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_stopCaptur
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "StopCaptureFunc called:"
+  		  ss << NowTime()
+			 << ": StopCaptureFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
@@ -1497,7 +1523,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setStreamLeng
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
-  		  ss << "StopCaptureFunc called:"
+  		  ss << NowTime()
+			 << ": StopCaptureFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
