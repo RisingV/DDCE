@@ -54,14 +54,13 @@
        <plugin> 
           <artifactId>maven-assembly-plugin</artifactId> 
           <configuration> 
-              <archive> 
-                  <manifest> 
-                      <mainClass>com.bdcom.sys.gui.Application</mainClass>
-                  </manifest> 
+              <archive>
+                  <manifest>
+                      <mainClass>com.bdcom.itester.rpc.RpcServer</mainClass>
+                  </manifest>
               <!--
-                  <manifest> 
+                      <mainClass>com.bdcom.sys.gui.Application</mainClass>
                       <mainClass>com.bdcom.sys.cli.CLI</mainClass>
-                  </manifest> 
                 -->
               </archive>
               <descriptorRefs> 

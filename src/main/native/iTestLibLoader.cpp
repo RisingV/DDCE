@@ -26,7 +26,7 @@ typedef int (__stdcall *SetDelayCount)( UINT, int, int, UINT );
 typedef int (__stdcall *SetTxMode)( UINT, int, int, int, UINT );
 typedef int (__stdcall *StartPort)( UINT, int, int );
 typedef int (__stdcall *StopPort)( UINT, int, int );
-typedef int (__stdcall *GetPortAllStats)( UINT, int, int, int, *ULONG );
+typedef int (__stdcall *GetPortAllStats)( UINT, int, int, int, ULONG* );
 typedef int (__stdcall *GetLinkStatus)( UINT, int, int, int* );
 typedef int (__stdcall *GetWorkInfo)( UINT, int, int, int* );
 typedef int (__stdcall *SetUsedState)( UINT, int, int, int );
@@ -597,10 +597,19 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_clearStatReli
 
 JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, 
-  				jint validStreamCount, jint length, jbyteArray StrHead) {
-	int status = 1;	
-	jbyte* bytes = env->GetByteArrayElements( StrHead, 0 );
-	BYTE* bytearr = (BYTE*) bytes;
+  				jint validStreamCount, jint length, jintArray StrHead) {
+	int status = 1;
+	if ( ((int)length) < 0 ) {
+		return status;
+	}	
+	//jbyte* bytes = env->GetByteArrayElements( StrHead, 0 );
+	//BYTE* bytearr = (BYTE*) bytes;
+	
+	long* jintegers = (long*) env->GetIntArrayElements( StrHead, 0 );	
+	BYTE bytearr[length];
+	for ( int i = 0; i < length; i++ ) {
+		bytearr[i] = 0xff & jintegers[i];
+	}
  	if ( socketId >= 0 && NULL != SetHeaderFunc ) {
 		status = SetHeaderFunc( (UINT) socketId, (int) cardId, (int) portId, 
 					(int) validStreamCount, (int) length, bytearr); 

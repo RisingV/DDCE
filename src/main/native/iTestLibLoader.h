@@ -66,10 +66,10 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_clearStatReli
 /*
  * Class:     com_bdcom_itester_lib_ITesterLibLoader
  * Method:    setHeader
- * Signature: (IIIII[B)I
+ * Signature: (IIIII[I)I
  */
 JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
-  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jbyteArray);
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jintArray);
 
 /*
  * Class:     com_bdcom_itester_lib_ITesterLibLoader
