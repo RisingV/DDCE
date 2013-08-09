@@ -43,7 +43,7 @@ public abstract class EthFrameUtil {
         return MAC.get( cardId * 4 + portId );
     }
 
-    public static byte[] getHeader(int srcCardId, int srcPortId, int dstCardId, int dstPortId) {
+    public static int[] getHeader(int srcCardId, int srcPortId, int dstCardId, int dstPortId) {
         String srcMac = getMacAddr( srcCardId, srcPortId );
         String dstMac = getMacAddr( dstCardId, dstPortId );
 
@@ -56,18 +56,18 @@ public abstract class EthFrameUtil {
         return stringToByteArray( sb.toString() );
     }
 
-    private static byte[] stringToByteArray(String s) {
-        byte[] bs = new byte[60];
+    private static int[] stringToByteArray(String s) {
+        int[] ia = new int[60];
 
         int len = s.length();
         int strIndex = 0;
         int bsIndex = 0;
         while( strIndex < len ) {
-            bs[bsIndex++] = Byte.parseByte( s.substring(strIndex, strIndex + 2 ) , 16 );
+            ia[bsIndex++] = Integer.parseInt( s.substring(strIndex, strIndex + 2 ) , 16 );
             strIndex += 2;
         }
 
-        return bs;
+        return ia;
     }
 
 }

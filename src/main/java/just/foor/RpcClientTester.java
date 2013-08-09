@@ -44,8 +44,8 @@ public class RpcClientTester implements ApplicationConstants {
             return;
         }
 
-        byte[] head0to1 = EthFrameUtil.getHeader(3, 0, 3, 1);
-        byte[] head1to0 = EthFrameUtil.getHeader(3, 1, 3, 0);
+        int[] head0to1 = EthFrameUtil.getHeader(3, 0, 3, 1);
+        int[] head1to0 = EthFrameUtil.getHeader(3, 1, 3, 0);
         int socketId = cs.getSocketId();
 
         it.setUsedState( socketId, 3, 0, 1 );
