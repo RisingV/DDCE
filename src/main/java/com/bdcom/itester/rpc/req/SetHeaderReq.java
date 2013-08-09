@@ -22,7 +22,7 @@ public class SetHeaderReq implements Serializable {
 
     private int length;
 
-    private byte[] strHead;
+    private int[] strHead;
 
     public int getSocketId() {
         return socketId;
@@ -42,10 +42,6 @@ public class SetHeaderReq implements Serializable {
 
     public int getLength() {
         return length;
-    }
-
-    public byte[] getStrHead() {
-        return strHead;
     }
 
     public void setSocketId(int socketId) {
@@ -68,7 +64,11 @@ public class SetHeaderReq implements Serializable {
         this.length = length;
     }
 
-    public void setStrHead(byte[] strHead) {
+    public int[] getStrHead() {
+        return strHead;
+    }
+
+    public void setStrHead(int[] strHead) {
         this.strHead = strHead;
     }
 

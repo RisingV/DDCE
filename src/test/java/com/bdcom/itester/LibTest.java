@@ -166,7 +166,7 @@ public class LibTest {
 	public PortStats getPortAllStatsTest( ITesterLibLoader itl, int socketId, int cardId, int portId, int length ) {
 		PortStats ps = itl.getPortAllStats(socketId, cardId, portId, length);
 		
-		int[] stats = ps.getStats();
+		long[] stats = ps.getStats();
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("PortStats: [ ");

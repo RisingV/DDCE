@@ -183,7 +183,7 @@ class ConnectionHandler implements SocketObserver {
 
     @Override
     public void packetSent(NIOSocket socket, Object tag) {
-        System.out.println(" packet sent from client: " + socket );
+       // System.out.println(" packet sent from client: " + socket );
     }
 }
 

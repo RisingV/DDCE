@@ -75,7 +75,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         addAttribute( COMPONENT.NIO_CLIENT, clientProxy );
         addAttribute( COMPONENT.DIALECT, dialect );
 
-        //init ui compo
+        //init util compo
         SubmitFrame submitFrame = new SubmitFrame(clientProxy, this);
         ScenarioMgrFrame scenarioMgrFrame = new ScenarioMgrFrame( clientProxy, this );
         ScriptMgrFrame scriptMgrFrame = new ScriptMgrFrame( clientProxy, this );

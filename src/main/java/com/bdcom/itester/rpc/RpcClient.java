@@ -224,7 +224,7 @@ public class RpcClient implements ITesterAPI {
 
     @Override
     public int setHeader(int socketId, int cardId, int portId, int validStreamCount,
-                         int length, byte[] strHead) {
+                         int length, int[] strHead) {
         SetHeaderReq setHeaderReq = new SetHeaderReq();
         setHeaderReq.setSocketId( socketId );
         setHeaderReq.setCardId( cardId );
@@ -498,7 +498,7 @@ public class RpcClient implements ITesterAPI {
 
     @Override
     public WorkInfo getWorkInfo(int socketId, int cardId, int portId) {
-        GetWorkInfoReq getWorkInfoReq = null;
+        GetWorkInfoReq getWorkInfoReq = new GetWorkInfoReq();
         getWorkInfoReq.setSocketId( socketId );
         getWorkInfoReq.setCardId( cardId );
         getWorkInfoReq.setPortId( portId );

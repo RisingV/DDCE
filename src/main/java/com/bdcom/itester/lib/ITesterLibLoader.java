@@ -122,7 +122,7 @@ public class ITesterLibLoader {
 	 *		    1: connect fail
 	 * */
 	public final native int setHeader(int socketId, int cardId, int portId, 
-			int validStreamCount, int length, byte[] strHead);
+			int validStreamCount, int length, int[] strHead);
 	
 	/**
 	 * @param socketId return by <code>connectToServer(String ipAddr)</code>
