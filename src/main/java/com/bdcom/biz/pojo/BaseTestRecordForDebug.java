@@ -140,7 +140,7 @@ public class BaseTestRecordForDebug extends BaseTestRecord {
 	      "softwareinfo":"",
 	      "step":"",
 	      "subStrateNo":"0144302C00001",
-	      "subStrateType":"���-S3524B(A)",
+	      "subStrateType":"S3524B(A)",
 	      "terminalname":"",
 	      "testerID":"root",
 	      "testtype":"",
