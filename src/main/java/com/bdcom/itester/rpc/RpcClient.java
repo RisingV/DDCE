@@ -228,6 +228,7 @@ public class RpcClient implements ITesterAPI {
         SetHeaderReq setHeaderReq = new SetHeaderReq();
         setHeaderReq.setSocketId( socketId );
         setHeaderReq.setCardId( cardId );
+        setHeaderReq.setPortId( portId );
         setHeaderReq.setValidStreamCount( validStreamCount );
         setHeaderReq.setLength( length );
         setHeaderReq.setStrHead( strHead );
@@ -262,6 +263,7 @@ public class RpcClient implements ITesterAPI {
         SetPayloadReq setPayloadReq = new SetPayloadReq();
         setPayloadReq.setSocketId( socketId );
         setPayloadReq.setCardId( cardId );
+        setPayloadReq.setPortId( portId );
         setPayloadReq.setLength( length );
         setPayloadReq.setData( data );
         setPayloadReq.setPayloadType( payloadType );
@@ -295,6 +297,7 @@ public class RpcClient implements ITesterAPI {
         SetDelayCountReq setDelayCountReq = new SetDelayCountReq();
         setDelayCountReq.setSocketId(socketId);
         setDelayCountReq.setCardId(cardId);
+        setDelayCountReq.setDelayCount( portId );
         setDelayCountReq.setDelayCount( delayCount );
 
         byte[] data = null;
@@ -326,6 +329,7 @@ public class RpcClient implements ITesterAPI {
         SetTxModeReq setTxModeReq = new SetTxModeReq();
         setTxModeReq.setSocketId( socketId );
         setTxModeReq.setCardId( cardId );
+        setTxModeReq.setPortId( portId );
         setTxModeReq.setMode( mode );
         setTxModeReq.setBurstNum( burstNum );
 
