@@ -615,7 +615,13 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
 					(int) validStreamCount, (int) length, bytearr); 
 		#ifdef _DEBUG
   		{
+		  stringstream bs;
 		  stringstream ss;
+		  bs << "[";
+		  for ( int i = 0; i < length; i++ ) {
+		  	bs << (int) bytearr[i] << ", ";
+		  }
+		  bs << "]";
   		  ss << NowTime()
 			 << ": SetHeaderFunc called:"
   		     << "[ socketId: "
@@ -629,7 +635,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
   		     << " length: "
   		     << length
   		     << " StrHead: "
-  		     << bytearr
+  		     << bs.str()
   		     << " ] status: "
   		     <<  status;
 	      std::string s = ss.str();
@@ -868,14 +874,21 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
 	jint *elems = env->GetIntArrayElements( jstats, NULL );
 	*/
 	jlongArray jstats = env->NewLongArray( (jsize) length );
-	jlong *elems = env->GetLongArrayElements( jstats, NULL );
+	//jlong *elems = env->GetLongArrayElements( jstats, NULL );
+	jlong elems[length];
 	jboolean connected = (jboolean) 0;
   	if ( socketId >= 0 && NULL != GetPortAllStatsFunc ) {		
 	  	status = GetPortAllStatsFunc( (UINT) socketId, (int) cardId,
 		  			 (int) portId, (int) length, stats );
 		#ifdef _DEBUG
   		{
+		  stringstream ls;
 		  stringstream ss;
+		  ls << "[";
+		  for ( int i = 0; i < length; i++ ) {
+  			ls << stats[i] << ", ";	
+		  }
+		  ls << "]";
   		  ss << NowTime()
 			 << ": GetPortAllStatsFunc called:"
   		     << "[ socketId: "
@@ -887,7 +900,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
   		     << " length: "
   		     << length
   		     << " ] stats: "
-  		     << stats 
+  		     << ls.str()
 	   		 << " status: "
   		     <<  status;
 	      std::string s = ss.str();
@@ -910,6 +923,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
  		for ( int i = 0; i < (int) length; i++ ) {
 			elems[i] = (jlong) stats[i];  	
  		}
+ 		env->SetLongArrayRegion( jstats, 0, length, elems );
  	}
   
   	env->CallVoidMethod( PortStatsObj, setStats, jstats );
@@ -1533,7 +1547,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setStreamLeng
   		{
 		  stringstream ss;
   		  ss << NowTime()
-			 << ": StopCaptureFunc called:"
+			 << ": SetStreamLengthFunc called:"
   		     << "[ socketId: "
   		     << socketId
   		     << " cardId: "
