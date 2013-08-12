@@ -33,7 +33,147 @@ public class RpcClientTester implements ApplicationConstants {
         ITesterAPI it = new RpcClient( serverConfig );
 
         sendTest( it );
-        //printAll( it );
+        //sendTestx( it );
+    }
+
+    private static void sendTestx(ITesterAPI it) {
+        CommuStatus cs = it.connectToServer( SERV_IP );
+
+        if ( !cs.isConnected() ) {
+            System.out.println( "connect to " + SERV_IP + "fail!" );
+            return;
+        }
+
+        int packetNum = 1000;
+        int streamId0 = 1234;
+        int streamId1 = 4321;
+        byte[] byteData = { 0x5, 0xA };
+        int ePayloadType = 0;
+
+        int[] head0to1 = EthFrameUtil.getHeader(3, 0, 3, 1);
+        int[] head1to0 = EthFrameUtil.getHeader(3, 1, 3, 0);
+        int socketId = cs.getSocketId();
+
+        //it.setEthernetPhysicalForATT( socketId, 3, 0, 0, 2, 1, 0 );
+        //it.setEthernetPhysicalForATT( socketId, 3, 1, 0, 2, 1, 0 );
+
+        EthPhyProper epp0 = it.getEthernetPhysical( socketId, 3, 0 );
+        EthPhyProper epp1 = it.getEthernetPhysical( socketId, 3, 1 );
+
+        System.out.println( "   EthPhyProper: " );
+        System.out.println( "       connected(3, 0): "+ epp0.isConnected() );
+        System.out.println( "       link(3, 0): "+ epp0.isLinked() );
+        System.out.println( "       nego(3, 0): "+ epp0.getNego() );
+        System.out.println( "       speed(3, 0): "+ epp0.getSpeed() );
+        System.out.println( "       fullDuplex(3, 0): "+ epp0.getFullDuplex() );
+        System.out.println( "       loopback(3, 0): "+ epp0.getLoopback() );
+        System.out.println( "   EthPhyProper: " );
+        System.out.println( "       connected(3, 1): "+ epp1.isConnected() );
+        System.out.println( "       link(3, 1): "+ epp1.isLinked() );
+        System.out.println( "       nego(3, 1): "+ epp1.getNego() );
+        System.out.println( "       speed(3, 1): "+ epp1.getSpeed() );
+        System.out.println( "       fullDuplex(3, 1): "+ epp1.getFullDuplex() );
+        System.out.println( "       loopback(3, 1): "+ epp1.getLoopback() );
+
+        int len = head0to1.length + head1to0.length;
+        it.setHeader( socketId, 3, 0, 2, len, head0to1 );
+        it.setHeader( socketId, 3, 1, 2, len, head1to0 );
+
+        it.setPayload( socketId, 3, 0, 0, byteData, ePayloadType);
+        it.setPayload( socketId, 3, 1, 0, byteData, ePayloadType);
+
+        it.setDelayCount( socketId, 3, 0, 12 );
+        it.setDelayCount( socketId, 3, 1, 12 );
+
+        it.setUsedState( socketId, 3, 0, 1 );
+        it.setUsedState( socketId, 3, 1, 1 );
+
+        it.setTxMode( socketId, 3, 0, 1, packetNum);
+        it.setTxMode( socketId, 3, 1, 1, packetNum);
+
+        it.setStreamId( socketId, 3, 0, streamId0, 1);
+        it.setStreamId( socketId, 3, 0, streamId1, 1);
+        it.setStreamId( socketId, 3, 1, streamId0, 1);
+        it.setStreamId( socketId, 3, 1, streamId1, 1);
+
+        it.setStreamLength( socketId, 3, 0, streamId0, 68-head0to1.length );
+        it.setStreamLength( socketId, 3, 1, streamId0, 68-head0to1.length );
+        it.setStreamLength( socketId, 3, 0, streamId1, 1518-head0to1.length );
+        it.setStreamLength( socketId, 3, 1, streamId1, 1518-head0to1.length );
+
+        it.startPort( socketId , 3, 0 );
+        it.startPort( socketId , 3, 1 );
+
+        LinkStatus ls0 = it.getLinkStatus( socketId, 3, 0);
+        LinkStatus ls1 = it.getLinkStatus( socketId, 3, 1);
+        UsedState us0 = it.getUsedState( socketId, 3, 0 );
+        UsedState us1 = it.getUsedState( socketId, 3, 1 );
+        WorkInfo wi0 = it.getWorkInfo(socketId, 3, 0);
+        WorkInfo wi1 = it.getWorkInfo( socketId, 3, 1 );
+
+        System.out.println( "   LinkStatus: " );
+        System.out.println("       connected(3, 0): " + ls0.isConnected());
+        System.out.println( "       linkup(3, 0): "+ ls0.isLinked() );
+        System.out.println( "   LinkStatus: " );
+        System.out.println("       connected(3, 1): " + ls1.isConnected());
+        System.out.println( "       linkup(3, 1): "+ ls1.isLinked() );
+        System.out.println( "   UsedState: " );
+        System.out.println( "       connected(3, 0): "+ us0.isConnected() );
+        System.out.println( "       used(3, 0): "+ us0.isUsed() );
+        System.out.println( "   UsedState: " );
+        System.out.println( "       connected(3, 1): "+ us1.isConnected() );
+        System.out.println("       used(3, 1): " + us1.isUsed());
+        System.out.println( "   WorkInfo: ");
+        System.out.println( "       connected(3, 0): "+ wi0.isConnected() );
+        System.out.println( "       workNow(3, 0): "+ wi0.isWorkNow() );
+        System.out.println( "   WorkInfo: ");
+        System.out.println( "       connected(3, 1): "+ wi1.isConnected() );
+        System.out.println( "       workNow(3, 1): "+ wi1.isWorkNow() );
+
+        while( true ) {
+            try {
+                TimeUnit.SECONDS.sleep( 1 );
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            WorkInfo wi00 = it.getWorkInfo( socketId, 3, 0 );
+            WorkInfo wi01 = it.getWorkInfo( socketId, 3, 1 );
+            if ( !wi00.isWorkNow() && !wi01.isWorkNow() ) {
+                break;
+            }
+        }
+
+        it.setUsedState( socketId, 3, 0, 0 );
+        it.setUsedState( socketId, 3, 1, 0 );
+
+        System.out.println( "   After stop UsedState: " );
+        System.out.println( "       connected(3, 0): "+ us0.isConnected() );
+        System.out.println( "       used(3, 0): "+ us0.isUsed() );
+        System.out.println( "   After stop UsedState: " );
+        System.out.println( "       connected(3, 1): "+ us1.isConnected() );
+        System.out.println("       used(3, 1): " + us1.isUsed());
+        System.out.println( "   After stop WorkInfo: ");
+        System.out.println( "       connected(3, 0): "+ wi0.isConnected() );
+        System.out.println( "       workNow(3, 0): "+ wi0.isWorkNow() );
+        System.out.println( "   After stop WorkInfo: ");
+        System.out.println( "       connected(3, 1): "+ wi1.isConnected() );
+        System.out.println( "       workNow(3, 1): "+ wi1.isWorkNow() );
+
+        PortStats ps0 = it.getPortAllStats( socketId, 3, 0, 8);
+        PortStats ps1 = it.getPortAllStats( socketId, 3, 1, 8);
+
+        System.out.println( "   PortStats: " );
+        System.out.println( "       connected(3, 0): "+ ps0.isConnected() );
+        System.out.println( "       stats(3, 0): "+ printIntArray(ps0.getStats()) );
+        System.out.println( "   PortStats: " );
+        System.out.println( "       connected(3, 1): "+ ps1.isConnected() );
+        System.out.println( "       stats(3, 1): "+ printIntArray(ps1.getStats()) );
+
+        it.clearStatReliably( socketId, 3, 0 );
+        it.clearStatReliably( socketId, 3, 1 );
+
+        it.disconnectToServer( socketId );
+
     }
 
     private static void sendTest(ITesterAPI it) {
@@ -47,6 +187,9 @@ public class RpcClientTester implements ApplicationConstants {
         int[] head0to1 = EthFrameUtil.getHeader(3, 0, 3, 1);
         int[] head1to0 = EthFrameUtil.getHeader(3, 1, 3, 0);
         int socketId = cs.getSocketId();
+
+        it.setEthernetPhysicalForATT( socketId, 3, 0, 1, 0, 1, 0 );
+        it.setEthernetPhysicalForATT( socketId, 3, 1, 1, 0, 1, 0 );
 
         it.setUsedState( socketId, 3, 0, 1 );
         it.setUsedState( socketId, 3, 1, 1 );
@@ -87,7 +230,7 @@ public class RpcClientTester implements ApplicationConstants {
         System.out.println( "       workNow(3, 1): "+ wi1.isWorkNow() );
 
         try {
-            TimeUnit.SECONDS.sleep( 5 );
+            TimeUnit.SECONDS.sleep( 3 );
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
