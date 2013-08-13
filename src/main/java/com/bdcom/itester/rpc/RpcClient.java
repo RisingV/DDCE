@@ -682,6 +682,38 @@ public class RpcClient implements ITesterAPI {
     }
 
     @Override
+    public int setFramLengthChange(int socketId, int cardId, int portId, int isChange) {
+        SetFramLengthChangeReq setFramLengthChangeReq = new SetFramLengthChangeReq();
+        setFramLengthChangeReq.setSocketId( socketId );
+        setFramLengthChangeReq.setCardId( cardId );
+        setFramLengthChangeReq.setPortId( portId );
+        setFramLengthChangeReq.setChange( isChange );
+
+        byte[] data = null;
+        try {
+            data = SerializeUtil.serializeToByteArray( setFramLengthChangeReq );
+        } catch (IOException e) {
+            logException( e );
+        }
+
+        BDPacket request = BDPacket.newPacket( RpcID.SET_FRAM_LENGTH_CHANGE );
+        request.setDataType( RPC_REQUEST );
+        request.setData( data );
+
+        BDPacket response = null;
+        try {
+            response = client.send( request );
+        } catch (InterruptedException e) {
+            logException(e);
+        } catch (IOException e) {
+            logException(e);
+        }
+
+        int status = BDPacketUtil.byteArrayToInt( response.getData() );
+        return status;
+    }
+
+    @Override
     public int loadFPGA(int socketId, int cardId, int ethPhySpeed) {
         LoadFpgaReq loadFpgaReq = new LoadFpgaReq();
         loadFpgaReq.setSocketId(socketId);

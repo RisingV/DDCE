@@ -81,10 +81,10 @@ public class RpcClientTester implements ApplicationConstants {
 
         int[] head = EthFrameUtil.getHeader( 3, 2, 3, 0 );
 
-        byte[] payload = {0x5, 0xA};
+        int payload = 0x5A;
         it.setTxMode( socketId, 3, 2, 0, 0);
-        //it.setPayload(socketId, 3, 2, 512, payload, 0);
-        it.setHeader(socketId, 3, 2, 1, head.length, head);
+        it.setPayload(socketId, 3, 2, 512, payload, 0);
+        it.setHeader(socketId, 3, 2, 2, head.length, head);
         it.setStreamLength(socketId, 3, 2, 100, 100);
         it.setUsedState( socketId, 3, 2, 1 );
         it.startPort( socketId, 3, 2);
@@ -151,12 +151,19 @@ public class RpcClientTester implements ApplicationConstants {
         }
 
         int packetNum = 1000;
-        int streamId0 = 2342;
-        byte[] byteData = { 53, 65 };
+        int streamId0 = 0;
+        //byte[] byteData = { 53, 65 };
+        int byteData = 0x5A;
         int ePayloadType = 0;
 
         int[] head0to1 = EthFrameUtil.getHeader(cd0, pd0, cd1, pd1);
         int[] head1to0 = EthFrameUtil.getHeader(cd1, pd1, cd0, pd0);
+
+//        int len = head0to1.length + head1to0.length;
+//        int[] h = new int[head0to1.length + head1to0.length];
+//        System.arraycopy( head0to1, 0, h, 0, head0to1.length );
+//        System.arraycopy( head1to0, 0, h, head0to1.length, head1to0.length);
+
         int socketId = cs.getSocketId();
 
         //it.setEthernetPhysicalForATT( socketId, 3, 0, 0, 2, 1, 0 );
@@ -181,18 +188,17 @@ public class RpcClientTester implements ApplicationConstants {
 //        System.out.println( "       loopback(3, 3): "+ epp1.getLoopback() );
         it.startCapture( socketId, cd0, pd0 );
 
-        int len = head0to1.length + head1to0.length;
-        it.setHeader( socketId, cd0, pd0, 2, len, head0to1 );
-        it.setHeader( socketId, cd1, pd1, 2, len, head1to0 );
+//        it.setHeader( socketId, cd0, pd0, 2, head0to1.length, head0to1 );
+//        it.setHeader( socketId, cd1, pd1, 2, head1to0.length, head1to0 );
 
-//        it.setPayload( socketId, cd0, pd0, 0, byteData, ePayloadType);
-//        it.setPayload( socketId, cd1, pd1, 0, byteData, ePayloadType);
+        it.setHeader( socketId, cd0, pd0, 2, 44, head0to1 );
+        it.setHeader( socketId, cd1, pd1, 2, 44, head1to0 );
+
+        it.setPayload( socketId, cd0, pd0, 0, byteData, ePayloadType);
+        it.setPayload( socketId, cd1, pd1, 0, byteData, ePayloadType);
 
         it.setDelayCount( socketId, cd0, pd0, 12 );
         it.setDelayCount( socketId, cd1, pd1, 12 );
-
-        it.setUsedState( socketId, cd0, pd0, 1 );
-        it.setUsedState( socketId, cd1, pd1, 1 );
 
         it.setTxMode( socketId, cd0, pd0, 1, packetNum);
         it.setTxMode( socketId, cd1, pd1, 1, packetNum);
@@ -200,10 +206,13 @@ public class RpcClientTester implements ApplicationConstants {
         it.setStreamId( socketId, cd0, pd0, streamId0, 1);
         it.setStreamId( socketId, cd1, pd1, streamId0, 1);
 
-        it.setStreamLength( socketId, cd0, pd0, streamId0, 68-head0to1.length );
-        it.setStreamLength( socketId, cd1, pd1, streamId0, 68-head1to0.length );
-        //it.setStreamLength( socketId, cd0, pd0, streamId0+1, 70-head0to1.length );
-        //it.setStreamLength( socketId, cd1, pd1, streamId0+1, 70-head1to0.length );
+        it.setStreamLength( socketId, cd0, pd0, streamId0, 200-head0to1.length );
+        it.setStreamLength( socketId, cd1, pd1, streamId0, 200-head1to0.length );
+        it.setStreamLength( socketId, cd0, pd0, streamId0+1, 300-head0to1.length );
+        it.setStreamLength( socketId, cd1, pd1, streamId0+1, 300-head1to0.length );
+
+        it.setUsedState( socketId, cd0, pd0, 1 );
+        it.setUsedState( socketId, cd1, pd1, 1 );
 
         it.startPort( socketId , cd0, pd0 );
         it.startPort( socketId , cd1, pd1 );
@@ -518,7 +527,8 @@ public class RpcClientTester implements ApplicationConstants {
 
         int packetNum = 1000;
         int streamId0 = 1234;
-        byte[] byteData = { 0x5, 0xA };
+        //byte[] byteData = { 0x5, 0xA };
+        int byteData = 0x5A;
         int ePayloadType = 0;
 
         int[] head0to1 = EthFrameUtil.getHeader(3, 0, 3, 1);
@@ -550,8 +560,8 @@ public class RpcClientTester implements ApplicationConstants {
         it.setHeader( socketId, 3, 0, 2, len, head0to1 );
         it.setHeader( socketId, 3, 1, 2, len, head1to0 );
 
-//        it.setPayload( socketId, 3, 0, 0, byteData, ePayloadType);
-//        it.setPayload( socketId, 3, 1, 0, byteData, ePayloadType);
+        it.setPayload( socketId, 3, 0, 0, byteData, ePayloadType);
+        it.setPayload( socketId, 3, 1, 0, byteData, ePayloadType);
 
         it.setDelayCount( socketId, 3, 0, 12 );
         it.setDelayCount( socketId, 3, 1, 12 );

@@ -49,6 +49,8 @@ public interface ITesterAPI {
     public int setEthernetPhysicalForATT(int socketId, int cardId, int portId,
                            int nego, int ethPhySpeed, int fullDuplex, int loopback);
 
+    public int setFramLengthChange(int socketId, int cardId, int portId, int isChange);
+
     public int loadFPGA(int socketId, int cardId, int ethPhySpeed);
 
     public int resetFPGA(int socketId, int cardId);
