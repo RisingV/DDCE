@@ -83,7 +83,7 @@ public class RpcClientTester implements ApplicationConstants {
 
         byte[] payload = {0x5, 0xA};
         it.setTxMode( socketId, 3, 2, 0, 0);
-        it.setPayload(socketId, 3, 2, 512, payload, 0);
+        //it.setPayload(socketId, 3, 2, 512, payload, 0);
         it.setHeader(socketId, 3, 2, 1, head.length, head);
         it.setStreamLength(socketId, 3, 2, 100, 100);
         it.setUsedState( socketId, 3, 2, 1 );
@@ -185,8 +185,8 @@ public class RpcClientTester implements ApplicationConstants {
         it.setHeader( socketId, cd0, pd0, 2, len, head0to1 );
         it.setHeader( socketId, cd1, pd1, 2, len, head1to0 );
 
-        it.setPayload( socketId, cd0, pd0, 0, byteData, ePayloadType);
-        it.setPayload( socketId, cd1, pd1, 0, byteData, ePayloadType);
+//        it.setPayload( socketId, cd0, pd0, 0, byteData, ePayloadType);
+//        it.setPayload( socketId, cd1, pd1, 0, byteData, ePayloadType);
 
         it.setDelayCount( socketId, cd0, pd0, 12 );
         it.setDelayCount( socketId, cd1, pd1, 12 );
@@ -550,8 +550,8 @@ public class RpcClientTester implements ApplicationConstants {
         it.setHeader( socketId, 3, 0, 2, len, head0to1 );
         it.setHeader( socketId, 3, 1, 2, len, head1to0 );
 
-        it.setPayload( socketId, 3, 0, 0, byteData, ePayloadType);
-        it.setPayload( socketId, 3, 1, 0, byteData, ePayloadType);
+//        it.setPayload( socketId, 3, 0, 0, byteData, ePayloadType);
+//        it.setPayload( socketId, 3, 1, 0, byteData, ePayloadType);
 
         it.setDelayCount( socketId, 3, 0, 12 );
         it.setDelayCount( socketId, 3, 1, 12 );
