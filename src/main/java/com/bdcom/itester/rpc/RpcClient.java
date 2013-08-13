@@ -259,7 +259,7 @@ public class RpcClient implements ITesterAPI {
 
     @Override
     public int setPayload(int socketId, int cardId, int portId, int length,
-                          byte[] data, int payloadType) {
+                          int data, int payloadType) {
         SetPayloadReq setPayloadReq = new SetPayloadReq();
         setPayloadReq.setSocketId( socketId );
         setPayloadReq.setCardId( cardId );
@@ -297,7 +297,7 @@ public class RpcClient implements ITesterAPI {
         SetDelayCountReq setDelayCountReq = new SetDelayCountReq();
         setDelayCountReq.setSocketId(socketId);
         setDelayCountReq.setCardId(cardId);
-        setDelayCountReq.setDelayCount( portId );
+        setDelayCountReq.setPortId( portId );
         setDelayCountReq.setDelayCount( delayCount );
 
         byte[] data = null;

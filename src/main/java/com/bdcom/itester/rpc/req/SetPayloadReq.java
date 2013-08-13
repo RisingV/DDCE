@@ -20,7 +20,7 @@ public class SetPayloadReq implements Serializable {
 
     private int length;
 
-    private byte[] data;
+    private int data;
 
     private int payloadType;
 
@@ -40,7 +40,7 @@ public class SetPayloadReq implements Serializable {
         return length;
     }
 
-    public byte[] getData() {
+    public int getData() {
         return data;
     }
 
@@ -64,7 +64,7 @@ public class SetPayloadReq implements Serializable {
         this.length = length;
     }
 
-    public void setData(byte[] data) {
+    public void setData(int data) {
         this.data = data;
     }
 

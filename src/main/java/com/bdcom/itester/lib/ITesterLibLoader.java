@@ -131,7 +131,7 @@ public class ITesterLibLoader {
 	 *		    1: connect fail
 	 * */
 	public final native int setPayload(int socketId, int cardId, int portId,
-			int length, byte[] data, int payloadType);
+			int length, int data, int payloadType);
 	
 	/**
 	 * @param socketId return by <code>connectToServer(String ipAddr)</code>

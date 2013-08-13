@@ -24,7 +24,7 @@ public interface ITesterAPI {
 
     public int setHeader(int socketId, int cardId, int portId, int validStreamCount, int length, int[] strHead);
 
-    public int setPayload(int socketId, int cardId, int portId, int length, byte[] data, int payloadType);
+    public int setPayload(int socketId, int cardId, int portId, int length, int data, int payloadType);
 
     public int setDelayCount(int socketId, int cardId, int portId, int delayCount);
 
