@@ -1,4 +1,4 @@
-package com.bdcom.itester.util;
+package com.bdcom.itester.api.wrapper;
 
 import java.util.HashMap;
 import java.util.Map;

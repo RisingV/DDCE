@@ -18,7 +18,7 @@ public class Scenario implements Serializable {
 	
 	private static final long serialVersionUID = 458346062352593578L;
 	
-	private static long _maxId = -1; //can't Serialize, should init by hand
+	private static long _maxId = -1; //can't Serialize, should int by hand
 	
 	private long id = -1;
 	

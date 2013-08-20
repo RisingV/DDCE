@@ -98,7 +98,7 @@ public class ViewManager implements ApplicationConstants {
 		mainFrame.setImage(im);
 		
 		submitTab.setMsgTable(mainFrame.getMsgTable());
-//		mainFrame.init(); //can't add viewTab after init() called
+//		mainFrame.init(); //can't add viewTab after int() called
 		ViewUtil.centerWindow(loginFrame);		
 		
 	}

@@ -118,7 +118,7 @@ public class LocalTalker {
 									client = localServer.accept();
 								} catch (IOException e) {
 								}
-//								init();
+//								portInfo();
 								if ( null != client ) {
 									exec.execute(getChildThread(client));
 								}

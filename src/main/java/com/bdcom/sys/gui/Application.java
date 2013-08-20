@@ -52,14 +52,14 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
 
     private void init() {
 
-        //init config
+        //int config
         PathConfig pathConfig = new PathConfig( CURRENT_DIR );
         ServerConfig serverConfig = new ServerConfig( pathConfig );
 
         addAttribute( CONFIG.PATH_CONFIG, pathConfig );
         addAttribute( CONFIG.SERVER_CONFIG, serverConfig );
 
-        //init logical compo
+        //int logical compo
         ScriptMgr scriptMgr = new ScriptMgr( pathConfig );
         ScenarioMgr scenarioMgr = new ScenarioMgr((pathConfig));
         ClientProxy clientProxy = new ClientProxy( serverConfig );

@@ -784,7 +784,7 @@ public class RpcClient implements ITesterAPI {
 
         byte[] data = null;
         try {
-            data = SerializeUtil.serializeToByteArray( data );
+            data = SerializeUtil.serializeToByteArray( getStreamSendInfoReq );
         } catch (IOException e) {
             logException( e );
         }

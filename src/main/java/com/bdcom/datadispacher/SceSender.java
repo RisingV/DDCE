@@ -45,13 +45,13 @@ public class SceSender implements
 				server = new Socket(ip,port);
 			} catch (UnknownHostException e) {
 				String msg = this.getClass().getName() + 
-						" throws UnknownHostException when init Server ip: " +
+						" throws UnknownHostException when portInfo Server ip: " +
 						ip.toString() + "port: " +port;
 				ErrorLogger.log(msg);
 				status = _SERVER_INIT_FAILURE;
 			} catch (IOException e) {
 				String msg = this.getClass().getName() + 
-						" throws IOException when init Server ip: " +
+						" throws IOException when portInfo Server ip: " +
 						ip.toString() + "port: " + port;
 				ErrorLogger.log(msg);
 				status = _SERVER_INIT_FAILURE;
