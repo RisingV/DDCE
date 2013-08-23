@@ -1,4 +1,4 @@
-package com.bdcom.view.itester;
+package com.bdcom.view.itester.tree;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;

@@ -62,9 +62,16 @@ public abstract class ServerContent {
         return 1;
     }
 
-    public static int SaveITesterRecord(ITesterRecord record) {
-        //TODO
-        return 1;
+    public static ITesterRecord SaveITesterRecord(ITesterRecord record) {
+        if ( ITesterRecord.CHECK_WORK_ORDER == record.getType() ) {
+            //TODO
+            //check if work order is valid or has tested
+            //and set record status;
+        } else if ( ITesterRecord.COMMIT_TEST_RESULT == record.getType() ) {
+            //TODO
+            //save record
+        }
+        return record;
     }
 
 }

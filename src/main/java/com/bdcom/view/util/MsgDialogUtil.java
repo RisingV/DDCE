@@ -1,6 +1,7 @@
 package com.bdcom.view.util;
 
 import com.bdcom.nio.exception.GlobalException;
+import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.sys.gui.Application;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.util.LocaleUtil;
@@ -20,6 +21,7 @@ import java.io.EOFException;
 public abstract class MsgDialogUtil implements ApplicationConstants {
 
     private static final String CANT_CONNECT = "Connection refused";
+    private static final String SERVER_RESPONSE_ERR = "Server response error!";
 
     public static void reportGlobalException(GlobalException e) {
         Exception origin = e.getOriginException();
@@ -38,6 +40,11 @@ public abstract class MsgDialogUtil implements ApplicationConstants {
 
         showErrorDialog( msg );
         ErrorLogger.log( msg );
+    }
+
+    public static void reportResponseException(ResponseException e) {
+        String serverResErr = LocaleUtil.getLocalName( SERVER_RESPONSE_ERR );
+        showErrorDialog( serverResErr );
     }
 	
 	public static void showErrorDialog(String msg) {

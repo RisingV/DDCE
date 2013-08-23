@@ -6,6 +6,7 @@ import com.bdcom.itester.rpc.req.*;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.client.ClientWrapper;
+import com.bdcom.nio.exception.GlobalException;
 import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.util.SerializeUtil;
 import com.bdcom.util.StringUtil;
@@ -42,9 +43,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException(e);
         } catch (IOException e) {
+            logException(e);
+        } catch (GlobalException e) {
             logException(e);
         }
 
@@ -72,9 +73,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException(e);
         } catch (IOException e) {
+            logException(e);
+        } catch (GlobalException e) {
             logException(e);
         }
 
@@ -93,9 +94,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send(request);
-        } catch (InterruptedException e) {
-            logException(e);
         } catch (IOException e) {
+            logException(e);
+        } catch (GlobalException e) {
             logException(e);
         }
 
@@ -132,9 +133,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send(request);
-        } catch (InterruptedException e) {
-            logException(e);
         } catch (IOException e) {
+            logException(e);
+        } catch (GlobalException e) {
             logException(e);
         }
 
@@ -172,9 +173,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send(request);
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -212,9 +213,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -247,9 +248,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -282,9 +283,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -314,10 +315,10 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
             logException( e );
+        } catch (GlobalException e) {
+            logException(e);
         }
 
         int status = BDPacketUtil.byteArrayToInt( response.getData() );
@@ -347,10 +348,10 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
             logException( e );
+        } catch (GlobalException e) {
+            logException(e);
         }
 
         int status = BDPacketUtil.byteArrayToInt( response.getData() );
@@ -378,9 +379,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException(e);
         } catch (IOException e) {
+            logException(e);
+        } catch (GlobalException e) {
             logException(e);
         }
 
@@ -409,9 +410,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -441,9 +442,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -481,9 +482,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -521,10 +522,10 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
             logException( e );
+        } catch (GlobalException e) {
+            logException(e);
         }
 
         WorkInfo workInfo = null;
@@ -562,10 +563,10 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
             logException( e );
+        } catch (GlobalException e) {
+            logException(e);
         }
 
         int status = BDPacketUtil.byteArrayToInt( response.getData() );
@@ -593,10 +594,10 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
             logException( e );
+        } catch (GlobalException e) {
+            logException(e);
         }
 
         UsedState usedState = null;
@@ -635,10 +636,10 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
             logException( e );
+        } catch (GlobalException e) {
+            logException(e);
         }
 
         int status = BDPacketUtil.byteArrayToInt( response.getData() );
@@ -671,9 +672,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException(e);
         } catch (IOException e) {
+            logException(e);
+        } catch (GlobalException e) {
             logException(e);
         }
 
@@ -703,9 +704,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException(e);
         } catch (IOException e) {
+            logException(e);
+        } catch (GlobalException e) {
             logException(e);
         }
 
@@ -734,9 +735,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -764,9 +765,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -796,9 +797,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -837,9 +838,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -877,9 +878,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -908,9 +909,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 
@@ -950,9 +951,9 @@ public class RpcClient implements ITesterAPI {
         BDPacket response = null;
         try {
             response = client.send( request );
-        } catch (InterruptedException e) {
-            logException( e );
         } catch (IOException e) {
+            logException( e );
+        } catch (GlobalException e) {
             logException( e );
         }
 

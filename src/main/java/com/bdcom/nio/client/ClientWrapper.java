@@ -4,6 +4,7 @@ import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
 import com.bdcom.nio.DataType;
 import com.bdcom.nio.RequestID;
+import com.bdcom.nio.exception.GlobalException;
 import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.util.log.ErrorLogger;
 
@@ -50,23 +51,34 @@ public class ClientWrapper {
         return client.getServerConfig();
     }
 
-    public BDPacket send(BDPacket packet) throws InterruptedException, IOException {
+    public BDPacket send(BDPacket packet) throws IOException, GlobalException {
         start();
         int requestID = packet.getRequestID();
         client.sendPacket( packet );
 
         BDPacket response = null;
-        while( true ) {
-            response = getResponseByRequestID( requestID );
-            if ( DataType.GLOBAL_EXCEPTION != response.getDataType() ) {
-                break;
-            } else {
-                if ( responseSortingThread.hasUnhandledException() ) {
-                    responseSortingThread.handledRecentException();
+        boolean interrupted = false;
+        try {
+            while( true ) {
+                response = getResponseByRequestID( requestID );
+                if ( DataType.GLOBAL_EXCEPTION != response.getDataType() ) {
                     break;
                 } else {
-                    continue;
+                    if ( responseSortingThread.hasUnhandledException() ) {
+                        responseSortingThread.handledRecentException();
+                        BDPacketUtil.globalExceptionCheck( packet );
+                        break;
+                    } else {
+                        continue;
+                    }
                 }
+            }
+        } catch (InterruptedException e) { // this damn exception almost never happen, so ignore it
+            interrupted = true;
+            ErrorLogger.log( "fetch Response interrupted! request:" + requestID  );
+        } finally {
+            if ( interrupted ) {
+                return null;
             }
         }
 

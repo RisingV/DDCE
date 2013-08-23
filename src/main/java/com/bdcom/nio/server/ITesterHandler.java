@@ -1,10 +1,9 @@
 package com.bdcom.nio.server;
 
-import com.bdcom.nio.ServerContent;
+import com.bdcom.biz.pojo.ITesterRecord;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
-import com.bdcom.nio.DataType;
-import com.bdcom.biz.pojo.ITesterRecord;
+import com.bdcom.nio.ServerContent;
 import com.bdcom.util.SerializeUtil;
 
 import java.io.IOException;
@@ -36,12 +35,13 @@ public class ITesterHandler extends CommonHandler {
             }
         }
 
-        int saveStatus = ServerContent.SaveITesterRecord(record);
-        byte[] data = BDPacketUtil.intToByteArray( saveStatus );
-
-        BDPacket pack = BDPacket.newPacket( bdPacket.getRequestID() );
-        pack.setDataType( DataType.INTEGER );
-        pack.setData( data );
+        ITesterRecord checked = ServerContent.SaveITesterRecord(record);
+        BDPacket pack = null;
+        try {
+            pack = BDPacketUtil.encapsulateToPacket( checked );
+        } catch (IOException e) {
+            System.err.println( "IOException when encapsulate ITesterRecord: " + e.getMessage() );
+        }
 
         return pack;
     }

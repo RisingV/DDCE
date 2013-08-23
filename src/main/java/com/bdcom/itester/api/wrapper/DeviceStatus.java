@@ -181,6 +181,34 @@ public class DeviceStatus {
         public int getPortId() {
             return portId;
         }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append( "(" )
+              .append( cardId )
+              .append( "," )
+              .append( portId )
+              .append( ")" );
+            return sb.toString();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            Class<?> clazz = obj.getClass();
+            if ( clazz != PortLocation.class ) {
+                return false;
+            }
+            PortLocation that = (PortLocation) obj;
+            if ( this == obj ) {
+                return true;
+            }
+            if ( this.cardId == that.portId &&
+                    this.portId == that.portId ) {
+                return true;
+            }
+            return false;
+        }
     }
 
 }

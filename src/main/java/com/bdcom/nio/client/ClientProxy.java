@@ -7,10 +7,12 @@ import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
+import com.bdcom.nio.DataType;
 import com.bdcom.nio.RequestID;
 import com.bdcom.nio.exception.GlobalException;
 import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.sys.config.ServerConfig;
+import com.bdcom.util.SerializeUtil;
 import com.bdcom.util.log.ErrorLogger;
 
 import java.io.IOException;
@@ -40,7 +42,7 @@ public class ClientProxy {
         return client.getServerConfig();
     }
 
-    public BDPacket sendRawPacket(BDPacket packet) throws IOException, InterruptedException {
+    public BDPacket sendRawPacket(BDPacket packet) throws IOException, GlobalException {
         return client.send( packet );
     }
 
@@ -64,21 +66,26 @@ public class ClientProxy {
 
     public int sendBaseTestRecord(BaseTestRecord record)
             throws IOException, ResponseException, GlobalException {
-        int status = -1;
-        try {
-            BDPacket packet = BDPacketUtil.encapsulateToPacket(record);
-            BDPacket response = client.send(packet);
-            status = BDPacketUtil.parseIntResponse( response, RequestID.SEND_BASE_TEST_REC );
-        } catch (InterruptedException e) {
-            ErrorLogger.log(e.getMessage());
-        }
 
-        return status;
+        BDPacket packet = BDPacketUtil.encapsulateToPacket(record);
+        BDPacket response = client.send(packet);
+        return BDPacketUtil.parseIntResponse( response, RequestID.SEND_BASE_TEST_REC );
     }
 
-    public BDPacket sendITesterRecord(ITesterRecord record) throws IOException, InterruptedException {
+    public ITesterRecord sendITesterRecord(ITesterRecord record) throws IOException,
+            ResponseException, GlobalException {
         BDPacket packet = BDPacketUtil.encapsulateToPacket(record);
-        return client.send(packet);
+        BDPacket response = client.send( packet );
+        if ( DataType.I_TESTER_RECORD !=  response.getDataType() ) {
+            throw new ResponseException("Invalid Response!");
+        }
+        ITesterRecord resObj = null;
+        try {
+            resObj = (ITesterRecord) SerializeUtil.deserializeFromByteArray(response.getData());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return resObj;
     }
 
     public void uploadScenarios(ScenarioMgr scenarioMgr) throws IOException, GlobalException {

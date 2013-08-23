@@ -14,10 +14,11 @@ public class TestSession {
     private ITesterAPI api;
     private int pktNum;
     private int socketId;
-    private int[] idList;
+    private int[] idList; //{ srcCardId, srcPortId, dstCardId, dstPortId }
     private int[] streamIDs;
     private boolean finished = false;
     private Boolean passed = null;
+    private PortStats ps;
 
     TestSession(ITesterAPI api, int pktNum, int socketId,
                 int[] idList, int[] streamIDs) {
@@ -26,6 +27,10 @@ public class TestSession {
         this.socketId = socketId;
         this.idList = idList;
         this.streamIDs = streamIDs;
+    }
+
+    public PortStats getPortStats() {
+        return ps;
     }
 
     public boolean isTestDone() {
@@ -68,7 +73,7 @@ public class TestSession {
 
     private void getTestResultAndStop() {
         if ( null == passed ) {
-            PortStats ps = api.getPortAllStats( socketId, idList[0], idList[1], 8 );
+            ps = api.getPortAllStats( socketId, idList[0], idList[1], 8 );
             long[] stats = ps.getStats();
             if ( stats[0] == stats[3] ) {
                 passed = Boolean.TRUE;

@@ -82,7 +82,6 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         ScriptList scriptList = new ScriptList(this);
         MsgTable msgTable = new MsgTable(this);
 
-
         addAttribute( COMPONENT.MSG_TABLE, msgTable );
         addAttribute( COMPONENT.SCRIPT_LIST, scriptList );
         addAttribute( COMPONENT.SCENARIO_MGR_FRAME, scenarioMgrFrame );

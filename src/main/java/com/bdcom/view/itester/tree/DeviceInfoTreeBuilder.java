@@ -1,4 +1,4 @@
-package com.bdcom.view.itester;
+package com.bdcom.view.itester.tree;
 
 import com.bdcom.itester.api.wrapper.DeviceStatus;
 import com.bdcom.view.util.ViewUtil;

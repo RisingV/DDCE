@@ -16,6 +16,7 @@ public class ITesterException extends Exception {
     private int cardId;
     private int portId;
     private int errType;
+    private String serverIP;
 
     public int getCardId() {
         return cardId;
@@ -33,6 +34,10 @@ public class ITesterException extends Exception {
         return errType;
     }
 
+    public String getServerIP() {
+        return serverIP;
+    }
+
     public void setPortId(int portId) {
         this.portId = portId;
     }
@@ -48,6 +53,11 @@ public class ITesterException extends Exception {
     public ITesterException(String msg, int errType) {
         super(msg);
         this.errType = errType;
+    }
+
+    public ITesterException(int errType, String serverIP) {
+        this( errType );
+        this.serverIP = serverIP;
     }
 
     public ITesterException(int errType, int cardId, int portId) {
