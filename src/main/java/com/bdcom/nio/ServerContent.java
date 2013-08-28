@@ -64,6 +64,8 @@ public abstract class ServerContent {
 
     public static ITesterRecord SaveITesterRecord(ITesterRecord record) {
         if ( ITesterRecord.CHECK_WORK_ORDER == record.getType() ) {
+            record.setEverTested( false );
+            record.setWorkOrderValid( true );
             //TODO
             //check if work order is valid or has tested
             //and set record status;

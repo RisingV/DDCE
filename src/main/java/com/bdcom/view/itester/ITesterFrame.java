@@ -12,6 +12,7 @@ import com.bdcom.nio.exception.ResponseException;
 import com.bdcom.sys.ApplicationConstants;
 import com.bdcom.util.LocaleUtil;
 import com.bdcom.util.StringUtil;
+import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.view.ViewTab;
 import com.bdcom.view.itester.tree.DeviceInfoTreeBuilder;
 import com.bdcom.view.util.GBC;
@@ -22,10 +23,12 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -36,27 +39,234 @@ import java.util.Set;
 public class ITesterFrame extends JPanel
         implements ViewTab, ApplicationConstants {
 
+    private static final String ADD_TEST_SERVER = "Add Test Server";
+    private static final String ADD_TEST_CASE = "Add Test Case";
+    private static final String COMMIT_TEST_RESULT = "Commit Test Result";
+    private static final String COMMITTED_NUM = "Committed Number:";
+    private static final String UNCOMMITTED_NUM = "Uncommitted Number:";
+    private static final String SEQUENTIAL_MODE = "Sequential Mode";
+    private static final String COCURRENT_MODE = "Cocurrent Mode";
+    private static final String START_ALL = "Start All";
+    private static final String EXE_MODE = "Execution Mode";
+    private static final String SERVER_PORTS_STATUS = "Server Ports Status";
+    private static final String TEST_CASE_LIST = "Test Case List";
+    private static final String TEST_CONFIG = "Test Config";
+
     private final ITesterAPI api;
     private final ClientProxy client;
 
     private ITesterAPIWrapper apiWrapper;
 
+    private JPanel frame = this;
     private JScrollPane leftPane;
+    private JPanel leftInnerPane;
     private JPanel rightPane;
     private JPanel buttonPane;
     private JPanel modePane;
-    private JPanel progressesPane;
+    private JScrollPane progressesPane;
+    private JPanel progressesInnerPane;
 
     private JButton addServerBt;
     private JButton addTestBt;
+    private JButton commitBt;
     private JButton startAllBt;
 
+    private ButtonGroup modeGroup;
+    private JRadioButton sequentialMode;
+    private JRadioButton cocurrentMode;
+
+    private AddServerDialog addServerDialog;
+    private WorkOrderDialog workOrderDialog;
+    private TestConfigDialog testConfigDialog;
+    private CommitDialog commitDialog;
+
     private Map<String, DeviceStatus> dsMap = new HashMap<String, DeviceStatus>();
+    private List<ProgressPanel> ppSet = new ArrayList<ProgressPanel>();
+    private List<JTree> diTreeList = new ArrayList<JTree>();
 
     public ITesterFrame(ITesterAPI api, ClientProxy client) {
         this.api = api;
         this.client = client;
         this.apiWrapper = new ITesterAPIWrapper( api );
+        initUI();
+    }
+
+    private void initUI() {
+        initLeftPane();
+        initRightPane();
+        frame.add( leftPane, BorderLayout.WEST );
+        frame.add( rightPane, BorderLayout.EAST );
+    }
+
+    private void initDialogs() {
+        addServerDialog = new AddServerDialog( frame, dsMap );
+        testConfigDialog = new TestConfigDialog( frame, dsMap );
+        workOrderDialog = new WorkOrderDialog( frame, testConfigDialog );
+        commitDialog = new CommitDialog( frame );
+    }
+
+    private void initLeftPane() {
+        String serverPortsStatus = LocaleUtil.getLocalName( SERVER_PORTS_STATUS );
+
+        leftInnerPane = new JPanel();
+        leftPane = new JScrollPane( leftInnerPane );
+        leftPane.setPreferredSize( new Dimension(220, 600) );
+        leftInnerPane.setLayout(new GridBagLayout());
+        Border bd = BorderFactory.createTitledBorder( serverPortsStatus );
+        leftPane.setBorder( bd );
+    }
+
+    private void initRightPane() {
+        initDialogs();
+        initButtonPane();
+        initModePane();
+        initProgressesPane();
+
+        rightPane = new JPanel();
+        rightPane.setLayout( new GridBagLayout() );
+        rightPane.add( buttonPane, new GBC(0, 0) );
+        rightPane.add( modePane, new GBC(0, 1) );
+        rightPane.add( progressesPane, new GBC(0, 2) );
+    }
+
+    private void initButtonPane() {
+        String addServ = LocaleUtil.getLocalName( ADD_TEST_SERVER );
+        String addTest = LocaleUtil.getLocalName( ADD_TEST_CASE );
+        String commitResult = LocaleUtil.getLocalName( COMMIT_TEST_RESULT );
+
+        addServerBt = new JButton( addServ );
+        addTestBt = new JButton( addTest );
+        commitBt = new JButton( commitResult );
+        addServerBt.setPreferredSize( new Dimension(120, 30) );
+        addTestBt.setPreferredSize(new Dimension(110, 30) );
+        commitBt.setPreferredSize(new Dimension(110, 30) );
+
+        addServerBt.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addServerDialog.display();
+            }
+        });
+
+        addTestBt.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                workOrderDialog.display();
+            }
+        });
+
+        commitBt.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ProgressPanel[] panels = getTestedProgressPanels();
+                int total = panels.length;
+                ITesterRecord[] records = new ITesterRecord[total];
+                for ( int i=0; i < total; i++ ) {
+                    records[i] = panels[i].getTestResult();
+                }
+                List<ProgressPanel> panelsToRemove = new ArrayList<ProgressPanel>();
+                try {
+                    commitDialog.display();
+                    for ( int i=0; i < total; i++ ) {
+                        sendITesterRecord( records[i] );
+                        panelsToRemove.add(panels[i]);
+                    }
+                } catch (GlobalException ex) {
+                    reportSendException( ex );
+                } catch (ResponseException ex) {
+                    reportSendException( ex );
+                } catch (IOException ex) {
+                    reportSendException( ex );
+                } finally {
+                    int committedNum = panelsToRemove.size();
+                    ProgressPanel[] pls = new ProgressPanel[committedNum];
+                    pls = panelsToRemove.toArray( pls );
+                    removeProgressPanels( pls );
+                    resetProgressesPane();
+
+                    String committedNumMsg = LocaleUtil.getLocalName( COMMITTED_NUM );
+                    String uncommittedNumMsg = LocaleUtil.getLocalName( UNCOMMITTED_NUM );
+                    StringBuilder sb = new StringBuilder();
+                    sb.append( "<html>" )
+                      .append( committedNumMsg )
+                      .append( committedNum )
+                      .append( "<br/>" )
+                      .append( uncommittedNumMsg )
+                      .append( total - committedNum )
+                      .append( "<br/></html>" );
+
+                    commitDialog.close();
+                    MsgDialogUtil.showMsgDialog( sb.toString() );
+                }
+            }
+        });
+
+        String testConfig = LocaleUtil.getLocalName( TEST_CONFIG );
+        Border bd = BorderFactory.createTitledBorder( testConfig );
+        buttonPane = new JPanel();
+        buttonPane.setLayout( new GridBagLayout() );
+        buttonPane.setPreferredSize(new Dimension(600, 100));
+        buttonPane.setBorder( bd );
+        buttonPane.add( addServerBt, new GBC(0, 0).setInsets(5, 10, 5, 10) );
+        buttonPane.add( addTestBt, new GBC(1, 0).setInsets( 5, 10 ,5, 10 ) );
+        buttonPane.add( commitBt, new GBC(2, 0).setInsets( 5, 10, 5, 10) );
+    }
+
+    private void initModePane() {
+        String sequential = LocaleUtil.getLocalName( SEQUENTIAL_MODE );
+        String cocurrent = LocaleUtil.getLocalName( COCURRENT_MODE );
+        String exeMode = LocaleUtil.getLocalName( EXE_MODE );
+        String startAll = LocaleUtil.getLocalName( START_ALL );
+
+        startAllBt = new JButton( startAll );
+        startAllBt.setPreferredSize( new Dimension( 120, 30 ) );
+        modeGroup = new ButtonGroup();
+        sequentialMode = new JRadioButton( sequential );
+        cocurrentMode = new JRadioButton( cocurrent );
+        modeGroup.add( sequentialMode );
+        modeGroup.add( cocurrentMode );
+        ActionListener al = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( sequentialMode.isSelected() ||
+                        cocurrentMode.isSelected() ) {
+                    startAllBt.setEnabled( true );
+                } else {
+                    startAllBt.setEnabled( false );
+                }
+            }
+        };
+        sequentialMode.addActionListener( al );
+        cocurrentMode.addActionListener(al);
+
+        startAllBt.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( sequentialMode.isSelected() ) {
+                    ProgressPanel[] panels = getUnTestedProgressPanels();
+                    new TestExecutor( panels, TestExecutor.SYNC ).start();
+                }
+                if ( cocurrentMode.isSelected() ) {
+                    ProgressPanel[] panels = getUnTestedProgressPanels();
+                    new TestExecutor( panels, TestExecutor.ASYNC ).start();
+                }
+            }
+        });
+        startAllBt.setEnabled( false );
+
+        modePane = new JPanel();
+        Border titledBorder = BorderFactory.createTitledBorder( exeMode );
+        modePane.setBorder( titledBorder );
+
+        modePane.setLayout( new GridBagLayout() );
+        modePane.setPreferredSize( new Dimension( 600, 100 ) );
+        modePane.add( sequentialMode, new GBC(0, 0).setInsets( 5, 10, 5, 10) );
+        modePane.add( cocurrentMode, new GBC(1, 0).setInsets( 5, 10, 5, 10) );
+        modePane.add( startAllBt, new GBC(2, 0).setInsets( 5, 10, 5, 10) );
+    }
+
+    private void initProgressesPane() {
+        resetProgressesPane();
     }
 
     void addDeviceInfoTree(String ip) {
@@ -76,11 +286,88 @@ public class ITesterFrame extends JPanel
         }
 
         JTree deviceInfoTree = DeviceInfoTreeBuilder.buildTree( deviceStatus );
-        leftPane.add( deviceInfoTree );
+        diTreeList.add( deviceInfoTree );
+
+        leftInnerPane.removeAll();
+        int num = diTreeList.size();
+        for ( int i=0; i < num; i++ ) {
+            leftInnerPane.add(deviceInfoTree, new GBC(0, i));
+        }
     }
 
     void addTestCase(ITesterRecord record, TestCaseConfig testConfig) {
         ProgressPanel progressPanel = new ProgressPanel( record, apiWrapper, testConfig );
+        progressPanel.setPanelOwner( this );
+        progressPanel.setRemoveAction( new RemoveProgressPanelAction( progressPanel ) );
+        addProgressPanels( progressPanel );
+        resetProgressesPane();
+    }
+
+    private void resetProgressesPane() {
+        if ( null == progressesPane ) {
+            String testCaseList = LocaleUtil.getLocalName( TEST_CASE_LIST );
+
+            progressesInnerPane = new JPanel();
+            progressesInnerPane.setLayout( new GridBagLayout() );
+
+            progressesPane = new JScrollPane( progressesInnerPane );
+            progressesPane.setPreferredSize( new Dimension( 600, 400 ) );
+            Border bd = BorderFactory.createTitledBorder( testCaseList );
+            progressesPane.setBorder( bd );
+        }
+        progressesInnerPane.removeAll();
+        int count = ppSet.size();
+        for ( int i=0; i < count; i++ ) {
+            ProgressPanel pp = ppSet.get( i );
+            progressesInnerPane.add( pp, new GBC(0, i) );
+        }
+        progressesInnerPane.revalidate();
+        progressesPane.revalidate();
+        progressesPane.repaint();
+    }
+
+    private ProgressPanel[] getTestedProgressPanels() {
+        List<ProgressPanel> ppl = new ArrayList<ProgressPanel>();
+        for ( ProgressPanel pane : ppSet ) {
+            if ( pane.isTested() ) {
+                ppl.add( pane );
+            }
+        }
+        ProgressPanel[] panels = new ProgressPanel[ppl.size()];
+        panels = ppl.toArray( panels );
+        return panels;
+    }
+
+    private ProgressPanel[] getUnTestedProgressPanels() {
+        List<ProgressPanel> ppl = new ArrayList<ProgressPanel>();
+        for ( ProgressPanel pane : ppSet ) {
+            if ( !pane.isTested() ) {
+                ppl.add( pane );
+            }
+        }
+        ProgressPanel[] panels = new ProgressPanel[ppl.size()];
+        panels = ppl.toArray( panels );
+        return panels;
+    }
+
+    private void addProgressPanels(ProgressPanel... panels) {
+        if ( null == panels || panels.length == 0 ) {
+            return;
+        }
+        int len = panels.length;
+        for ( int i=0; i < len; i++ ) {
+            ppSet.add(panels[i]);
+        }
+    }
+
+    private void removeProgressPanels(ProgressPanel... panels) {
+        if ( null == panels || panels.length == 0 || ppSet.isEmpty() ) {
+            return;
+        }
+        int len = panels.length;
+        for ( int i=0; i < len; i++ ) {
+            ppSet.remove( panels[i] );
+        }
     }
 
     ITesterRecord sendITesterRecord(ITesterRecord itr)
@@ -101,39 +388,143 @@ public class ITesterFrame extends JPanel
         }
     }
 
+    class RemoveProgressPanelAction implements ActionListener {
+
+        private final ProgressPanel panel;
+
+        RemoveProgressPanelAction(ProgressPanel panel) {
+            this.panel = panel;
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            removeProgressPanels( panel );
+            resetProgressesPane();
+        }
+    }
+
+    class TestExecutor extends Thread {
+        static final int SYNC = 0xA;
+        static final int ASYNC = 0xB;
+
+        private final ProgressPanel[] panels;
+        private final int mode;
+        TestExecutor(ProgressPanel[] panels, int mode) {
+            this.panels = panels;
+            this.mode = mode;
+        }
+
+        @Override
+        public void run() {
+            if ( mode == SYNC ) {
+                syncTest();
+            } else {
+                asyncTest();
+            }
+        }
+
+        private void syncTest() {
+            if ( null == panels || panels.length == 0 ) {
+                return;
+            }
+            for (ProgressPanel panel : panels)  {
+                if ( null != panel && !panel.isTested() ) {
+                    panel.startTest();
+                    int timeoutCounter = 0;
+                    while( true ) {
+                        try {
+                            TimeUnit.SECONDS.sleep( 5 );
+                        } catch (InterruptedException e) {
+                            ErrorLogger.log( "TestExecutor Thread interrupted: "
+                                    + e.getMessage() );
+                        }
+                        if ( panel.isTested() || timeoutCounter > 8 ) {
+                            break;
+                        }
+                        timeoutCounter++;
+                    }
+                }
+            }
+        }
+
+        private void asyncTest() {
+            if ( null == panels || panels.length == 0 ) {
+                return;
+            }
+            for ( ProgressPanel panel: panels ) {
+                if ( null != panel && !panel.isTested() ) {
+                    panel.startTest();
+                }
+            }
+        }
+    }
+
+    private String tabTitle;
+    private String tabTip;
+    private Icon tabIcon;
+    private static final String ITESTER_STREAM_TEST = "ITester Stream Test";
+
     @Override
     public void setTabTitle(String tabTitle) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.tabTitle = tabTitle;
     }
 
     @Override
     public String getTabTitle() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if ( null == tabTitle ) {
+            tabTitle = LocaleUtil.getLocalName( ITESTER_STREAM_TEST );
+        }
+        return tabTitle;
     }
 
     @Override
     public void setTabIcon(Icon tabIcon) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.tabIcon = tabIcon;
     }
 
     @Override
     public Icon getTabIcon() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return tabIcon;
     }
 
     @Override
     public Component getTabComponent() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return frame;
     }
 
     @Override
     public void setTabTip(String tabTip) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.tabTip = tabTip;
     }
 
     @Override
     public String getTabTip() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return tabTip;
+    }
+
+    class CommitDialog extends IDialog {
+
+        private static final long serialVersionUID = -1016258074484354448L;
+        private static final String COMMITTING = "Committing...";
+
+        private JLabel msgLabel;
+
+        CommitDialog(JComponent fatherFrame) {
+            super(fatherFrame);
+        }
+
+        private void initUI() {
+            String msg = LocaleUtil.getLocalName( COMMITTING );
+            msgLabel = new JLabel( msg );
+            add( msgLabel, BorderLayout.CENTER );
+            dialog.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE );
+            dialog.addWindowListener( new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    //do nothing
+                }
+            });
+        }
+
     }
 
     class AddServerDialog extends IDialog {
@@ -154,7 +545,7 @@ public class ITesterFrame extends JPanel
 
         private final Map<String, DeviceStatus> dsMap;
 
-        public AddServerDialog(JFrame fatherFrame, Map<String, DeviceStatus> dsMap) {
+        public AddServerDialog(JComponent fatherFrame, Map<String, DeviceStatus> dsMap) {
             super(fatherFrame);
             this.dsMap = dsMap;
             initUI();
@@ -168,6 +559,7 @@ public class ITesterFrame extends JPanel
             setTitle( dialogTitle );
             ipLabel = new JLabel( label );
             ipField = new JTextField();
+            ipField.setPreferredSize( new Dimension( 150, 20 ) );
             okBt = new JButton( confirm );
             okBt.addActionListener( this );
 
@@ -191,12 +583,12 @@ public class ITesterFrame extends JPanel
             String ip = ipField.getText();
             if ( !StringUtil.isVaildIp(ip) ) {
                 String msg = LocaleUtil.getLocalName( INVALID_IP );
-                MsgDialogUtil.showMsgDialog( msg );
+                MsgDialogUtil.showMsgDialog( dialog, msg );
                 return;
             }
             if ( dsMap.containsKey( ip) ) {
                 String msg = LocaleUtil.getLocalName( ADDR_ADDED );
-                MsgDialogUtil.showMsgDialog( msg );
+                MsgDialogUtil.showMsgDialog( dialog, msg );
                 return;
             }
 
@@ -229,7 +621,7 @@ public class ITesterFrame extends JPanel
 
         private WorkOrderHistory workOrderHistory = new WorkOrderHistory();
 
-        public WorkOrderDialog(JFrame fatherFrame, TestConfigDialog tcDialog) {
+        public WorkOrderDialog(JComponent fatherFrame, TestConfigDialog tcDialog) {
             super(fatherFrame);
             this.tcDialog = tcDialog;
             initUI();
@@ -245,22 +637,26 @@ public class ITesterFrame extends JPanel
             Border workOrderTitle = BorderFactory.createTitledBorder( workOder );
             Border barCodeTitle = BorderFactory.createTitledBorder( barCode );
             workOrderPane = new WorkOrderPanel();
-            workOrderPane.setBorder( workOrderTitle );
+            //workOrderPane.setBorder( workOrderTitle );
             barCodePane = new JPanel();
             barCodePane.setBorder( barCodeTitle );
             buttonPane = new JPanel();
 
             barCodeLabel = new JLabel( barCode );
             barCodeField = new JTextField();
+            barCodeField.setPreferredSize( new Dimension( 150, 20 ) );
 
             nextBt = new JButton( next );
+            nextBt.setPreferredSize( new Dimension( 70, 30 ) );
             nextBt.addActionListener(this);
 
             barCodePane.setLayout( new GridBagLayout() );
-            barCodePane.add( barCodeLabel, new GBC(0, 0).setInsets(5, 10, 5, 10) );
-            barCodePane.add( barCodeField, new GBC(1, 0).setInsets(5, 10, 5, 10) );
+            barCodePane.setPreferredSize( new Dimension( 300, 150 ) );
+            barCodePane.add( barCodeLabel, new GBC(0, 0).setInsets(10) );
+            barCodePane.add( barCodeField, new GBC(1, 0).setInsets(10) );
 
             buttonPane.setLayout( new GridBagLayout() );
+            buttonPane.setPreferredSize( new Dimension( 300, 70 ) );
             buttonPane.add( nextBt, new GBC(0, 0).setInsets(5, 10, 5, 10) );
             buttonPane.add( cancelBt, new GBC(1, 0).setInsets(5, 10, 5, 10) );
 
@@ -273,7 +669,16 @@ public class ITesterFrame extends JPanel
         @Override
         public void display() {
             String[] wos = workOrderHistory.getAll();
-            workOrderPane.update( wos );
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for ( int i=0; i < wos.length; i++) {
+                sb.append( wos[i] )
+                  .append(", ");
+            }
+            sb.append("]");
+            System.out.println(sb.toString());
+            workOrderPane.update(wos);
+            workOrderPane.clearInputCompos();
             super.display();
         }
 
@@ -301,12 +706,12 @@ public class ITesterFrame extends JPanel
 
             if ( !itr.isWorkOrderValid() ) {
                 String invalidWorkOder = LocaleUtil.getLocalName( INVALID_WORK_ORDER );
-                MsgDialogUtil.showMsgDialog( invalidWorkOder );
+                MsgDialogUtil.showMsgDialog( dialog, invalidWorkOder );
                 return;
             }
             if ( itr.isEverTested() ) {
                 String everTested = LocaleUtil.getLocalName( EVER_TESTED );
-                MsgDialogUtil.showMsgDialog( everTested );
+                MsgDialogUtil.showMsgDialog( dialog, everTested );
                 return;
             }
 
@@ -320,13 +725,13 @@ public class ITesterFrame extends JPanel
             String workOrder = workOrderPane.getSelectedWorkOrder();
             if ( !StringUtil.isNotBlank( workOrder ) ) {
                 String blankWorkOrder = LocaleUtil.getLocalName( WORK_ORDER_IS_BLANK  );
-                MsgDialogUtil.showMsgDialog( blankWorkOrder );
+                MsgDialogUtil.showMsgDialog( dialog, blankWorkOrder );
                 return true;
             }
             String barCode = barCodeField.getText();
             if ( !StringUtil.isNotBlank( barCode ) ) {
                 String blankBarCode = LocaleUtil.getLocalName( BAR_CODE_IS_BLANK );
-                MsgDialogUtil.showMsgDialog( blankBarCode );
+                MsgDialogUtil.showMsgDialog( dialog, blankBarCode );
                 return true;
             }
             return false;
@@ -341,7 +746,7 @@ public class ITesterFrame extends JPanel
                 if ( counter < LIMIT ) {
                     queue[ counter++ ] = wo;
                 } else {
-                    for ( int i= LIMIT-1; i > 1; i-- ) {
+                    for ( int i= LIMIT-1; i > 0; i-- ) {
                         queue[i] = queue[i-1];
                     }
                     queue[0] = wo;
@@ -375,7 +780,8 @@ public class ITesterFrame extends JPanel
             private JLabel emptyLabel;
             private JLabel workOrderLabel;
             private JTextField workOrderField;
-            private JPanel historyPane;
+            private JScrollPane historyPane;
+            private JPanel historyInnerPane;
             private JPanel inputPane;
 
             private Map<String, JRadioButton> jrbMap = new HashMap<String, JRadioButton>();
@@ -386,6 +792,9 @@ public class ITesterFrame extends JPanel
             }
 
             String getSelectedWorkOrder() {
+                if ( inputNewWorkOrder.isSelected() ) {
+                    selectedWorkOrder = workOrderField.getText();
+                }
                 return selectedWorkOrder;
             }
 
@@ -415,6 +824,7 @@ public class ITesterFrame extends JPanel
                 emptyLabel = new JLabel( noRecentInput );
                 workOrderLabel = new JLabel( workOrderNum );
                 workOrderField = new JTextField();
+                workOrderField.setPreferredSize( new Dimension( 150, 20) );
 
                 buttonGroup = new ButtonGroup();
                 inputNewWorkOrder = new JRadioButton( inputNew );
@@ -422,20 +832,30 @@ public class ITesterFrame extends JPanel
                 inputNewWorkOrder.addActionListener( this );
                 buttonGroup.add( inputNewWorkOrder );
 
-                historyPane = new JPanel();
+                historyInnerPane = new JPanel();
+                historyPane = new JScrollPane( historyInnerPane );
+                historyPane.setPreferredSize( new Dimension( 300, 150 ) );
                 Border titledBd = BorderFactory.createTitledBorder( recentInput );
                 historyPane.setBorder( titledBd );
-                historyPane.setLayout( new GridBagLayout() );
-                historyPane.add( emptyLabel, new GBC(0, 0) );
+                historyInnerPane.setLayout(new GridBagLayout());
+                historyInnerPane.add( emptyLabel, new GBC(0, 0) );
 
                 inputPane = new JPanel();
                 inputPane.setLayout( new GridBagLayout() );
-                inputPane.add( inputNewWorkOrder, new GBC(0, 0).setInsets( 10 ) );
-                inputPane.add( workOrderLabel, new GBC(0, 1).setInsets( 10) );
+                //inputPane.add( inputNewWorkOrder, new GBC(0, 0).setInsets( 10,1,10,1 ) );
+                inputPane.add( workOrderLabel, new GBC(0, 1).setInsets( 10 ) );
                 inputPane.add( workOrderField, new GBC(1, 1).setInsets( 10 ) );
 
-                add( historyPane, BorderLayout.NORTH );
-                add( inputPane, BorderLayout.SOUTH );
+                setLayout( new GridBagLayout() );
+                add( historyPane, new GBC(0, 0)
+                        .setInsets(10)
+                    );
+                add(inputNewWorkOrder, new GBC(0, 1)
+                        .setInsets(10)
+                        .setAnchor(GBC.WEST));
+                add( inputPane, new GBC(0, 2)
+                        .setInsets( 10 )
+                    );
             }
 
             void update(String[] wos) {
@@ -464,12 +884,25 @@ public class ITesterFrame extends JPanel
                 resetLayout( jrbs );
             }
 
-            private void resetLayout(JRadioButton[] jrbs) {
-                historyPane.removeAll();
-                for ( int i = 0; i < jrbs.length; i++ ) {
-                    historyPane.add( jrbs[i], new GBC(0, i).setInsets( 5, 10, 5, 10 ) );
+            private void clearInputCompos() {
+                String wo = workOrderField.getText();
+                if ( !"".equals( wo ) ) {
+                    workOrderField.setText( "" );
                 }
-                historyPane.revalidate();
+                String bc = barCodeField.getText();
+                if ( !"".equals( bc ) ) {
+                    barCodeField.setText( "" );
+                }
+            }
+
+            private void resetLayout(JRadioButton[] jrbs) {
+                historyInnerPane.removeAll();
+                for ( int i = 0; i < jrbs.length; i++ ) {
+                    historyInnerPane.add(jrbs[i], new GBC(0, i)
+                            .setAnchor(GBC.WEST)
+                            .setInsets(5, 10, 5, 10));
+                }
+                historyInnerPane.revalidate();
             }
         }
 
@@ -505,7 +938,7 @@ public class ITesterFrame extends JPanel
 
         private ITesterRecord itr;
 
-        public TestConfigDialog(JFrame fatherFrame, Map<String, DeviceStatus> dsMap) {
+        public TestConfigDialog(JComponent fatherFrame, Map<String, DeviceStatus> dsMap) {
             super(fatherFrame);
             this.dsMap = dsMap;
             initUI();
@@ -518,10 +951,18 @@ public class ITesterFrame extends JPanel
             initSecondsPane();
             initButtonPane();
             setLayout(new GridBagLayout());
-            add(serverListPane, new GBC(0, 0));
-            add( portListPane, new GBC(0, 1) );
-            add( secondsPane, new GBC(0, 2) );
-            add( buttonPane, new GBC(0, 3) );
+            add(serverListPane, new GBC(0, 0)
+                    .setAnchor(GBC.WEST)
+                    .setInsets(5,20,5,10));
+            add(portListPane, new GBC(0, 1)
+                    .setAnchor(GBC.WEST)
+                    .setInsets(5,10,5,10));
+            add( secondsPane, new GBC(0, 2)
+                    .setAnchor( GBC.WEST )
+                    .setInsets(5,10,5,10) );
+            add(buttonPane, new GBC(0, 3)
+                    //.setAnchor( GBC.WEST )
+                    .setInsets(5, 10, 5, 10));
         }
 
         private void setDialogTitle() {
@@ -530,7 +971,7 @@ public class ITesterFrame extends JPanel
         }
 
         private void initServerListPane() {
-            serverListPane = new ServerListPane( getIpList() );
+            serverListPane = new ServerListPane( getIpList(), new JPanel() );
             String title = LocaleUtil.getLocalName( TEST_SERVER_LIST );
             Border titledBorder = BorderFactory.createTitledBorder( title );
             serverListPane.setBorder( titledBorder );
@@ -546,6 +987,8 @@ public class ITesterFrame extends JPanel
 
             srcPortPane = new JScrollPane( srcPortList );
             dstPortPane = new JScrollPane( dstPortList );
+            srcPortPane.setPreferredSize( new Dimension( 150, 200 ) );
+            dstPortPane.setPreferredSize( new Dimension( 150, 200 ) );
             String srcPort = LocaleUtil.getLocalName( SRC_PORT );
             String dstPort = LocaleUtil.getLocalName( DST_PORT );
             Border srcPortBorder = BorderFactory.createTitledBorder( srcPort );
@@ -554,8 +997,9 @@ public class ITesterFrame extends JPanel
             dstPortPane.setBorder( dstPortBorder );
 
             portListPane = new JPanel();
-            portListPane.add( srcPortPane, BorderLayout.WEST );
-            portListPane.add( dstPortPane, BorderLayout.EAST );
+            portListPane.setLayout( new GridBagLayout() );
+            portListPane.add( srcPortPane, new GBC(0, 0).setInsets(10) );
+            portListPane.add( dstPortPane, new GBC(1, 0).setInsets(10) );
         }
 
         private void initSecondsPane() {
@@ -571,6 +1015,7 @@ public class ITesterFrame extends JPanel
         private void initButtonPane() {
             String confirm = LocaleUtil.getLocalName( CONFIRM );
             okBt = new JButton( confirm );
+            okBt.setPreferredSize( new Dimension(70, 30) );
             okBt.addActionListener( this );
 
             buttonPane = new JPanel();
@@ -613,12 +1058,12 @@ public class ITesterFrame extends JPanel
         private boolean isNoPortSelected() {
             if ( srcPortList.getSelectedIndex() < 0 ) {
                 String msg = LocaleUtil.getLocalName( SELECT_SRC_PORT );
-                MsgDialogUtil.showMsgDialog( msg );
+                MsgDialogUtil.showMsgDialog( dialog, msg );
                 return true;
             }
             if ( dstPortList.getSelectedIndex() < 0 ) {
                 String msg = LocaleUtil.getLocalName( SELECT_DST_PORT );
-                MsgDialogUtil.showMsgDialog( msg );
+                MsgDialogUtil.showMsgDialog( dialog, msg );
                 return true;
             }
             return false;
@@ -631,7 +1076,7 @@ public class ITesterFrame extends JPanel
                     (DeviceStatus.PortLocation) dstPortList.getSelectedValue();
             if ( src.equals( dst ) ) {
                 String msg = LocaleUtil.getLocalName( SELECT_DIFF_PORT );
-                MsgDialogUtil.showMsgDialog( msg );
+                MsgDialogUtil.showMsgDialog( dialog, msg );
                 return true;
             }
             return false;
@@ -640,6 +1085,10 @@ public class ITesterFrame extends JPanel
         public void display(ITesterRecord itr) {
             this.itr = itr;
             serverListPane.update( getIpList() );
+            String serverIP = serverListPane.getSelectedServerIP();
+            if ( null != serverIP ) {
+                updatePortLists( serverIP );
+            }
             super.display();
         }
 
@@ -669,18 +1118,22 @@ public class ITesterFrame extends JPanel
             return ipList;
         }
 
-        class ServerListPane extends JPanel implements ActionListener {
+        class ServerListPane extends JScrollPane implements ActionListener {
 
             private static final long serialVersionUID = 6724875493333867111L;
 
             private ButtonGroup buttonGroup;
             private Map<String, JRadioButton> jrbMap = new HashMap<String, JRadioButton>();
             private String selectedServerIP;
+            private JPanel innerPane;
 
-            ServerListPane(String[] ipList) {
+            ServerListPane(String[] ipList, JPanel innerPane) {
+                super( innerPane );
+                this.innerPane = innerPane;
                 this.buttonGroup = new ButtonGroup();
-                setLayout( new GridBagLayout() );
+                this.innerPane.setLayout(new GridBagLayout());
                 update( ipList );
+                setPreferredSize( new Dimension( 318, 150 ));
             }
 
             String getSelectedServerIP() {
@@ -726,9 +1179,11 @@ public class ITesterFrame extends JPanel
                 if ( null == jrbs || jrbs.length == 0 ) {
                     return;
                 }
-                removeAll();
+                innerPane.removeAll();
                 for( int i = 0; i < jrbs.length; i++ ) {
-                   add( jrbs[i], new GBC(0, i).setInsets(5, 10, 5, 10) );
+                   innerPane.add(jrbs[i], new GBC(0, i)
+                           .setAnchor(GBC.WEST)
+                           .setInsets(5, 10, 5, 10));
                 }
             }
 
@@ -740,12 +1195,12 @@ public class ITesterFrame extends JPanel
 
         private static final String CANCEL = "cancel";
 
-        private final JFrame fatherFrame;
+        private final JComponent fatherFrame;
 
         protected JDialog dialog = this;
         protected JButton cancelBt;
 
-        public IDialog(JFrame fatherFrame) {
+        public IDialog(JComponent fatherFrame) {
             this.fatherFrame = fatherFrame;
             initUI();
         }
@@ -753,13 +1208,22 @@ public class ITesterFrame extends JPanel
         private void initUI() {
             String cancel = LocaleUtil.getLocalName(CANCEL);
             cancelBt = new JButton( cancel );
+            cancelBt.setPreferredSize( new Dimension(70, 30) );
             cancelBt.addActionListener( new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     close();
                 }
             });
-
+            addWindowListener( new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    super.windowClosing(e);
+                    if ( null != fatherFrame ) {
+                        fatherFrame.setEnabled( true );
+                    }
+                }
+            });
         }
 
         @Override
@@ -774,6 +1238,7 @@ public class ITesterFrame extends JPanel
             dialog.setAlwaysOnTop( true );
             dialog.pack();
             dialog.setResizable( false );
+            dialog.setLocationRelativeTo( null );
             dialog.setVisible( true );
         }
 

@@ -281,6 +281,10 @@ public interface ApplicationConstants {
 
         public static final String SCRIPT_MGR_FRAME = "Script Mgr Frame";
 
+        public static final String ITESTER_API = "ITester API";
+
+        public static final String ITESTER_FRAME = "ITester Frame";
+
         public static final String SCRIPT_LIST = "Script List Frame";
 
         public static final String SCENARIO_MGR = "Scenario Mgr";
