@@ -26,8 +26,8 @@ import java.util.concurrent.TimeUnit;
  * Date: 13-8-20    <br/>
  * Time: 17:34  <br/>
  */
-public class ProgressPanel extends JPanel
-                           implements ActionListener, PropertyChangeListener {
+public class TestProgressRow implements
+        ActionListener, PropertyChangeListener {
 
     private static final String UNTESTED = "Untested";
     private static final String SUCCESS = "Success!";
@@ -50,28 +50,49 @@ public class ProgressPanel extends JPanel
     private JButton detailButton;
     private JButton removeButton;
     private ActionListener removeAction;
+    private AbstractAction updateAction;
     private JLabel statusLabel;
     private DetailDialog detailDialog;
+    private JPanel buttonPanel;
     private JComponent panelOwner;
     private boolean tested;
+    private boolean running;
 
-    ProgressPanel(ITesterRecord iTesterRecord, ITesterAPIWrapper apiWrapper,
-                  TestCaseConfig testConfig) {
+    TestProgressRow(ITesterRecord iTesterRecord, ITesterAPIWrapper apiWrapper,
+                    TestCaseConfig testConfig) {
         this.iTesterRecord = iTesterRecord;
         this.apiWrapper = apiWrapper;
         this.testConfig = testConfig;
         initUI();
     }
 
+    public void setUpdateAction(AbstractAction action) {
+        updateAction = action;
+    }
+
     public void setPanelOwner( JComponent panelOwner ) {
         this.panelOwner = panelOwner;
     }
 
+    public JProgressBar getProgressBar() {
+        return progressBar;
+    }
+
+    public JLabel getStatusLabel() {
+        return statusLabel;
+    }
+
+    public JPanel getButtonPanel() {
+        return buttonPanel;
+    }
+
     public void startTest() {
+        tested = false;
+        running = true;
         startButton.setEnabled( false );
         detailButton.setEnabled( false );
         removeButton.setEnabled( false );
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+//        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
         boolean startFail = false;
         try {
@@ -108,6 +129,10 @@ public class ProgressPanel extends JPanel
         return tested;
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
     public ITesterRecord getTestResult() {
         if ( !tested ) {
             return null;
@@ -125,7 +150,7 @@ public class ProgressPanel extends JPanel
         String detail = LocaleUtil.getLocalName( DETAIL );
         detailButton = new JButton( detail );
         detailButton.addActionListener( detailDialog );
-        detailButton.setEnabled(false);
+        //detailButton.setEnabled(false);
 
         String delete = LocaleUtil.getLocalName( DELETE );
         removeButton = new JButton( delete );
@@ -138,12 +163,11 @@ public class ProgressPanel extends JPanel
         String untested = LocaleUtil.getLocalName( UNTESTED );
         statusLabel = new JLabel( untested );
 
-        setLayout( new GridBagLayout() );
-        this.add(progressBar, new GBC(0, 0).setInsets(5, 10, 5, 10));
-        this.add( statusLabel, new GBC(1, 0).setInsets( 5, 10, 5, 10 ) );
-        this.add( startButton, new GBC(2, 0).setInsets( 5, 10, 5, 10 ) );
-        this.add( detailButton, new GBC(3, 0).setInsets( 5, 10, 5, 10 ) );
-        this.add( removeButton, new GBC(4, 0).setInsets( 5, 10, 5, 10 ) );
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout( new GridBagLayout() );
+        buttonPanel.add(startButton, new GBC(0, 0).setInsets(2, 6, 2, 6));
+        buttonPanel.add(detailButton, new GBC(1, 0).setInsets(2, 6, 2, 6));
+        buttonPanel.add(removeButton, new GBC(2, 0).setInsets(2, 6, 2, 6));
     }
 
     @Override
@@ -160,7 +184,7 @@ public class ProgressPanel extends JPanel
     }
 
     private void reportTestException(ITesterException e) {
-        ITesterUtil.reportTestException( e, this );
+        ITesterUtil.reportTestException( e, panelOwner );
     }
 
     class TestTask extends SwingWorker<Void, Void> {
@@ -175,13 +199,28 @@ public class ProgressPanel extends JPanel
         protected Void doInBackground() throws Exception {
             int progress = 0;
             do {
-                progress = session.getProgressPercent();
+                boolean connected = true;
+                try {
+                    progress = session.getProgressPercent();
+                } catch (ITesterException e) {
+                    if ( e.getErrType() == ITesterException.CONNECT_FAIL ) {
+                        connected = false;
+                    }
+                    reportTestException( e );
+                } finally {
+                    if ( !connected ) {
+                        break;
+                    }
+                }
                 setProgress( progress );
                 try {
                     TimeUnit.MILLISECONDS.sleep( 800 );
                 } catch (InterruptedException e) {
                     ErrorLogger.log("ProgressBar updating thread interrupted: "
                             + e.getMessage());
+                }
+                if ( null != updateAction ) {
+                    updateAction.actionPerformed( null );
                 }
             } while ( progress < 100 );
             return null;
@@ -190,8 +229,11 @@ public class ProgressPanel extends JPanel
         @Override
         protected void done() {
             super.done();
-            ProgressPanel.this.setCursor(
-                    Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR) );
+            if ( null != updateAction ) {
+                updateAction.actionPerformed( null );
+            }
+//            TestProgressRow.this.setCursor(
+//                    Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR) );
 
             startButton.setEnabled( true );
             detailButton.setEnabled( true );
@@ -217,6 +259,7 @@ public class ProgressPanel extends JPanel
             PortStats ps = session.getPortStats();
             detailDialog.updateStats( ps );
             tested = true;
+            running = false;
         }
 
     }
@@ -276,7 +319,7 @@ public class ProgressPanel extends JPanel
             this.itr = itr;
             this.testConfig = testConfig;
             initUI();
-            updateTestOption( itr, testConfig );
+            updateTestOption( this.itr, this.testConfig );
         }
 
         private void initUI() {
@@ -373,8 +416,8 @@ public class ProgressPanel extends JPanel
                 @Override
                 public void windowClosing(WindowEvent e) {
                     super.windowClosing(e);
-                    if ( null != ProgressPanel.this.panelOwner ) {
-                        ProgressPanel.this.panelOwner.setEnabled( true );
+                    if ( null != TestProgressRow.this.panelOwner ) {
+                        TestProgressRow.this.panelOwner.setEnabled( true );
                     }
                 }
             });
@@ -434,6 +477,7 @@ public class ProgressPanel extends JPanel
             JTextField f = new JTextField();
             f.setPreferredSize( new Dimension( 100, 20 ));
             f.setEditable( false );
+            f.setText("0");
             return f;
         }
 
@@ -443,8 +487,8 @@ public class ProgressPanel extends JPanel
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if ( null != ProgressPanel.this.panelOwner ) {
-                ProgressPanel.this.panelOwner.setEnabled( false );
+            if ( null != TestProgressRow.this.panelOwner ) {
+                TestProgressRow.this.panelOwner.setEnabled( false );
             }
             setAlwaysOnTop( true );
             pack();

@@ -56,9 +56,10 @@
           <configuration> 
               <archive>
                   <manifest>
-                      <mainClass>just.foor.DeviceTreeTester</mainClass>
+                      <mainClass>com.bdcom.sys.gui.Application</mainClass>
                   </manifest>
               <!--
+                      <mainClass>just.foor.DeviceTreeTester</mainClass>
                       <mainClass>com.bdcom.itester.rpc.RpcServer</mainClass>
                       <mainClass>com.bdcom.sys.gui.Application</mainClass>
                       <mainClass>com.bdcom.sys.cli.CLI</mainClass>

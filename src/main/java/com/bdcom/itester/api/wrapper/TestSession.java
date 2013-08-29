@@ -33,20 +33,23 @@ public class TestSession {
         return ps;
     }
 
-    public boolean isTestDone() {
+    public boolean isTestDone() throws ITesterException {
         if ( !finished ) {
             return 100 == getProgressPercent();
         }
         return finished;
     }
 
-    public int getProgressPercent() {
+    public int getProgressPercent() throws ITesterException {
         int percent = 100;
         if ( !finished ) {
             int pktSentNum = 0;
             for ( int i=0; i < streamIDs.length; i++ ) {
                 int sid = streamIDs[i];
                 StreamInfo si = api.getStreamSendInfo( socketId, idList[0], idList[1], sid);
+                if ( !si.isConnected() ) {
+                    throw new ITesterException( ITesterException.CONNECT_FAIL );
+                }
                 pktSentNum += si.getPacketCount();
             }
             //System.out.println( pktSentNum +"*100/"+pktNum );

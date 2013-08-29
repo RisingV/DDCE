@@ -22,12 +22,20 @@ public class ITesterLibLoader {
 		String itesterDllPath = extractLibFromJar( pathConfig, "/","iTesterLib" );
 		if ( null != itesterDllPath ) {
 			String navtiveLibPath = extractLibFromJar( pathConfig, "/", "iTestLibLoader" );
-			if ( null != navtiveLibPath ) {
+			if ( null != navtiveLibPath && platformCheck() ) {
 				System.load( navtiveLibPath );
 				loadITesterDllLib( itesterDllPath );
 			}
 		}
 	}
+
+    private static boolean platformCheck() {
+        String os = System.getProperty( "os.name" );
+        if ( os.indexOf( "Windows") > 0 || os.indexOf( "windows") > 0 ) {
+            return true;
+        }
+        return false;
+    }
 
 	private static String extractLibFromJar(PathConfig pathConfig, String pathInJar, String libName) {
 		if ( libName.indexOf(DLL_EXT) < 0 ) {

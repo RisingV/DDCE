@@ -36,9 +36,11 @@ public class RpcClientTester implements ApplicationConstants {
         serverConfig.writeToConfigFile("172.16.22.222", "7777");
 
         ITesterAPI it = new RpcClient( serverConfig );
-        iTestAPIWrapperTest( it );
-        //doubleStreamTest( it, 3, 0, 3, 1 );
+        iTestAPIWrapperTest( it, 3, 1, 3, 2 );
+        //doubleStreamTest( it, 3, 1, 3, 2 );
 
+        //setUnused( it , 3, 1);
+        //setUnused( it , 3, 2);
         //sendTest( it );
 
         //captureTest( it, 3, 0 );
@@ -54,16 +56,22 @@ public class RpcClientTester implements ApplicationConstants {
        // sendTesty( it );
     }
 
-    private static void iTestAPIWrapperTest(ITesterAPI it) {
+    private static void iTestAPIWrapperTest(ITesterAPI it, int c0, int p0, int c1, int p1) {
         ITesterAPIWrapper itw = new ITesterAPIWrapper(it);
 
         try {
-            final TestSession ts = itw.startTest( "172.16.22.202",2,0,2,1,30);
+            final TestSession ts = itw.startTest( "172.16.22.202",c0,p0,c1,p1,15);
             Thread reportProgress = new Thread() {
                 @Override
                 public void run() {
                     while ( true ) {
-                        int percent = ts.getProgressPercent();
+                        int percent = 0;
+                        try {
+                            percent = ts.getProgressPercent();
+                        } catch (ITesterException e) {
+                            e.printStackTrace();
+                            break;
+                        }
                         System.out.println( "testProgress: " + percent +"%");
                         try {
                             TimeUnit.SECONDS.sleep( 1 );
@@ -402,6 +410,18 @@ public class RpcClientTester implements ApplicationConstants {
         it.clearStatReliably( socketId, cd1, pd1 );
 
         it.disconnectToServer( socketId );
+
+    }
+
+    private static void setUnused(ITesterAPI it, int cardId, int portId  ) {
+        CommuStatus cs = it.connectToServer(SERV_IP);
+
+        if ( !cs.isConnected() ) {
+            System.out.println( "connect to " + SERV_IP + "fail!" );
+            return;
+        }
+
+        it.setUsedState( cs.getSocketId(), cardId, portId, 0 );
 
     }
 
