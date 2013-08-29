@@ -1,5 +1,6 @@
 package just.foor;
 
+import com.bdcom.nio.exception.GlobalException;
 import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.DataType;
@@ -31,6 +32,8 @@ public class ClientTester {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (GlobalException e) {
+            e.printStackTrace();
         }
 
         proxy.shutdown();
@@ -43,7 +46,7 @@ public class ClientTester {
         System.exit(0);
     }
 
-    public static void sendingEcho(ClientProxy proxy, int id, String proID) throws IOException, InterruptedException {
+    public static void sendingEcho(ClientProxy proxy, int id, String proID) throws IOException, InterruptedException, GlobalException {
         StringBuilder sb = new StringBuilder();
         sb.append( "request num: " ).append( id );
         sb.append(" Process ID: ").append( proID );

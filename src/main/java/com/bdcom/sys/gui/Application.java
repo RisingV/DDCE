@@ -3,6 +3,8 @@ package com.bdcom.sys.gui;
 import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.script.ScriptExecutor;
 import com.bdcom.biz.script.ScriptMgr;
+import com.bdcom.itester.api.ITesterAPI;
+import com.bdcom.itester.rpc.RpcClient;
 import com.bdcom.nio.client.ClientProxy;
 import com.bdcom.sys.AppContentAdaptor;
 import com.bdcom.sys.ApplicationConstants;
@@ -11,8 +13,10 @@ import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.sys.service.Dialect;
 import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.view.*;
+import com.bdcom.view.itester.ITesterFrame;
 
 import javax.swing.*;
+import java.io.File;
 import java.text.DateFormat;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -82,6 +86,19 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         ScriptList scriptList = new ScriptList(this);
         MsgTable msgTable = new MsgTable(this);
 
+        // test code start
+        PathConfig xpathConfig = new PathConfig(
+                RUN_TIME.CURRENT_DIR + File.separator + "RPC-config" );
+
+        ServerConfig xserverConfig = new ServerConfig( xpathConfig );
+        xserverConfig.setDefaultIP("172.16.22.222");
+        xserverConfig.setDefaultPort( 7777 );
+        xserverConfig.writeToConfigFile("172.16.22.222", "7777");
+        ITesterAPI api = new RpcClient(xserverConfig);
+        ITesterFrame iTesterFrame = new ITesterFrame( api, clientProxy );
+        addAttribute( COMPONENT.ITESTER_API, api );
+        addAttribute( COMPONENT.ITESTER_FRAME, iTesterFrame );
+        // test code end
 
         addAttribute( COMPONENT.MSG_TABLE, msgTable );
         addAttribute( COMPONENT.SCRIPT_LIST, scriptList );

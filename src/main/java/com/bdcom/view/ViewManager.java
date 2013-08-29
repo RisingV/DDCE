@@ -1,5 +1,6 @@
 package com.bdcom.view;
 
+import com.bdcom.view.itester.ITesterFrame;
 import com.bdcom.view.util.ViewUtil;
 import com.bdcom.sys.Applicable;
 import com.bdcom.sys.ApplicationConstants;
@@ -32,6 +33,8 @@ public class ViewManager implements ApplicationConstants {
 	
 	private ScriptList scriptListTab;
 
+    private ITesterFrame itesterTab;
+
     private final Applicable app;
 
 	public ViewManager( Applicable app ) {
@@ -57,7 +60,8 @@ public class ViewManager implements ApplicationConstants {
 		submitTab = (SubmitFrame) getCompo(COMPONENT.SUBMIT_FRAME);
 		scmTab = (ScriptMgrFrame) getCompo(COMPONENT.SCRIPT_MGR_FRAME );
 		scriptListTab = (ScriptList) getCompo(COMPONENT.SCRIPT_LIST);
-		
+        itesterTab = (ITesterFrame) getCompo(COMPONENT.ITESTER_FRAME);
+
 		smTab.setScenarioListRefreshHook(
 	    		submitTab.getScenarioListRefreshHook() 
 	    		);
@@ -87,6 +91,7 @@ public class ViewManager implements ApplicationConstants {
 				);
 		
 		mainFrame.addViewTab(submitTab);
+        mainFrame.addViewTab(itesterTab);
 		mainFrame.addRootViewTab(smTab);
 		mainFrame.addRootViewTab(scmTab);
 		mainFrame.addRootViewTab(scriptListTab);

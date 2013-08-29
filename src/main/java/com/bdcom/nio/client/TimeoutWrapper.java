@@ -1,6 +1,7 @@
 package com.bdcom.nio.client;
 
 import com.bdcom.nio.BDPacket;
+import com.bdcom.nio.exception.GlobalException;
 
 import java.io.IOException;
 import java.util.concurrent.*;
@@ -21,7 +22,7 @@ public class TimeoutWrapper {
     }
 
     public BDPacket send(BDPacket request, long timeout)
-            throws IOException, InterruptedException, TimeoutException {
+            throws IOException, InterruptedException, TimeoutException, GlobalException {
         BDPacket response = null;
         if ( timeout > 0 ) {
             TimerTask<BDPacket> task = new TimerTask<BDPacket>(client,request);

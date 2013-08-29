@@ -45,10 +45,16 @@ public class ITesterAPIWrapper {
         this.streams = streams;
     }
 
-    public DeviceStatus getDeviceStatus(String ip) {
-        if ( null == commuStatus || !commuStatus.isConnected() ) {
+    public DeviceStatus getDeviceStatus(String ip) throws ITesterException {
+        if ( !StringUtil.isVaildIp(ip) ) {
+            throw new ITesterException( ITesterException.INVALID_IP, ip );
+        }
+        if ( null == commuStatus || !commuStatus.isConnected() || !ip.equals( IP ) ) {
             commuStatus = api.connectToServer(ip);
             IP = ip;
+        }
+        if ( !commuStatus.isConnected() ) {
+            throw new ITesterException( ITesterException.CONNECT_FAIL, ip );
         }
         return new DeviceStatus(api, commuStatus.getSocketId(), IP );
     }
@@ -66,14 +72,14 @@ public class ITesterAPIWrapper {
     public TestSession startTest( String ip, int cd0, int pd0, int cd1, int pd1, int seconds )
             throws ITesterException {
         if ( !StringUtil.isVaildIp(ip) ) {
-            throw new ITesterException( ITesterException.INVALID_IP );
+            throw new ITesterException( ITesterException.INVALID_IP, ip );
         }
         if ( null == commuStatus || !commuStatus.isConnected() || !ip.equals( IP ) ) {
             commuStatus = api.connectToServer(ip);
             IP = ip;
         }
         if ( !commuStatus.isConnected() ) {
-            throw new ITesterException( ITesterException.CONNECT_FAIL );
+            throw new ITesterException( ITesterException.CONNECT_FAIL, ip );
         }
         int socketId = commuStatus.getSocketId();
 
