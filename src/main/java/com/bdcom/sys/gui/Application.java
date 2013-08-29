@@ -4,7 +4,7 @@ import com.bdcom.biz.scenario.ScenarioMgr;
 import com.bdcom.biz.script.ScriptExecutor;
 import com.bdcom.biz.script.ScriptMgr;
 import com.bdcom.itester.api.ITesterAPI;
-import com.bdcom.itester.rpc.RpcClient;
+import com.bdcom.itester.api.JniAPIImpl;
 import com.bdcom.nio.client.ClientProxy;
 import com.bdcom.sys.AppContentAdaptor;
 import com.bdcom.sys.ApplicationConstants;
@@ -16,7 +16,6 @@ import com.bdcom.view.*;
 import com.bdcom.view.itester.ITesterFrame;
 
 import javax.swing.*;
-import java.io.File;
 import java.text.DateFormat;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -87,6 +86,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         MsgTable msgTable = new MsgTable(this);
 
         // test code start
+        /*
         PathConfig xpathConfig = new PathConfig(
                 RUN_TIME.CURRENT_DIR + File.separator + "RPC-config" );
 
@@ -95,6 +95,8 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         xserverConfig.setDefaultPort( 7777 );
         xserverConfig.writeToConfigFile("172.16.22.222", "7777");
         ITesterAPI api = new RpcClient(xserverConfig);
+        */
+        ITesterAPI api = JniAPIImpl.getInstance();
         ITesterFrame iTesterFrame = new ITesterFrame( api, clientProxy );
         addAttribute( COMPONENT.ITESTER_API, api );
         addAttribute( COMPONENT.ITESTER_FRAME, iTesterFrame );

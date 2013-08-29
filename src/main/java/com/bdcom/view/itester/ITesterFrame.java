@@ -64,7 +64,7 @@ public class ITesterFrame extends JPanel
     private JPanel buttonPane;
     private JPanel modePane;
     private JScrollPane progressesPane;
-    private JPanel progressesInnerPane;
+    private TestProgressTable progressesTable;
 
     private JButton addServerBt;
     private JButton addTestBt;
@@ -80,8 +80,8 @@ public class ITesterFrame extends JPanel
     private TestConfigDialog testConfigDialog;
     private CommitDialog commitDialog;
 
+    private List<TestProgressRow> tprList = new ArrayList<TestProgressRow>();
     private Map<String, DeviceStatus> dsMap = new HashMap<String, DeviceStatus>();
-    private List<ProgressPanel> ppSet = new ArrayList<ProgressPanel>();
     private List<JTree> diTreeList = new ArrayList<JTree>();
 
     public ITesterFrame(ITesterAPI api, ClientProxy client) {
@@ -110,10 +110,10 @@ public class ITesterFrame extends JPanel
 
         leftInnerPane = new JPanel();
         leftPane = new JScrollPane( leftInnerPane );
-        leftPane.setPreferredSize( new Dimension(220, 600) );
+        leftPane.setPreferredSize(new Dimension(220, 600));
         leftInnerPane.setLayout(new GridBagLayout());
         Border bd = BorderFactory.createTitledBorder( serverPortsStatus );
-        leftPane.setBorder( bd );
+        leftPane.setBorder(bd);
     }
 
     private void initRightPane() {
@@ -141,14 +141,14 @@ public class ITesterFrame extends JPanel
         addTestBt.setPreferredSize(new Dimension(110, 30) );
         commitBt.setPreferredSize(new Dimension(110, 30) );
 
-        addServerBt.addActionListener( new ActionListener() {
+        addServerBt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 addServerDialog.display();
             }
         });
 
-        addTestBt.addActionListener( new ActionListener() {
+        addTestBt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 workOrderDialog.display();
@@ -158,13 +158,13 @@ public class ITesterFrame extends JPanel
         commitBt.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ProgressPanel[] panels = getTestedProgressPanels();
+                TestProgressRow[] panels = getTestedProgressPanels();
                 int total = panels.length;
                 ITesterRecord[] records = new ITesterRecord[total];
                 for ( int i=0; i < total; i++ ) {
                     records[i] = panels[i].getTestResult();
                 }
-                List<ProgressPanel> panelsToRemove = new ArrayList<ProgressPanel>();
+                List<TestProgressRow> panelsToRemove = new ArrayList<TestProgressRow>();
                 try {
                     commitDialog.display();
                     for ( int i=0; i < total; i++ ) {
@@ -179,10 +179,9 @@ public class ITesterFrame extends JPanel
                     reportSendException( ex );
                 } finally {
                     int committedNum = panelsToRemove.size();
-                    ProgressPanel[] pls = new ProgressPanel[committedNum];
-                    pls = panelsToRemove.toArray( pls );
-                    removeProgressPanels( pls );
-                    resetProgressesPane();
+                    TestProgressRow[] rows = new TestProgressRow[committedNum];
+                    rows = panelsToRemove.toArray( rows );
+                    removeProgressRows(rows);
 
                     String committedNumMsg = LocaleUtil.getLocalName( COMMITTED_NUM );
                     String uncommittedNumMsg = LocaleUtil.getLocalName( UNCOMMITTED_NUM );
@@ -204,9 +203,9 @@ public class ITesterFrame extends JPanel
         String testConfig = LocaleUtil.getLocalName( TEST_CONFIG );
         Border bd = BorderFactory.createTitledBorder( testConfig );
         buttonPane = new JPanel();
-        buttonPane.setLayout( new GridBagLayout() );
+        buttonPane.setLayout(new GridBagLayout());
         buttonPane.setPreferredSize(new Dimension(600, 100));
-        buttonPane.setBorder( bd );
+        buttonPane.setBorder(bd);
         buttonPane.add( addServerBt, new GBC(0, 0).setInsets(5, 10, 5, 10) );
         buttonPane.add( addTestBt, new GBC(1, 0).setInsets( 5, 10 ,5, 10 ) );
         buttonPane.add( commitBt, new GBC(2, 0).setInsets( 5, 10, 5, 10) );
@@ -243,11 +242,11 @@ public class ITesterFrame extends JPanel
             @Override
             public void actionPerformed(ActionEvent e) {
                 if ( sequentialMode.isSelected() ) {
-                    ProgressPanel[] panels = getUnTestedProgressPanels();
+                    TestProgressRow[] panels = getUnTestedProgressPanels();
                     new TestExecutor( panels, TestExecutor.SYNC ).start();
                 }
                 if ( cocurrentMode.isSelected() ) {
-                    ProgressPanel[] panels = getUnTestedProgressPanels();
+                    TestProgressRow[] panels = getUnTestedProgressPanels();
                     new TestExecutor( panels, TestExecutor.ASYNC ).start();
                 }
             }
@@ -266,7 +265,13 @@ public class ITesterFrame extends JPanel
     }
 
     private void initProgressesPane() {
-        resetProgressesPane();
+        String testCaseList = LocaleUtil.getLocalName( TEST_CASE_LIST );
+
+        progressesTable = TestProgressTable.newInstance();
+        progressesPane = new JScrollPane( progressesTable );
+        progressesPane.setPreferredSize( new Dimension( 600, 400 ) );
+        Border bd = BorderFactory.createTitledBorder( testCaseList );
+        progressesPane.setBorder(bd);
     }
 
     void addDeviceInfoTree(String ip) {
@@ -296,77 +301,45 @@ public class ITesterFrame extends JPanel
     }
 
     void addTestCase(ITesterRecord record, TestCaseConfig testConfig) {
-        ProgressPanel progressPanel = new ProgressPanel( record, apiWrapper, testConfig );
-        progressPanel.setPanelOwner( this );
-        progressPanel.setRemoveAction( new RemoveProgressPanelAction( progressPanel ) );
-        addProgressPanels( progressPanel );
-        resetProgressesPane();
+        TestProgressRow testProgressRow = new TestProgressRow( record, apiWrapper, testConfig );
+        testProgressRow.setPanelOwner( this );
+
+        tprList.add(testProgressRow);
+        progressesTable.addRow( testProgressRow );
     }
 
-    private void resetProgressesPane() {
-        if ( null == progressesPane ) {
-            String testCaseList = LocaleUtil.getLocalName( TEST_CASE_LIST );
-
-            progressesInnerPane = new JPanel();
-            progressesInnerPane.setLayout( new GridBagLayout() );
-
-            progressesPane = new JScrollPane( progressesInnerPane );
-            progressesPane.setPreferredSize( new Dimension( 600, 400 ) );
-            Border bd = BorderFactory.createTitledBorder( testCaseList );
-            progressesPane.setBorder( bd );
-        }
-        progressesInnerPane.removeAll();
-        int count = ppSet.size();
-        for ( int i=0; i < count; i++ ) {
-            ProgressPanel pp = ppSet.get( i );
-            progressesInnerPane.add( pp, new GBC(0, i) );
-        }
-        progressesInnerPane.revalidate();
-        progressesPane.revalidate();
-        progressesPane.repaint();
-    }
-
-    private ProgressPanel[] getTestedProgressPanels() {
-        List<ProgressPanel> ppl = new ArrayList<ProgressPanel>();
-        for ( ProgressPanel pane : ppSet ) {
-            if ( pane.isTested() ) {
-                ppl.add( pane );
+    private TestProgressRow[] getTestedProgressPanels() {
+        List<TestProgressRow> tpl = new ArrayList<TestProgressRow>();
+        for ( TestProgressRow row : tprList) {
+            if ( row.isTested() ) {
+                tpl.add(row);
             }
         }
-        ProgressPanel[] panels = new ProgressPanel[ppl.size()];
-        panels = ppl.toArray( panels );
-        return panels;
+        TestProgressRow[] rows = new TestProgressRow[tpl.size()];
+        rows = tpl.toArray( rows );
+        return rows;
     }
 
-    private ProgressPanel[] getUnTestedProgressPanels() {
-        List<ProgressPanel> ppl = new ArrayList<ProgressPanel>();
-        for ( ProgressPanel pane : ppSet ) {
+    private TestProgressRow[] getUnTestedProgressPanels() {
+        List<TestProgressRow> tpRows = new ArrayList<TestProgressRow>();
+        for ( TestProgressRow pane : tprList) {
             if ( !pane.isTested() ) {
-                ppl.add( pane );
+                tpRows.add(pane);
             }
         }
-        ProgressPanel[] panels = new ProgressPanel[ppl.size()];
-        panels = ppl.toArray( panels );
-        return panels;
+        TestProgressRow[] rows = new TestProgressRow[tpRows.size()];
+        rows = tpRows.toArray( rows );
+        return rows;
     }
 
-    private void addProgressPanels(ProgressPanel... panels) {
-        if ( null == panels || panels.length == 0 ) {
+    private void removeProgressRows(TestProgressRow... rows) {
+        if ( null == rows || rows.length == 0 || tprList.isEmpty() ) {
             return;
         }
-        int len = panels.length;
+        int len = rows.length;
         for ( int i=0; i < len; i++ ) {
-            ppSet.add(panels[i]);
-        }
-    }
-
-    private void removeProgressPanels(ProgressPanel... panels) {
-        if ( null == panels || panels.length == 0 || ppSet.isEmpty() ) {
-            return;
-        }
-        int len = panels.length;
-        for ( int i=0; i < len; i++ ) {
-            ppSet.remove( panels[i] );
+            tprList.remove(rows[i]);
+            progressesTable.removeRow( rows[i] );
         }
     }
 
@@ -388,28 +361,14 @@ public class ITesterFrame extends JPanel
         }
     }
 
-    class RemoveProgressPanelAction implements ActionListener {
-
-        private final ProgressPanel panel;
-
-        RemoveProgressPanelAction(ProgressPanel panel) {
-            this.panel = panel;
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            removeProgressPanels( panel );
-            resetProgressesPane();
-        }
-    }
-
     class TestExecutor extends Thread {
         static final int SYNC = 0xA;
         static final int ASYNC = 0xB;
 
-        private final ProgressPanel[] panels;
+        private final TestProgressRow[] rows;
         private final int mode;
-        TestExecutor(ProgressPanel[] panels, int mode) {
-            this.panels = panels;
+        TestExecutor(TestProgressRow[] rows, int mode) {
+            this.rows = rows;
             this.mode = mode;
         }
 
@@ -423,12 +382,13 @@ public class ITesterFrame extends JPanel
         }
 
         private void syncTest() {
-            if ( null == panels || panels.length == 0 ) {
+            if ( null == rows || rows.length == 0 ) {
                 return;
             }
-            for (ProgressPanel panel : panels)  {
-                if ( null != panel && !panel.isTested() ) {
-                    panel.startTest();
+            for (TestProgressRow row : rows)  {
+                if ( null != row && !row.isTested()
+                        && !row.isRunning() ) {
+                    row.startTest();
                     int timeoutCounter = 0;
                     while( true ) {
                         try {
@@ -437,7 +397,7 @@ public class ITesterFrame extends JPanel
                             ErrorLogger.log( "TestExecutor Thread interrupted: "
                                     + e.getMessage() );
                         }
-                        if ( panel.isTested() || timeoutCounter > 8 ) {
+                        if ( row.isTested() || timeoutCounter > 8 ) {
                             break;
                         }
                         timeoutCounter++;
@@ -447,12 +407,13 @@ public class ITesterFrame extends JPanel
         }
 
         private void asyncTest() {
-            if ( null == panels || panels.length == 0 ) {
+            if ( null == rows || rows.length == 0 ) {
                 return;
             }
-            for ( ProgressPanel panel: panels ) {
-                if ( null != panel && !panel.isTested() ) {
-                    panel.startTest();
+            for ( TestProgressRow row: rows) {
+                if ( null != row && !row.isTested()
+                        && !row.isRunning() ) {
+                    row.startTest();
                 }
             }
         }
@@ -1237,7 +1198,7 @@ public class ITesterFrame extends JPanel
             }
             dialog.setAlwaysOnTop( true );
             dialog.pack();
-            dialog.setResizable( false );
+            dialog.setResizable(false);
             dialog.setLocationRelativeTo( null );
             dialog.setVisible( true );
         }
