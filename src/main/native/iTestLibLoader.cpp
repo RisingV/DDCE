@@ -21,7 +21,7 @@ typedef int (__stdcall *GetCardInfo)( UINT, int, int*, int*, char** );
 typedef int (__stdcall *GetEthernetPhysical)( UINT, int, int, int*, int*, enum ETH_PHY_SPEED*, int*, BOOL* );
 typedef int (__stdcall *ClearStatReliably)( UINT, int, int );
 typedef int (__stdcall *SetHeader)( UINT, int, int, int, int, byte[] );
-typedef int (__stdcall *SetPayload)( UINT, int, int, int, byte[], int );
+typedef int (__stdcall *SetPayload)( UINT, int, int, int, UCHAR, int );
 typedef int (__stdcall *SetDelayCount)( UINT, int, int, UINT );
 typedef int (__stdcall *SetTxMode)( UINT, int, int, int, UINT );
 typedef int (__stdcall *StartPort)( UINT, int, int );
@@ -656,19 +656,24 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
  	
  	return (jint) status;
 }
-
 JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setPayload
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId,
-  			 jint length, jbyteArray data, jint type ) {
+  			 jint length, jint data, jint type) {
  	int status = 1;
- 	jbyte* bytes = env->GetByteArrayElements( data, 0 );
- 	BYTE* bytearr = (BYTE*) bytes;
+ //	jbyte* bytes = env->GetByteArrayElements( data, 0 );
+ //	BYTE* bytearr = (BYTE*) bytes;
  	if ( socketId >= 0 && NULL != SetPayloadFunc ) {
 		status = SetPayloadFunc( (UINT) socketId, (int) cardId, (int) portId, 
-					(int) length, bytearr, (int) type ); 
+					(int) length, (UCHAR) data, (int) type ); 
 		#ifdef _DEBUG
   		{
 		  stringstream ss;
+		 // stringstream bs;
+		 // bs << "[";
+		 // for ( int i = 0; i < 2; i++ ) {
+  		//	bs << (int) bytearr[i] << ", ";	
+		 // }
+		 //  bs << "]";
   		  ss << NowTime()
 			 << ": SetPayloadFunc called:"
   		     << "[ socketId: "
@@ -679,8 +684,8 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setPayload
   		     << portId
   		     << " length: "
   		     << length
-  		     << " StrHead: "
-  		     << bytearr
+  		     << " data: "
+  		     << data
   		     << " type: "
   		     << type
   		     << " ] status: "
@@ -858,6 +863,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_stopPort
 	return (jint) status;
 }
 
+
 JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAllStats
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, jint length ) {
   	jclass PortStatsClz = FindClass( env, "com/bdcom/itester/lib/PortStats" );
@@ -869,18 +875,16 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
 	  									"setConnected", "(Z)V" );
 	int status = 1; 
 	ULONG stats[length];
-	/*
-	jintArray jstats = env->NewIntArray( (jsize) length );
-	jint *elems = env->GetIntArrayElements( jstats, NULL );
-	*/
+
 	jlongArray jstats = env->NewLongArray( (jsize) length );
-	//jlong *elems = env->GetLongArrayElements( jstats, NULL );
-	jlong elems[length];
+	jlong *elems = env->GetLongArrayElements( jstats, JNI_FALSE );
+	//jlong elems[length];
 	jboolean connected = (jboolean) 0;
   	if ( socketId >= 0 && NULL != GetPortAllStatsFunc ) {		
 	  	status = GetPortAllStatsFunc( (UINT) socketId, (int) cardId,
 		  			 (int) portId, (int) length, stats );
-		#ifdef _DEBUG
+		 
+	#ifdef _DEBUG
   		{
 		  stringstream ls;
 		  stringstream ss;
@@ -906,7 +910,8 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
 	      std::string s = ss.str();
 		  Print2File( s.c_str() );	
 	    }
-   		#endif	 			
+   		#endif
+		   	 			
 	}
 	#ifdef _DEBUG
 	else {
@@ -917,7 +922,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
 			Print2File("GetPortAllStatsFunc is NULL");  
 		}			
   	}
-  	#endif
+  	#endif	
   	connected = (jboolean) !status;
   	if ( connected ) {
  		for ( int i = 0; i < (int) length; i++ ) {
@@ -931,6 +936,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
   	
   	return PortStatsObj;
 }
+
 
 JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getLinkStatus
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId) {

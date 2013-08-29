@@ -74,10 +74,10 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
 /*
  * Class:     com_bdcom_itester_lib_ITesterLibLoader
  * Method:    setPayload
- * Signature: (IIII[BI)I
+ * Signature: (IIIIII)I
  */
 JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setPayload
-  (JNIEnv *, jobject, jint, jint, jint, jint, jbyteArray, jint);
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     com_bdcom_itester_lib_ITesterLibLoader
