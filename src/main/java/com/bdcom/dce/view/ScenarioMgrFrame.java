@@ -15,7 +15,7 @@ import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.sys.gui.GuiInterface;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

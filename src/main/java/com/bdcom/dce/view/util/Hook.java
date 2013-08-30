@@ -1,6 +1,6 @@
 package com.bdcom.dce.view.util;
 
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

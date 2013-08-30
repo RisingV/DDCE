@@ -1,6 +1,6 @@
 package com.bdcom.dce.biz.script.session;
 
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.biz.script.ScriptXmlConfConstants;
 import com.bdcom.dce.util.StringUtil;
 

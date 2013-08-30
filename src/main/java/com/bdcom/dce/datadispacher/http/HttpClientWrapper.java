@@ -6,7 +6,7 @@ import com.bdcom.dce.sys.gui.Application;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import org.json.JSONException;
 import org.json.JSONObject;
 

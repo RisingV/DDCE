@@ -593,7 +593,7 @@ public class NIOService
         }
         catch (Exception e)
         {
-            System.err.println("Failed to log the following exception to the exception observer:");
+            System.err.println("Failed to logger the following exception to the exception observer:");
             System.err.println(e);
             e.printStackTrace();
         }

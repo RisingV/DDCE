@@ -3,7 +3,7 @@ package com.bdcom.dce.dataparser;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.sys.cli.jargp.ArgumentProcessor;
 import com.bdcom.dce.sys.cli.jargp.BoolDef;
 import com.bdcom.dce.sys.cli.jargp.ParameterDef;

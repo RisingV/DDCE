@@ -1,7 +1,7 @@
 package com.bdcom.dce.datadispacher;
 
 import com.bdcom.dce.biz.pojo.Scenario;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.sys.AppSession;
 import com.bdcom.dce.biz.scenario.ScenarioUtil;
 import com.bdcom.dce.util.StringUtil;
