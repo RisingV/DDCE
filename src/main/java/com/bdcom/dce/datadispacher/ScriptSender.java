@@ -2,6 +2,7 @@ package com.bdcom.dce.datadispacher;
 
 import com.bdcom.dce.sys.AppSession;
 import com.bdcom.dce.sys.ConfigPath;
+import com.bdcom.dce.util.CommuniConstants;
 import com.bdcom.dce.util.CommunicateStatus;
 
 import java.io.*;
@@ -18,7 +19,7 @@ import java.util.Date;
  */
 
 public class ScriptSender implements
-        CommunicateStatus, CommuniConstants{
+        CommunicateStatus, CommuniConstants {
 	
 	private static final DateFormat DATE_FORMAT = AppSession.DATE_FORMAT;
 	

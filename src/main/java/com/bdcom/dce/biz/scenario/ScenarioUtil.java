@@ -1,6 +1,6 @@
 package com.bdcom.dce.biz.scenario;
 
-import com.bdcom.dce.datadispacher.CommuniConstants;
+import com.bdcom.dce.util.CommuniConstants;
 import com.bdcom.dce.biz.pojo.Scenario;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;

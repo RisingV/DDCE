@@ -1,6 +1,5 @@
 package com.bdcom.dce.biz.pojo;
 
-import com.bdcom.dce.sys.gui.Application;
 import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.Serializable;
@@ -8,8 +7,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import static com.bdcom.dce.sys.ApplicationConstants.USER;
 
 /**
  * @author francis yuan <br>
@@ -360,9 +357,8 @@ public class BaseTestRecord implements Serializable {
 		return attr;
 	}
 
-    public static BaseTestRecord newRecord() {
+    public static BaseTestRecord newRecord(String userNum) {
         BaseTestRecord record = new BaseTestRecord();
-        String userNum = Application.instance.getStringAttr( USER.USER_NUM );
         record.setTesterNum(userNum);
         return record;
     }
