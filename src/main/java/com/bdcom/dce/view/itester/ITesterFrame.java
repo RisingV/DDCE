@@ -9,6 +9,7 @@ import com.bdcom.dce.itester.api.wrapper.TestCaseConfig;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.nio.exception.GlobalException;
 import com.bdcom.dce.nio.exception.ResponseException;
+import com.bdcom.dce.sys.AppContent;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
@@ -54,6 +55,7 @@ public class ITesterFrame extends JPanel
 
     private final ITesterAPI api;
     private final ClientProxy client;
+    private final AppContent content;
 
     private ITesterAPIWrapper apiWrapper;
 
@@ -84,10 +86,11 @@ public class ITesterFrame extends JPanel
     private Map<String, DeviceStatus> dsMap = new HashMap<String, DeviceStatus>();
     private List<JTree> diTreeList = new ArrayList<JTree>();
 
-    public ITesterFrame(ITesterAPI api, ClientProxy client) {
+    public ITesterFrame(ITesterAPI api, ClientProxy client, AppContent content) {
         this.api = api;
         this.client = client;
         this.apiWrapper = new ITesterAPIWrapper( api );
+        this.content = content;
         initUI();
     }
 
@@ -158,18 +161,18 @@ public class ITesterFrame extends JPanel
         commitBt.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TestProgressRow[] panels = getTestedProgressPanels();
-                int total = panels.length;
+                TestProgressRow[] rows = getTestedProgressPanels();
+                int total = rows.length;
                 ITesterRecord[] records = new ITesterRecord[total];
                 for ( int i=0; i < total; i++ ) {
-                    records[i] = panels[i].getTestResult();
+                    records[i] = rows[i].getTestResult();
                 }
                 List<TestProgressRow> panelsToRemove = new ArrayList<TestProgressRow>();
                 try {
                     commitDialog.display();
                     for ( int i=0; i < total; i++ ) {
                         sendITesterRecord( records[i] );
-                        panelsToRemove.add(panels[i]);
+                        panelsToRemove.add(rows[i]);
                     }
                 } catch (GlobalException ex) {
                     reportSendException( ex );
@@ -179,9 +182,9 @@ public class ITesterFrame extends JPanel
                     reportSendException( ex );
                 } finally {
                     int committedNum = panelsToRemove.size();
-                    TestProgressRow[] rows = new TestProgressRow[committedNum];
-                    rows = panelsToRemove.toArray( rows );
-                    removeProgressRows(rows);
+                    TestProgressRow[] tpRows = new TestProgressRow[committedNum];
+                    tpRows = panelsToRemove.toArray( tpRows );
+                    removeProgressRows(tpRows);
 
                     String committedNumMsg = LocaleUtil.getLocalName( COMMITTED_NUM );
                     String uncommittedNumMsg = LocaleUtil.getLocalName( UNCOMMITTED_NUM );
@@ -650,8 +653,9 @@ public class ITesterFrame extends JPanel
             }
             String workOrder = workOrderPane.getSelectedWorkOrder();
             String barCode = barCodeField.getText();
+            String userName = content.getStringAttr( USER.USER_NUM );
             ITesterRecord itr = ITesterRecord
-                    .checkWorkOrderInstance(workOrder, barCode);
+                    .checkWorkOrderInstance(workOrder, barCode, userName);
 
             boolean sendSuccess = true;
             try {
