@@ -56,14 +56,14 @@
           <configuration> 
               <archive>
                   <manifest>
-                      <mainClass>com.bdcom.sys.gui.Application</mainClass>
+                      <mainClass>com.bdcom.dce.sys.gui.Application</mainClass>
                   </manifest>
               <!--
                       <mainClass>just.devtestest.ServerTester</mainClass>
                       <mainClass>just.devtestest.DeviceTreeTester</mainClass>
-                      <mainClass>com.bdcom.itester.rpc.RpcServer</mainClass>
-                      <mainClass>com.bdcom.sys.gui.Application</mainClass>
-                      <mainClass>com.bdcom.sys.cli.CLI</mainClass>
+                      <mainClass>com.bdcom.dce.itester.rpc.RpcServer</mainClass>
+                      <mainClass>com.bdcom.dce.sys.gui.Application</mainClass>
+                      <mainClass>com.bdcom.dce.sys.cli.CLI</mainClass>
                 -->
               </archive>
               <descriptorRefs> 
