@@ -48,6 +48,8 @@ public class ITesterRecord implements Serializable {
 
     private boolean testPass;
 
+    private boolean saved;
+
     private ITesterRecord(int type,
                           String workOrder,
                           String barCode,
@@ -102,4 +104,11 @@ public class ITesterRecord implements Serializable {
         this.testPass = testPass;
     }
 
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
+    }
 }
