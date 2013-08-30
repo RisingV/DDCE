@@ -3,7 +3,7 @@ package com.bdcom.dce.nio.client;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.DataType;
 import com.bdcom.dce.nio.RequestID;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.util.logger.MsgLogger;

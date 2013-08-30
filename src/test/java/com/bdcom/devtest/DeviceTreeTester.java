@@ -25,7 +25,7 @@ public class DeviceTreeTester extends JFrame {
 
     public DeviceTreeTester() {
 //        PathConfig pathConfig = new PathConfig(
-//                ApplicationConstants.RUN_TIME.CURRENT_DIR + File.separator + "RPC-config" );
+//                ApplicationConstants.RUN_TIME.CURRENT_DIR + File.separator + "RPC-configure" );
 
 //        ServerConfig serverConfig = new ServerConfig( pathConfig );
 //        serverConfig.setDefaultIP("172.16.22.222");

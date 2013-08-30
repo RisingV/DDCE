@@ -1,7 +1,7 @@
 package com.bdcom.dce.biz.scenario;
 
 import com.bdcom.dce.biz.pojo.Scenario;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.StringUtil;
 

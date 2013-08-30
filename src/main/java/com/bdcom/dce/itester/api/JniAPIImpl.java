@@ -2,7 +2,7 @@ package com.bdcom.dce.itester.api;
 
 import com.bdcom.dce.itester.lib.*;
 import com.bdcom.dce.sys.ApplicationConstants;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 
 /**
  * Created with IntelliJ IDEA. <br/>

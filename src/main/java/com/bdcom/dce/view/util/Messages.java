@@ -78,7 +78,7 @@ public interface Messages {
 			"script config file create fail!";
 	
 	public static final String SCRIPT_CONF_FILE_SAVE_FAIL_S =
-			"script config file  save fail!";
+			"script configure file  save fail!";
 	
 	public static final String _DIR_CREATE_FAIL_S =
 			"directory create fail!";

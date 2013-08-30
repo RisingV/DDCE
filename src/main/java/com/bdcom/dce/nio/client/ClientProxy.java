@@ -11,7 +11,7 @@ import com.bdcom.dce.nio.DataType;
 import com.bdcom.dce.nio.RequestID;
 import com.bdcom.dce.nio.exception.GlobalException;
 import com.bdcom.dce.nio.exception.ResponseException;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 

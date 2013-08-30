@@ -7,7 +7,7 @@ import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.client.ClientWrapper;
 import com.bdcom.dce.nio.exception.GlobalException;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;

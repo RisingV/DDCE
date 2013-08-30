@@ -2,14 +2,14 @@ package com.bdcom.dce.dataparser;
 
 import com.bdcom.dce.datadispacher.DataSender;
 import com.bdcom.dce.nio.exception.GlobalException;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.datadispacher.http.HttpClientWrapper;
 import com.bdcom.dce.nio.exception.ResponseException;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.sys.AppSession;
 import com.bdcom.dce.sys.gui.Application;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.sys.cli.jargp.*;
 

@@ -5,7 +5,7 @@ import com.bdcom.dce.itester.rpc.req.*;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.sys.ApplicationConstants;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 

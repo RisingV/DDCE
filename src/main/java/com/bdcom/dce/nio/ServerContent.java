@@ -3,7 +3,7 @@ package com.bdcom.dce.nio;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.biz.pojo.ITesterRecord;
 import com.bdcom.dce.biz.pojo.LoginAuth;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 
 import java.io.File;
 import java.util.Map;

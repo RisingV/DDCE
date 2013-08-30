@@ -1,7 +1,7 @@
 package com.bdcom.dce.nio.server;
 
 import com.bdcom.dce.nio.ServerContent;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.biz.script.ScriptMgr;
 
 /**

@@ -1,13 +1,13 @@
 package com.bdcom.devtest;
 
 import com.bdcom.dce.nio.exception.GlobalException;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.DataType;
 import com.bdcom.dce.nio.RequestID;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.sys.gui.Application;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

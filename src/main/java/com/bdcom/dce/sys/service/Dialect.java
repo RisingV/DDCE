@@ -14,8 +14,8 @@ import com.bdcom.dce.nio.server.IHandler;
 import com.bdcom.dce.nio.server.NIOServer;
 import com.bdcom.dce.sys.Applicable;
 import com.bdcom.dce.sys.ApplicationConstants;
-import com.bdcom.dce.sys.config.PathConfig;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 

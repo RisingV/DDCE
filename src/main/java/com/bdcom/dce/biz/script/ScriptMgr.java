@@ -2,7 +2,7 @@ package com.bdcom.dce.biz.script;
 
 import com.bdcom.dce.datadispacher.CommunicateStatus;
 import com.bdcom.dce.sys.gui.Application;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.biz.script.session.DefaultCrtSessions;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.XmlUtil;
@@ -35,7 +35,7 @@ public class ScriptMgr
 
     private static final String CONFIG_DIR_SCRIPT = "Script"+ SPT;
 
-    private static final String LOCAL_CONFIG_FILE_NAME = "script-config";
+    private static final String LOCAL_CONFIG_FILE_NAME = "script-configure";
 
     private static final String END_FIX = ".xml";
 
