@@ -4,7 +4,7 @@ import com.bdcom.dce.biz.scenario.ScenarioMgr;
 import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.nio.exception.GlobalException;
 import com.bdcom.dce.view.util.*;
-import com.bdcom.dce.datadispacher.CommunicateStatus;
+import com.bdcom.dce.util.CommunicateStatus;
 import com.bdcom.dce.nio.exception.ResponseException;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.sys.ApplicationConstants;

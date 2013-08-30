@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import static com.bdcom.dce.datadispacher.CommunicateStatus.NO_RUNNING_SCRIPT;
+import static com.bdcom.dce.util.CommunicateStatus.NO_RUNNING_SCRIPT;
 
 /**
  * @author francis yuan <br>
