@@ -1,8 +1,8 @@
 package com.bdcom.dce.nio.server;
 
-import com.bdcom.dce.nio.ServerContent;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -12,12 +12,18 @@ import com.bdcom.dce.nio.BDPacketUtil;
  */
 abstract public class CommonHandler implements IHandler {
 
+    private final PMInterface pmInterface;
+
+    protected CommonHandler(PMInterface pmInterface) {
+        this.pmInterface = pmInterface;
+    }
+
     @Override
     public BDPacket handle(BDPacket bdPacket) {
         if ( null == bdPacket ) {
             return BDPacketUtil.responseToNull();
         }
-        if (ServerContent.getRunningApplicationVersion() !=
+        if ( pmInterface.getRunningApplicationVersion() !=
                 bdPacket.getVersion() ) {
             return BDPacketUtil.responseToInvalidVer( bdPacket.getRequestID() );
         }

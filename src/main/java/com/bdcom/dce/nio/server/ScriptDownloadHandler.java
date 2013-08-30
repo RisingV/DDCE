@@ -1,10 +1,10 @@
 package com.bdcom.dce.nio.server;
 
-import com.bdcom.dce.nio.exception.ResponseException;
+import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.DataType;
-import com.bdcom.dce.nio.ServerContent;
-import com.bdcom.dce.biz.script.ScriptMgr;
+import com.bdcom.dce.nio.bdpm.PMInterface;
+import com.bdcom.dce.nio.exception.ResponseException;
 import com.bdcom.dce.util.SerializeUtil;
 
 import java.io.File;
@@ -21,6 +21,10 @@ import java.util.Map;
 public class ScriptDownloadHandler extends ScriptHandler {
 
     private Map<String, File> nfMap = new HashMap<String, File>();
+
+    public ScriptDownloadHandler(PMInterface pmInterface) {
+        super(pmInterface);
+    }
 
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
@@ -76,7 +80,7 @@ public class ScriptDownloadHandler extends ScriptHandler {
 
     private void rebuildNameFileMapping() {
         if ( needsRebuild ) {
-            synchronized ( ServerContent.GLOBAL_LOCK1 ) {
+            synchronized ( SCRIPT_STUFF_LOCK ) {
                 ScriptMgr scriptMgr = getScriptMgr();
                 File[] files = scriptMgr.getScriptConfFiles();
 

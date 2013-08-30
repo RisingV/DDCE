@@ -5,7 +5,7 @@ import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.nio.exception.GlobalException;
 import com.bdcom.dce.nio.exception.ResponseException;
 import com.bdcom.dce.sys.ApplicationConstants;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.sys.gui.GuiInterface;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
@@ -275,14 +275,14 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 			nullError = true;
 		}
 		
-		if ( !StringUtil.isVaildIp(ip) ) {
+		if ( !StringUtil.isValidIp(ip) ) {
 			MsgDialogUtil.showErrorDialog(
 					MessageUtil.getLocalisedMessage(INVAILD_IP)
 					);
 			nullError = true;
 		}
 		
-		if ( !StringUtil.isVaildNumber(port) ) {
+		if ( !StringUtil.isValidNumber(port) ) {
 			MsgDialogUtil.showErrorDialog(
 					MessageUtil.getLocalisedMessage(INVAILD_PORT)
 					);

@@ -1,9 +1,9 @@
 package com.bdcom.dce.nio.server;
 
+import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.DataType;
-import com.bdcom.dce.nio.ServerContent;
-import com.bdcom.dce.biz.script.ScriptMgr;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +15,10 @@ import java.io.IOException;
  * Time: 17:41  <br/>
  */
 public class ScriptFileListHandler extends ScriptHandler {
+
+    public ScriptFileListHandler(PMInterface pmInterface) {
+        super(pmInterface);
+    }
 
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
@@ -42,7 +46,7 @@ public class ScriptFileListHandler extends ScriptHandler {
 
     private String[] getFileList() {
         String[] fileNameList = null;
-        synchronized (ServerContent.GLOBAL_LOCK1 ) {
+        synchronized ( SCRIPT_STUFF_LOCK ) {
             ScriptMgr scriptMgr = getScriptMgr();
             scriptMgr.reloadScripts();
             File[] fileList = scriptMgr.getScriptConfFiles();

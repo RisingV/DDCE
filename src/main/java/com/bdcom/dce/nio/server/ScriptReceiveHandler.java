@@ -1,11 +1,11 @@
 package com.bdcom.dce.nio.server;
 
-import com.bdcom.dce.nio.exception.ResponseException;
+import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
-import com.bdcom.dce.nio.ServerContent;
-import com.bdcom.dce.biz.script.ScriptMgr;
+import com.bdcom.dce.nio.bdpm.PMInterface;
+import com.bdcom.dce.nio.exception.ResponseException;
 import com.bdcom.dce.util.SerializeUtil;
 
 import java.io.File;
@@ -18,6 +18,10 @@ import java.io.IOException;
  * Time: 15:37  <br/>
  */
 public class ScriptReceiveHandler extends ScriptHandler {
+
+    public ScriptReceiveHandler(PMInterface pmInterface) {
+        super(pmInterface);
+    }
 
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
@@ -46,7 +50,7 @@ public class ScriptReceiveHandler extends ScriptHandler {
     private void parseAndSave(BDPacket pack) throws IOException, ResponseException {
 
         if ( DataType.FILE == pack.getDataType() ) {
-            synchronized (ServerContent.GLOBAL_LOCK1 ) {
+            synchronized ( SCRIPT_STUFF_LOCK ) {
                 long ms = System.currentTimeMillis();
                 ScriptMgr scriptMgr = getScriptMgr();
                 File fileToSave = scriptMgr.newEmptyScriptConfFile(String.valueOf(ms));

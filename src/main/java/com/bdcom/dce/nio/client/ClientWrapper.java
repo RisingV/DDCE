@@ -5,7 +5,7 @@ import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
 import com.bdcom.dce.nio.RequestID;
 import com.bdcom.dce.nio.exception.GlobalException;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.IOException;

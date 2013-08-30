@@ -10,17 +10,23 @@ import java.io.*;
  */
 public class BDPacket {
 
-    private int version;
+    private static int currentVersion;
+
+    public static void setCurrentVersion(int ver) {
+        currentVersion = ver;
+    }
+
+    private final int version;
     private int requestID;
     private int dataType;
     private byte[] data;
 
-    public int getVersion() {
-        return version;
+    BDPacket() {
+        version = currentVersion;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public int getVersion() {
+        return version;
     }
 
     public int getRequestID() {
@@ -93,7 +99,6 @@ public class BDPacket {
         in.read(data);
         in.close();
 
-        packet.setVersion(version);
         packet.setRequestID(requestID);
         packet.setDataType(dataType);
         packet.setData(data);
@@ -103,7 +108,6 @@ public class BDPacket {
 
     public static BDPacket newPacket(int requestID) {
         BDPacket newPack = new BDPacket();
-        newPack.setVersion( ServerContent.getRunningApplicationVersion() );
         newPack.setRequestID( requestID );
 
         return newPack;

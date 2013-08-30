@@ -1,5 +1,6 @@
 package com.bdcom.devtest;
 
+import com.bdcom.dce.nio.bdpm.FakeTestInterface;
 import com.bdcom.dce.nio.server.ServerStarter;
 
 /**
@@ -10,6 +11,6 @@ import com.bdcom.dce.nio.server.ServerStarter;
  */
 public class ServerTester {
     public static void main(String...s) {
-        new Thread( new ServerStarter() ).start();
+        new Thread( new ServerStarter( new FakeTestInterface() ) ).start();
     }
 }

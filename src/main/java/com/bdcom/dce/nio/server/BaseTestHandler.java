@@ -1,10 +1,10 @@
 package com.bdcom.dce.nio.server;
 
-import com.bdcom.dce.nio.ServerContent;
+import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
-import com.bdcom.dce.biz.pojo.BaseTestRecord;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 import com.bdcom.dce.util.SerializeUtil;
 
 import java.io.IOException;
@@ -16,6 +16,13 @@ import java.io.IOException;
  * Time: 15:09  <br/>
  */
 public class BaseTestHandler extends CommonHandler {
+
+    private final PMInterface pmInterface;
+
+    public BaseTestHandler(PMInterface pmInterface) {
+        super( pmInterface );
+        this.pmInterface = pmInterface;
+    }
 
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
@@ -37,7 +44,7 @@ public class BaseTestHandler extends CommonHandler {
             }
         }
 
-        int saveStatus = ServerContent.SaveBaseTestRecord(record);
+        int saveStatus = pmInterface.saveBaseTestRecord(record);
         byte[] data = BDPacketUtil.intToByteArray( saveStatus );
 
         BDPacket pack = BDPacket.newPacket( bdPacket.getRequestID() );

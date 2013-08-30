@@ -1,10 +1,10 @@
 package com.bdcom.dce.nio.server;
 
-import com.bdcom.dce.nio.ServerContent;
+import com.bdcom.dce.biz.pojo.LoginAuth;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
-import com.bdcom.dce.biz.pojo.LoginAuth;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 import com.bdcom.dce.util.SerializeUtil;
 
 import java.io.IOException;
@@ -16,6 +16,13 @@ import java.io.IOException;
  * Time: 14:38  <br/>
  */
 public class LoginHandler extends CommonHandler {
+
+    private final PMInterface pmInterface;
+
+    public LoginHandler(PMInterface pmInterface) {
+        super(pmInterface);
+        this.pmInterface = pmInterface;
+    }
 
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
@@ -36,7 +43,7 @@ public class LoginHandler extends CommonHandler {
                 return BDPacketUtil.responseToInvalidData( bdPacket.getRequestID() ) ;
             }
         }
-        int loginStatus = ServerContent.login(auth);
+        int loginStatus = pmInterface.login(auth);
         byte[] data = BDPacketUtil.intToByteArray(loginStatus);
 
         BDPacket pack = BDPacket.newPacket( bdPacket.getRequestID() );

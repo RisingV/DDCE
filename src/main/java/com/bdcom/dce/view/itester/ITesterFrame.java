@@ -542,7 +542,7 @@ public class ITesterFrame extends JPanel
         @Override
         public void actionPerformed(ActionEvent e) {
             String ip = ipField.getText();
-            if ( !StringUtil.isVaildIp(ip) ) {
+            if ( !StringUtil.isValidIp(ip) ) {
                 String msg = LocaleUtil.getLocalName( INVALID_IP );
                 MsgDialogUtil.showMsgDialog( dialog, msg );
                 return;

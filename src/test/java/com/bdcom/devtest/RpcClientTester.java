@@ -8,8 +8,8 @@ import com.bdcom.dce.itester.api.wrapper.EthFrameUtil;
 import com.bdcom.dce.itester.api.wrapper.ITesterAPIWrapper;
 import com.bdcom.dce.itester.api.wrapper.ITesterException;
 import com.bdcom.dce.sys.ApplicationConstants;
-import com.bdcom.dce.sys.config.PathConfig;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +28,7 @@ public class RpcClientTester implements ApplicationConstants {
 
     public static void main(String... s) {
         PathConfig pathConfig = new PathConfig(
-                RUN_TIME.CURRENT_DIR + File.separator + "RPC-config" );
+                RUN_TIME.CURRENT_DIR + File.separator + "RPC-configure" );
 
         ServerConfig serverConfig = new ServerConfig( pathConfig );
         serverConfig.setDefaultIP("172.16.22.222");

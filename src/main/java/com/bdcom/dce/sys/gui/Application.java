@@ -8,8 +8,8 @@ import com.bdcom.dce.itester.api.JniAPIImpl;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.sys.AppContentAdaptor;
 import com.bdcom.dce.sys.ApplicationConstants;
-import com.bdcom.dce.sys.config.PathConfig;
-import com.bdcom.dce.sys.config.ServerConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
+import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.sys.service.Dialect;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.*;
@@ -55,7 +55,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
 
     private void init() {
 
-        //int config
+        //int configure
         PathConfig pathConfig = new PathConfig( CURRENT_DIR );
         ServerConfig serverConfig = new ServerConfig( pathConfig );
 
@@ -88,7 +88,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         // test code start
         /*
         PathConfig xpathConfig = new PathConfig(
-                RUN_TIME.CURRENT_DIR + File.separator + "RPC-config" );
+                RUN_TIME.CURRENT_DIR + File.separator + "RPC-configure" );
 
         ServerConfig xserverConfig = new ServerConfig( xpathConfig );
         xserverConfig.setDefaultIP("172.16.22.222");

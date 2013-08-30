@@ -1,9 +1,9 @@
 package com.bdcom.dce.nio.server;
 
+import com.bdcom.dce.biz.scenario.ScenarioMgr;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.DataType;
-import com.bdcom.dce.nio.ServerContent;
-import com.bdcom.dce.biz.scenario.ScenarioMgr;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 
 import java.io.IOException;
 import java.util.Set;
@@ -15,6 +15,10 @@ import java.util.Set;
  * Time: 16:47  <br/>
  */
 public class ScenarioNameListHandler extends ScenarioHandler {
+
+    public ScenarioNameListHandler(PMInterface pmInterface) {
+        super(pmInterface);
+    }
 
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
@@ -42,7 +46,7 @@ public class ScenarioNameListHandler extends ScenarioHandler {
 
     private String[] getNameList() {
 
-        synchronized ( ServerContent.GLOBAL_LOCK0 ) {
+        synchronized ( SCE_STUFF_LOCK ) {
             ScenarioMgr scenarioMgr = getScenarioMgr();
             scenarioMgr.reloadScenarios();
             Set<String> nameList = scenarioMgr.getScenarioNameList();

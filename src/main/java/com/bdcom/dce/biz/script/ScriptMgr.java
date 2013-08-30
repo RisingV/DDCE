@@ -2,7 +2,7 @@ package com.bdcom.dce.biz.script;
 
 import com.bdcom.dce.datadispacher.CommunicateStatus;
 import com.bdcom.dce.sys.gui.Application;
-import com.bdcom.dce.sys.config.PathConfig;
+import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.biz.script.session.DefaultCrtSessions;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.XmlUtil;
@@ -35,7 +35,7 @@ public class ScriptMgr
 
     private static final String CONFIG_DIR_SCRIPT = "Script"+ SPT;
 
-    private static final String LOCAL_CONFIG_FILE_NAME = "script-config";
+    private static final String LOCAL_CONFIG_FILE_NAME = "script-configure";
 
     private static final String END_FIX = ".xml";
 
@@ -103,7 +103,7 @@ public class ScriptMgr
             defaultIptPath = getDefaultConfigedIptPath(defaultConfFile);
             String rawDataPathSetted = getDefaultConfigedRawDataPath(defaultConfFile);
             if ( StringUtil.isNotBlank(rawDataPathSetted) &&
-                    StringUtil.isVaildFilePath(rawDataPathSetted)
+                    StringUtil.isValidFilePath(rawDataPathSetted)
                     ) {
                 File rawDataDir = new File(rawDataPathSetted);
                 if ( !rawDataDir.exists() ) {
@@ -237,7 +237,7 @@ public class ScriptMgr
 
     public int addCrtSession(String iname, String ipath) {
 
-        if ( !StringUtil.isVaildFilePath(ipath) ) {
+        if ( !StringUtil.isValidFilePath(ipath) ) {
             return _INVAILD_PATH;
         }
 
@@ -264,7 +264,7 @@ public class ScriptMgr
 
     public int setDefaultIptPath(String path) {
         int status = _NOT_DONE_YET;
-        if ( !StringUtil.isVaildFilePath(path) ) {
+        if ( !StringUtil.isValidFilePath(path) ) {
             return _INVAILD_PATH;
         }
 
@@ -288,7 +288,7 @@ public class ScriptMgr
 
     public int setRawDataPath(String path) {
         int status = _NOT_DONE_YET;
-        if ( !StringUtil.isVaildFilePath(path) ) {
+        if ( !StringUtil.isValidFilePath(path) ) {
             return _INVAILD_PATH;
         }
         if ( StringUtil.isNotBlank(path) ) { //allow set null,to use default;
@@ -363,7 +363,7 @@ public class ScriptMgr
         String interactor = XmlUtil.getElemValue(elemChain, xmlFile);
 
         if (!StringUtil.isNotBlank(rawDataPath) ||
-                !StringUtil.isVaildFilePath(rawDataPath)) {
+                !StringUtil.isValidFilePath(rawDataPath)) {
             rawDataPath = null;
             isUserDefaultRawDataPath = true;
         } else {
@@ -392,7 +392,7 @@ public class ScriptMgr
         String iptPath = XmlUtil.getElemValue(elemChain, xmlFile);
 
         if (!StringUtil.isNotBlank(iptPath) ||
-                !StringUtil.isVaildFilePath(iptPath)) {
+                !StringUtil.isValidFilePath(iptPath)) {
             iptPath = null;
         }
 
@@ -408,7 +408,7 @@ public class ScriptMgr
         String rawDataPath = XmlUtil.getElemValue(elemChain, xmlFile);
 
         if (!StringUtil.isNotBlank(rawDataPath) ||
-                !StringUtil.isVaildFilePath(rawDataPath)) {
+                !StringUtil.isValidFilePath(rawDataPath)) {
             rawDataPath = null;
             isUserDefaultRawDataPath = true;
         } else {

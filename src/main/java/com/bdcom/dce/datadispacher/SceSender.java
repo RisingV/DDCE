@@ -179,7 +179,7 @@ public class SceSender implements
 			}
 			
 			if ( StringUtil.isNotBlank(tmpStr) && 
-					StringUtil.isVaildNumber(tmpStr) ) {
+					StringUtil.isValidNumber(tmpStr) ) {
 				hcodeList.add(new Long(tmpStr));
 			}
 			counter ++;
@@ -223,7 +223,7 @@ public class SceSender implements
 			}
 			
 			if ( StringUtil.isNotBlank(tmpStr) && 
-					StringUtil.isVaildNumber(tmpStr) ) {
+					StringUtil.isValidNumber(tmpStr) ) {
 				sceNum = Integer.parseInt(tmpStr);
 			}
 			counter ++;

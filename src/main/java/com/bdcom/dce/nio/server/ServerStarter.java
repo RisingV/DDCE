@@ -1,7 +1,7 @@
 package com.bdcom.dce.nio.server;
 
-import com.bdcom.dce.nio.ServerContent;
 import com.bdcom.dce.nio.RequestID;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,34 +15,39 @@ import java.util.Map;
  */
 public class ServerStarter implements Runnable {
 
-    private int port;
-
     private NIOServer nioServer;
 
     private Map<Integer, IHandler> servMap;
 
-    public ServerStarter() {
-        port = ServerContent.getNIOServerPort();
+    private final PMInterface pmInterface;
+
+    public ServerStarter(PMInterface pmInterface) {
+        this.pmInterface = pmInterface;
+        initServMap( this.pmInterface );
+    }
+
+    private void initServMap(final PMInterface pm ) {
         servMap = new HashMap<Integer, IHandler>() {
             {
-                put( RequestID.LOGIN, new LoginHandler() );
-                put( RequestID.SEND_BASE_TEST_REC, new BaseTestHandler() );
-                put( RequestID.SEND_I_TESTER_REC, new ITesterHandler() );
-                put( RequestID.UPLOAD_SCENARIO, new ScenarioReceiveHandler() );
-                put( RequestID.GET_SCENARIO_NAME_LIST, new ScenarioNameListHandler() );
-                put( RequestID.DOWNLOAD_SCENARIO, new ScenarioDownloadHandler() );
-                put( RequestID.DELETE_BACKUP_SCENARIOS, new ScenarioDeleteHandler() );
-                put( RequestID.UPLOAD_SCRIPT, new ScriptReceiveHandler() );
-                put( RequestID.GET_SCRIPT_FILE_LIST, new ScriptFileListHandler() );
-                put( RequestID.DOWNLOAD_SCRIPT, new ScriptDownloadHandler() );
-                put( RequestID.DELETE_BACKUP_SCRIPTS, new ScriptDeleteHandler() );
-                put( RequestID.ECHO, new EchoHandler() );
+                put( RequestID.LOGIN, new LoginHandler(pm) );
+                put( RequestID.SEND_BASE_TEST_REC, new BaseTestHandler(pm) );
+                put( RequestID.SEND_I_TESTER_REC, new ITesterHandler(pm) );
+                put( RequestID.UPLOAD_SCENARIO, new ScenarioReceiveHandler(pm) );
+                put( RequestID.GET_SCENARIO_NAME_LIST, new ScenarioNameListHandler(pm) );
+                put( RequestID.DOWNLOAD_SCENARIO, new ScenarioDownloadHandler(pm) );
+                put( RequestID.DELETE_BACKUP_SCENARIOS, new ScenarioDeleteHandler(pm) );
+                put( RequestID.UPLOAD_SCRIPT, new ScriptReceiveHandler(pm) );
+                put( RequestID.GET_SCRIPT_FILE_LIST, new ScriptFileListHandler(pm) );
+                put( RequestID.DOWNLOAD_SCRIPT, new ScriptDownloadHandler(pm) );
+                put( RequestID.DELETE_BACKUP_SCRIPTS, new ScriptDeleteHandler(pm) );
+                put( RequestID.ECHO, new EchoHandler(pm) );
                 put( RequestID.TERMINAL, new TerminalHandler() );
             }
         };
     }
 
     private void start() throws IOException {
+        int port = pmInterface.getNIOServerPort();
         nioServer = new NIOServer( port );
         nioServer.setHandlerMap( servMap );
         nioServer.start();
