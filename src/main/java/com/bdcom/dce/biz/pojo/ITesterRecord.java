@@ -16,16 +16,18 @@ public class ITesterRecord implements Serializable {
 
     public static final int COMMIT_TEST_RESULT = 0xB;
 
-    public static ITesterRecord checkWorkOrderInstance(String workOrder, String barCode) {
-        return new ITesterRecord( CHECK_WORK_ORDER, workOrder, barCode );
+    public static ITesterRecord checkWorkOrderInstance(String workOrder,
+                                                       String barCode, String userName) {
+        return new ITesterRecord( CHECK_WORK_ORDER, workOrder, barCode, userName );
     }
 
     public static ITesterRecord checkWorkOrderInstance(ITesterRecord itr) {
         return new ITesterRecord( CHECK_WORK_ORDER, itr);
     }
 
-    public static ITesterRecord commitTestResultInstance(String workOrder, String barCode) {
-        return new ITesterRecord( COMMIT_TEST_RESULT, workOrder, barCode );
+    public static ITesterRecord commitTestResultInstance(String workOrder,
+                                                         String barCode, String userName) {
+        return new ITesterRecord( COMMIT_TEST_RESULT, workOrder, barCode, userName );
     }
 
     public static ITesterRecord commitTestResultInstance(ITesterRecord itr) {
@@ -38,20 +40,26 @@ public class ITesterRecord implements Serializable {
 
     private final String barCode;
 
+    private final String userName;
+
     private boolean workOrderValid;
 
     private boolean everTested;
 
     private boolean testPass;
 
-    private ITesterRecord(int type, String workOrder, String barCode) {
+    private ITesterRecord(int type,
+                          String workOrder,
+                          String barCode,
+                          String userName) {
         this.type = type;
         this.workOrder = workOrder;
         this.barCode = barCode;
+        this.userName = userName;
     }
 
     private ITesterRecord(int type, ITesterRecord itr) {
-        this( type, itr.workOrder, itr.barCode );
+        this( type, itr.workOrder, itr.barCode, itr.userName );
     }
 
     public int getType() {
@@ -64,6 +72,10 @@ public class ITesterRecord implements Serializable {
 
     public String getBarCode() {
         return barCode;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     public boolean isWorkOrderValid() {

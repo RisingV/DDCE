@@ -97,7 +97,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         ITesterAPI api = new RpcClient(xserverConfig);
         */
         ITesterAPI api = JniAPIImpl.getInstance();
-        ITesterFrame iTesterFrame = new ITesterFrame( api, clientProxy );
+        ITesterFrame iTesterFrame = new ITesterFrame( api, clientProxy, this );
         addAttribute( COMPONENT.ITESTER_API, api );
         addAttribute( COMPONENT.ITESTER_FRAME, iTesterFrame );
         // test code end
