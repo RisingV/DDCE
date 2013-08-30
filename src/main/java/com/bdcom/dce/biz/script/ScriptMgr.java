@@ -103,7 +103,7 @@ public class ScriptMgr
             defaultIptPath = getDefaultConfigedIptPath(defaultConfFile);
             String rawDataPathSetted = getDefaultConfigedRawDataPath(defaultConfFile);
             if ( StringUtil.isNotBlank(rawDataPathSetted) &&
-                    StringUtil.isVaildFilePath(rawDataPathSetted)
+                    StringUtil.isValidFilePath(rawDataPathSetted)
                     ) {
                 File rawDataDir = new File(rawDataPathSetted);
                 if ( !rawDataDir.exists() ) {
@@ -237,7 +237,7 @@ public class ScriptMgr
 
     public int addCrtSession(String iname, String ipath) {
 
-        if ( !StringUtil.isVaildFilePath(ipath) ) {
+        if ( !StringUtil.isValidFilePath(ipath) ) {
             return _INVAILD_PATH;
         }
 
@@ -264,7 +264,7 @@ public class ScriptMgr
 
     public int setDefaultIptPath(String path) {
         int status = _NOT_DONE_YET;
-        if ( !StringUtil.isVaildFilePath(path) ) {
+        if ( !StringUtil.isValidFilePath(path) ) {
             return _INVAILD_PATH;
         }
 
@@ -288,7 +288,7 @@ public class ScriptMgr
 
     public int setRawDataPath(String path) {
         int status = _NOT_DONE_YET;
-        if ( !StringUtil.isVaildFilePath(path) ) {
+        if ( !StringUtil.isValidFilePath(path) ) {
             return _INVAILD_PATH;
         }
         if ( StringUtil.isNotBlank(path) ) { //allow set null,to use default;
@@ -363,7 +363,7 @@ public class ScriptMgr
         String interactor = XmlUtil.getElemValue(elemChain, xmlFile);
 
         if (!StringUtil.isNotBlank(rawDataPath) ||
-                !StringUtil.isVaildFilePath(rawDataPath)) {
+                !StringUtil.isValidFilePath(rawDataPath)) {
             rawDataPath = null;
             isUserDefaultRawDataPath = true;
         } else {
@@ -392,7 +392,7 @@ public class ScriptMgr
         String iptPath = XmlUtil.getElemValue(elemChain, xmlFile);
 
         if (!StringUtil.isNotBlank(iptPath) ||
-                !StringUtil.isVaildFilePath(iptPath)) {
+                !StringUtil.isValidFilePath(iptPath)) {
             iptPath = null;
         }
 
@@ -408,7 +408,7 @@ public class ScriptMgr
         String rawDataPath = XmlUtil.getElemValue(elemChain, xmlFile);
 
         if (!StringUtil.isNotBlank(rawDataPath) ||
-                !StringUtil.isVaildFilePath(rawDataPath)) {
+                !StringUtil.isValidFilePath(rawDataPath)) {
             rawDataPath = null;
             isUserDefaultRawDataPath = true;
         } else {

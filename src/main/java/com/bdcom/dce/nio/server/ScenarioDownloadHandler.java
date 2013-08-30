@@ -5,6 +5,7 @@ import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
 import com.bdcom.dce.biz.pojo.Scenario;
 import com.bdcom.dce.biz.scenario.ScenarioMgr;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 import com.bdcom.dce.util.SerializeUtil;
 
 import java.io.IOException;
@@ -16,6 +17,11 @@ import java.io.IOException;
  * Time: 17:31  <br/>
  */
 public class ScenarioDownloadHandler extends ScenarioHandler {
+
+    public ScenarioDownloadHandler(PMInterface pmInterface) {
+        super(pmInterface);
+    }
+
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
         int requestID = bdPacket.getRequestID();

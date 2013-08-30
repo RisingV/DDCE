@@ -1,8 +1,8 @@
 package com.bdcom.dce.nio.server;
 
-import com.bdcom.dce.nio.ServerContent;
-import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.biz.scenario.ScenarioMgr;
+import com.bdcom.dce.nio.bdpm.PMInterface;
+import com.bdcom.dce.sys.configure.PathConfig;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -12,19 +12,28 @@ import com.bdcom.dce.biz.scenario.ScenarioMgr;
  */
 public abstract class ScenarioHandler extends CommonHandler {
 
+    protected static final byte[] SCE_STUFF_LOCK = new byte[0];
+
+    protected ScenarioHandler(PMInterface pmInterface) {
+        super(pmInterface);
+        this.pmInterface = pmInterface;
+    }
+
+    private final PMInterface pmInterface;
+
     private ScenarioMgr scenarioMgr;
 
     private String name = "ScenarioMgr";
 
     protected ScenarioMgr getScenarioMgr() {
         if ( null == scenarioMgr ) {
-            synchronized (ServerContent.GLOBAL_LOCK0) {
+            synchronized ( SCE_STUFF_LOCK ) {
                 if ( null == scenarioMgr ) {
-                    scenarioMgr = (ScenarioMgr) ServerContent.getContent(name);
+                    scenarioMgr = (ScenarioMgr) pmInterface.getContent(name);
                     if ( null == scenarioMgr ) {
-                        PathConfig pathConfig = ServerContent.getPathConfig();
+                        PathConfig pathConfig = pmInterface.getPathConfig();
                         scenarioMgr = new ScenarioMgr(pathConfig);
-                        ServerContent.addContent(name, scenarioMgr);
+                        pmInterface.addContent(name, scenarioMgr);
                     }
                 }
             }

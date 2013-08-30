@@ -3,7 +3,7 @@ package com.bdcom.dce.nio.server;
 import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
-import com.bdcom.dce.nio.ServerContent;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -13,6 +13,10 @@ import com.bdcom.dce.nio.ServerContent;
  */
 public class ScriptDeleteHandler extends ScriptHandler {
 
+    public ScriptDeleteHandler(PMInterface pmInterface) {
+        super(pmInterface);
+    }
+
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
         deleteAllScripts();
@@ -21,7 +25,7 @@ public class ScriptDeleteHandler extends ScriptHandler {
 
     private void deleteAllScripts() {
         ScriptMgr scriptMgr = getScriptMgr();
-        synchronized (ServerContent.GLOBAL_LOCK1 ) {
+        synchronized ( SCRIPT_STUFF_LOCK  ) {
             scriptMgr.reloadScripts();
             scriptMgr.removeAll();
         }

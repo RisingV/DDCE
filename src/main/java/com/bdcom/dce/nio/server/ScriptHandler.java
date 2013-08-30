@@ -1,8 +1,8 @@
 package com.bdcom.dce.nio.server;
 
-import com.bdcom.dce.nio.ServerContent;
-import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.biz.script.ScriptMgr;
+import com.bdcom.dce.nio.bdpm.PMInterface;
+import com.bdcom.dce.sys.configure.PathConfig;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -12,7 +12,16 @@ import com.bdcom.dce.biz.script.ScriptMgr;
  */
 public abstract class ScriptHandler extends CommonHandler {
 
+    protected static final byte[] SCRIPT_STUFF_LOCK = new byte[0];
+
     protected static boolean needsRebuild = true;
+
+    private  final PMInterface pmInterface;
+
+    protected ScriptHandler(PMInterface pmInterface) {
+        super(pmInterface);
+        this.pmInterface = pmInterface;
+    }
 
     private String name = "scriptMgr";
 
@@ -20,13 +29,13 @@ public abstract class ScriptHandler extends CommonHandler {
 
     protected ScriptMgr getScriptMgr() {
         if ( null == scriptMgr ) {
-            synchronized (ServerContent.GLOBAL_LOCK1) {
+            synchronized ( SCRIPT_STUFF_LOCK ) {
                 if ( null == scriptMgr ) {
-                    scriptMgr = (ScriptMgr) ServerContent.getContent(name);
+                    scriptMgr = (ScriptMgr) pmInterface.getContent(name);
                     if ( null == scriptMgr ) {
-                        PathConfig pathConfig = ServerContent.getPathConfig();
+                        PathConfig pathConfig = pmInterface.getPathConfig();
                         scriptMgr = new ScriptMgr( pathConfig );
-                        ServerContent.addContent(name, scriptMgr);
+                        pmInterface.addContent(name, scriptMgr);
                     }
                 }
             }

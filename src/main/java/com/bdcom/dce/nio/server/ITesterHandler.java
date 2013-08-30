@@ -3,7 +3,7 @@ package com.bdcom.dce.nio.server;
 import com.bdcom.dce.biz.pojo.ITesterRecord;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
-import com.bdcom.dce.nio.ServerContent;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 import com.bdcom.dce.util.SerializeUtil;
 
 import java.io.IOException;
@@ -15,6 +15,14 @@ import java.io.IOException;
  * Time: 15:29  <br/>
  */
 public class ITesterHandler extends CommonHandler {
+
+    private final PMInterface pmInterface;
+
+    public ITesterHandler(PMInterface pmInterface) {
+        super(pmInterface);
+        this.pmInterface = pmInterface;
+    }
+
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
         ITesterRecord record = null;
@@ -35,7 +43,7 @@ public class ITesterHandler extends CommonHandler {
             }
         }
 
-        ITesterRecord checked = ServerContent.SaveITesterRecord(record);
+        ITesterRecord checked = pmInterface.handlerITesterRecord(record);
         BDPacket pack = null;
         try {
             pack = BDPacketUtil.encapsulateToPacket( checked );

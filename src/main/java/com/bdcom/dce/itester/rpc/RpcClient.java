@@ -32,7 +32,7 @@ public class RpcClient implements ITesterAPI {
 
     @Override
     public CommuStatus connectToServer(String ipAddr) {
-        if ( null == ipAddr || !StringUtil.isVaildIp(ipAddr) ) {
+        if ( null == ipAddr || !StringUtil.isValidIp(ipAddr) ) {
             return null;
         }
 

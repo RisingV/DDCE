@@ -1,5 +1,8 @@
 package com.bdcom.dce.sys;
 
+import com.bdcom.dce.nio.BDPacket;
+import com.bdcom.dce.util.StringUtil;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,7 +12,25 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 13-7-17    <br/>
  * Time: 11:37  <br/>
  */
-public class AppContentAdaptor implements AppContent {
+public abstract class AppContentAdaptor implements AppContent {
+
+    private static final int VER_SET_BY_HAND = 400;
+
+    static {
+        initAppVersion();
+    }
+
+    private static void initAppVersion() {
+        int ver = 0;
+        String verStr = System.getProperty("dce.version");
+        if ( StringUtil.isNotBlank( verStr) &&
+                StringUtil.isValidNumber( verStr ) ) {
+            ver = Integer.parseInt( verStr );
+        } else {
+            ver = VER_SET_BY_HAND;
+        }
+        BDPacket.setCurrentVersion( ver );
+    }
 
     private Map<String, Object> attributes;
 

@@ -45,20 +45,20 @@ public abstract class StringUtil {
         return true;
     }
 	
-	public static boolean isVaildIp(String ip) {
+	public static boolean isValidIp(String ip) {
 		Pattern ipPattern = Pattern.compile("((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)");
 		Matcher ipMatcher = ipPattern.matcher(ip);
 		
 		return ipMatcher.matches();
 	}
 	
-	public static boolean isVaildNumber(String num) {
+	public static boolean isValidNumber(String num) {
 		Pattern numberPattern = Pattern.compile("^\\d+$");
 		Matcher numberMatcher = numberPattern.matcher(num);
 		return numberMatcher.matches();
 	}
 	
-	public static boolean isVaildFilePath(String path) {
+	public static boolean isValidFilePath(String path) {
 		path=path.replaceAll("\\\\", "/").trim();
 		Pattern pathPattern = Pattern.compile("(^\\.|^/|^[a-zA-Z])?:?/.+(/$)?");
 		Matcher pathMatcher = pathPattern.matcher(path);

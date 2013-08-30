@@ -1,10 +1,9 @@
 package com.bdcom.dce.nio.server;
 
+import com.bdcom.dce.biz.pojo.Scenario;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
-import com.bdcom.dce.nio.ServerContent;
-import com.bdcom.dce.biz.pojo.Scenario;
-import com.bdcom.dce.biz.scenario.ScenarioMgr;
+import com.bdcom.dce.nio.bdpm.PMInterface;
 import com.bdcom.dce.util.SerializeUtil;
 
 import java.io.IOException;
@@ -17,7 +16,11 @@ import java.io.IOException;
  */
 public class ScenarioReceiveHandler extends ScenarioHandler {
 
-    private static ScenarioMgr scenarioMgr;
+    public ScenarioReceiveHandler(PMInterface pmInterface) {
+        super(pmInterface);
+    }
+
+    //private static ScenarioMgr scenarioMgr;
 
     @Override
     protected BDPacket doHandle(BDPacket bdPacket) {
@@ -42,7 +45,7 @@ public class ScenarioReceiveHandler extends ScenarioHandler {
     }
 
     private void save(Scenario scenario) {
-        synchronized ( ServerContent.GLOBAL_LOCK0 ) {
+        synchronized ( SCE_STUFF_LOCK ) {
             getScenarioMgr().addScenario(scenario);
         }
     }

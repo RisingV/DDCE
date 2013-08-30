@@ -46,7 +46,7 @@ public class ITesterAPIWrapper {
     }
 
     public DeviceStatus getDeviceStatus(String ip) throws ITesterException {
-        if ( !StringUtil.isVaildIp(ip) ) {
+        if ( !StringUtil.isValidIp(ip) ) {
             throw new ITesterException( ITesterException.INVALID_IP, ip );
         }
         if ( null == commuStatus || !commuStatus.isConnected() || !ip.equals( IP ) ) {
@@ -71,7 +71,7 @@ public class ITesterAPIWrapper {
 
     public TestSession startTest( String ip, int cd0, int pd0, int cd1, int pd1, int seconds )
             throws ITesterException {
-        if ( !StringUtil.isVaildIp(ip) ) {
+        if ( !StringUtil.isValidIp(ip) ) {
             throw new ITesterException( ITesterException.INVALID_IP, ip );
         }
         if ( null == commuStatus || !commuStatus.isConnected() || !ip.equals( IP ) ) {
