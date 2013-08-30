@@ -9,7 +9,7 @@ import com.bdcom.dce.sys.config.ServerConfig;
 import com.bdcom.dce.sys.gui.GuiInterface;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.util.GBC;
 import com.bdcom.dce.view.util.MessageUtil;
 import com.bdcom.dce.view.util.MsgDialogUtil;

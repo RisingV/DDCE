@@ -8,7 +8,7 @@ import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
 import com.bdcom.dce.nio.RequestID;
 import com.bdcom.dce.util.SerializeUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.File;
 import java.io.IOException;

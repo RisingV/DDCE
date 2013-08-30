@@ -1,6 +1,6 @@
 package com.bdcom.dce.dataparser;
 
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.sys.AppSession;
 import com.bdcom.dce.biz.script.FileRawDataFetcher;

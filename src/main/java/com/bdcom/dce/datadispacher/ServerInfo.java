@@ -1,7 +1,7 @@
 package com.bdcom.dce.datadispacher;
 
 import com.bdcom.dce.sys.config.ServerInfoConstants;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.sys.ConfigPath;
 import com.bdcom.dce.util.XmlUtil;
 import org.dom4j.Document;

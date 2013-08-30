@@ -110,7 +110,7 @@ class SocketChannelResponder extends ChannelResponder implements NIOSocket
 	}
 
     /**
-     * Notify the observer that the packet is received, will log to the exception observer on NIOService if an error occurs.
+     * Notify the observer that the packet is received, will logger to the exception observer on NIOService if an error occurs.
      *
      * @param packet the packet received.
      */
@@ -128,7 +128,7 @@ class SocketChannelResponder extends ChannelResponder implements NIOSocket
 
 
     /**
-     * Notify the observer that the packet was sent. Will log to the exception observer on NIOService if an error occurs.
+     * Notify the observer that the packet was sent. Will logger to the exception observer on NIOService if an error occurs.
      *
      * @param tag the optional tag associated with the packet.
      */
@@ -320,7 +320,7 @@ class SocketChannelResponder extends ChannelResponder implements NIOSocket
 	}
 
 	/**
-     * Notify the observer that the socket connected. Will log to the exception observer on NIOService if an error occurs.
+     * Notify the observer that the socket connected. Will logger to the exception observer on NIOService if an error occurs.
      *
      */
 	private void notifyObserverOfConnect()
@@ -336,7 +336,7 @@ class SocketChannelResponder extends ChannelResponder implements NIOSocket
 	}
 
 	/**
-     * Notify the observer of the disconnect. Will log to the exception observer on NIOService if an error occurs.
+     * Notify the observer of the disconnect. Will logger to the exception observer on NIOService if an error occurs.
 	 *
 	 * @param exception the exception causing the disconnect, or null if this was a clean close.
 	 */

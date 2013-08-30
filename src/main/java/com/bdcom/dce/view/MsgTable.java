@@ -5,8 +5,8 @@ import com.bdcom.dce.sys.Applicable;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.biz.script.ScriptExecutor;
 import com.bdcom.dce.util.LocaleUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
-import com.bdcom.dce.util.log.MsgLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
+import com.bdcom.dce.util.logger.MsgLogger;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;

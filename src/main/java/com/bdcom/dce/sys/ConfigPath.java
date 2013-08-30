@@ -1,7 +1,7 @@
 package com.bdcom.dce.sys;
 
 import com.bdcom.dce.sys.gui.Application;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.XmlUtil;
 

@@ -7,7 +7,7 @@ import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.biz.pojo.ITesterRecord;
 import com.bdcom.dce.biz.pojo.LoginAuth;
 import com.bdcom.dce.util.SerializeUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.*;
 

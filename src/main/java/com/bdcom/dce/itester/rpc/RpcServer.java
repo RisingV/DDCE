@@ -3,7 +3,7 @@ package com.bdcom.dce.itester.rpc;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.server.IHandler;
 import com.bdcom.dce.nio.server.NIOServer;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.IOException;
 import java.util.HashMap;

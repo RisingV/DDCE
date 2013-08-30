@@ -4,7 +4,7 @@ import com.bdcom.dce.sys.gui.Application;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.biz.script.FileRawDataFetcher;
 import com.bdcom.dce.biz.script.ScriptMgr;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.*;
 import java.util.List;

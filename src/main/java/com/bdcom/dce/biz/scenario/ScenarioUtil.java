@@ -2,7 +2,7 @@ package com.bdcom.dce.biz.scenario;
 
 import com.bdcom.dce.datadispacher.CommuniConstants;
 import com.bdcom.dce.biz.pojo.Scenario;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.biz.pojo.Dumb;
 import com.bdcom.dce.biz.pojo.ForceToBeAttr;

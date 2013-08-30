@@ -1,6 +1,6 @@
 package com.bdcom.dce.biz.pojo;
 
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -13,7 +13,7 @@ import com.bdcom.dce.sys.config.PathConfig;
 import com.bdcom.dce.sys.config.ServerConfig;
 import com.bdcom.dce.sys.service.Dialect;
 import com.bdcom.dce.util.SerializeUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.IOException;
 import java.util.Map;

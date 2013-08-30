@@ -11,7 +11,7 @@ import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.sys.config.PathConfig;
 import com.bdcom.dce.sys.config.ServerConfig;
 import com.bdcom.dce.sys.service.Dialect;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.*;
 import com.bdcom.dce.view.itester.ITesterFrame;
 

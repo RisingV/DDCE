@@ -1,6 +1,6 @@
 package com.bdcom.dce.view.util;
 
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

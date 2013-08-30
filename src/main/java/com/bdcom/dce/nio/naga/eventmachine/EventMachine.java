@@ -160,7 +160,7 @@ public class EventMachine
 	 * <p>
 	 * <em>This method is thread-safe.</em>
 	 *
-	 * @param observer the observer to use, null will cause exceptions to log to stderr
+	 * @param observer the observer to use, null will cause exceptions to logger to stderr
 	 */
 	public void setObserver(ExceptionObserver observer)
 	{

@@ -1,7 +1,7 @@
 package com.bdcom.dce.biz.pojo;
 
 import com.bdcom.dce.sys.gui.Application;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;

@@ -6,7 +6,7 @@ import com.bdcom.dce.sys.config.PathConfig;
 import com.bdcom.dce.biz.script.session.DefaultCrtSessions;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.XmlUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.File;
 import java.io.FilenameFilter;

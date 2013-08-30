@@ -139,7 +139,7 @@ public class ChatServer implements ServerSocketObserver
                 }
             }, LOGIN_TIMEOUT);
 
-            // Send the request to log in.
+            // Send the request to logger in.
             nioSocket.write("Please enter your name:".getBytes());
         }
 

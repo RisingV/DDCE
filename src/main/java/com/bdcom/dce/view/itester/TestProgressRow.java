@@ -5,7 +5,7 @@ import com.bdcom.dce.itester.api.wrapper.*;
 import com.bdcom.dce.itester.lib.PortStats;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.util.GBC;
 
 import javax.swing.*;

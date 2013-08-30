@@ -3,7 +3,7 @@ package com.bdcom.dce.biz.script;
 import com.bdcom.dce.datadispacher.CommunicateStatus;
 import com.bdcom.dce.sys.Applicable;
 import com.bdcom.dce.sys.ApplicationConstants;
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.biz.script.interpreter.DefaultInteractor;
 import com.bdcom.dce.biz.script.interpreter.ScriptInteractor;
 import com.bdcom.dce.biz.script.interpreter.ScriptInterpreter;

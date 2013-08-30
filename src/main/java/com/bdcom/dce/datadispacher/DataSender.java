@@ -1,6 +1,6 @@
 package com.bdcom.dce.datadispacher;
 
-import com.bdcom.dce.util.log.ErrorLogger;
+import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.biz.pojo.LoginAuth;
 import com.bdcom.dce.sys.AppSession;
