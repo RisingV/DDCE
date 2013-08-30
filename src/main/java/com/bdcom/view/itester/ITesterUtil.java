@@ -21,7 +21,7 @@ public abstract class ITesterUtil {
     private static final String INVALID_IP = "invalid ip:";
     private static final String CANT_CONNECT = "can't connect to server:";
 
-    public static void reportTestException(ITesterException e, Component source) {
+    public static String reportTestException(ITesterException e, Component source) {
         int type = e.getErrType();
         StringBuilder sb = new StringBuilder();
         switch ( type ) {
@@ -60,7 +60,9 @@ public abstract class ITesterUtil {
                 break;
             }
         }
-        MsgDialogUtil.showErrorDialog( source, sb.toString() );
+        String msg = sb.toString();
+        MsgDialogUtil.showErrorDialog( source, msg );
+        return msg;
     }
 
 }

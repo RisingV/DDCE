@@ -5,7 +5,7 @@ import com.bdcom.biz.pojo.BaseTestRecord;
 import com.bdcom.sys.AppSession;
 import com.bdcom.biz.script.FileRawDataFetcher;
 import com.bdcom.util.StringUtil;
-import org.jargp.*;
+import com.bdcom.sys.cli.jargp.*;
 
 import java.io.BufferedReader;
 import java.io.File;

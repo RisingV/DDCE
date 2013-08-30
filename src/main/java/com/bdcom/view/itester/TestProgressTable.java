@@ -37,20 +37,41 @@ public class TestProgressTable extends JTable {
     public void addRow(TestProgressRow row) {
         if ( null != row ) {
             tableModel.addRow( row );
-            updateUI();
+            tableModel.fireTableDataChanged();
+        //    updateUI();
         }
     }
 
     public void removeRow(TestProgressRow row) {
         if ( null != row ) {
-            tableModel.removeRow( row );
-            updateUI();
+            tableModel.removeRow(row);
+            tableModel.fireTableDataChanged();
+//            if ( 0 == tableModel.getRowCount() ) {
+//                updateUI();
+//            } else {
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        updateUI();
+//                    }
+//                });
+//            }
         }
     }
 
     public void removeRow(int rowIndex) {
         tableModel.removeRow( rowIndex );
-        updateUI();
+        tableModel.fireTableDataChanged();
+//            if ( 0 == tableModel.getRowCount() ) {
+//                updateUI();
+//            } else {
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        updateUI();
+//                    }
+//                });
+//            }
     }
 
     private void initUI() {
@@ -284,7 +305,12 @@ public class TestProgressTable extends JTable {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                tableRef.updateUI();
+                SwingUtilities.invokeLater( new Runnable() {
+                    @Override
+                    public void run() {
+                        tableRef.updateUI();
+                    }
+                });
             }
         }
 

@@ -1,16 +1,15 @@
 package com.bdcom.view.itester;
 
 import com.bdcom.biz.pojo.ITesterRecord;
-import com.bdcom.itester.api.wrapper.ITesterAPIWrapper;
-import com.bdcom.itester.api.wrapper.ITesterException;
-import com.bdcom.itester.api.wrapper.TestCaseConfig;
-import com.bdcom.itester.api.wrapper.TestSession;
+import com.bdcom.itester.api.wrapper.*;
 import com.bdcom.itester.lib.PortStats;
 import com.bdcom.util.LocaleUtil;
+import com.bdcom.util.StringUtil;
 import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.view.util.GBC;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +31,7 @@ public class TestProgressRow implements
     private static final String UNTESTED = "Untested";
     private static final String SUCCESS = "Success!";
     private static final String FAIL = "Fail!";
+    private static final String ABNORMAL = "Abnormal!";
 
     private static final String START = "Start";
     private static final String RESTART = "Restart";
@@ -94,7 +94,6 @@ public class TestProgressRow implements
         removeButton.setEnabled( false );
 //        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        boolean startFail = false;
         try {
             testSession = apiWrapper.startTest(
                     testConfig.getIp(),
@@ -108,12 +107,7 @@ public class TestProgressRow implements
             testTask.addPropertyChangeListener(this);
             testTask.execute();
         } catch (ITesterException ex) {
-            startFail = true;
-            reportTestException( ex );
-        } finally {
-            if ( startFail ) {
-                startButton.setEnabled( true );
-            }
+            handleTestException(ex);
         }
     }
 
@@ -162,6 +156,7 @@ public class TestProgressRow implements
 
         String untested = LocaleUtil.getLocalName( UNTESTED );
         statusLabel = new JLabel( untested );
+        detailDialog.updateTestStatus(untested);
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout( new GridBagLayout() );
@@ -183,8 +178,19 @@ public class TestProgressRow implements
         }
     }
 
-    private void reportTestException(ITesterException e) {
-        ITesterUtil.reportTestException( e, panelOwner );
+    private void handleTestException(ITesterException e) {
+        String abnormal = LocaleUtil.getLocalName( ABNORMAL );
+        statusLabel.setText( abnormal );
+        if ( null != updateAction ) {
+            updateAction.actionPerformed( null );
+        }
+        startButton.setEnabled( true );
+        detailButton.setEnabled( true );
+        removeButton.setEnabled( true );
+        running = false;
+
+        String status = ITesterUtil.reportTestException( e, panelOwner );
+        detailDialog.updateTestStatus( status );
     }
 
     class TestTask extends SwingWorker<Void, Void> {
@@ -206,7 +212,7 @@ public class TestProgressRow implements
                     if ( e.getErrType() == ITesterException.CONNECT_FAIL ) {
                         connected = false;
                     }
-                    reportTestException( e );
+                    handleTestException(e);
                 } finally {
                     if ( !connected ) {
                         break;
@@ -246,15 +252,16 @@ public class TestProgressRow implements
 
             boolean isPass = session.isTestPass();
             iTesterRecord.setTestPass( isPass );
+            String status = null;
             if ( isPass ) {
-                String success = LocaleUtil.getLocalName( SUCCESS );
-                statusLabel.setText( success );
+                status = LocaleUtil.getLocalName( SUCCESS );
                 progressBar.setForeground( Color.green );
             } else {
-                String fail = LocaleUtil.getLocalName( FAIL );
-                statusLabel.setText( fail );
+                status = LocaleUtil.getLocalName( FAIL );
                 progressBar.setForeground(Color.red);
             }
+            statusLabel.setText( status );
+            detailDialog.updateTestStatus( status );
 
             PortStats ps = session.getPortStats();
             detailDialog.updateStats( ps );
@@ -282,7 +289,9 @@ public class TestProgressRow implements
         private static final String DST_PORT = "destination port";
         private static final String TEST_OPTION = "test option";
         private static final String TEST_STATS = "test data stats";
+        private static final String TEST_STATUS = "Test Status";
 
+        private JLabel testStatusLabel;
         private JLabel workOrderLabel;
         private JLabel barCodeLabel;
         private JLabel srcPortLabel;
@@ -311,6 +320,7 @@ public class TestProgressRow implements
 
         private JPanel testConfigPane;
         private JPanel testStatsPane;
+        private JPanel testStatusPane;
 
         private final ITesterRecord itr;
         private final TestCaseConfig testConfig;
@@ -338,6 +348,7 @@ public class TestProgressRow implements
             String dstPort = LocaleUtil.getLocalName( DST_PORT );
             String testOption = LocaleUtil.getLocalName( TEST_OPTION );
             String testStats = LocaleUtil.getLocalName( TEST_STATS );
+            String testStatus = LocaleUtil.getLocalName( TEST_STATUS );
 
             workOrderLabel = newLabel( workOrderNum );
             barCodeLabel = newLabel( barCode );
@@ -408,9 +419,17 @@ public class TestProgressRow implements
             testStatsPane.add(rxBpsLabel, loc(2, 3));
             testStatsPane.add(rxBpsField, loc(3, 3));
 
+            testStatusLabel = new JLabel();
+            testStatusLabel.setPreferredSize( new Dimension( 588, 35 ) );
+            testStatusPane = new JPanel();
+            Border statusTitle = BorderFactory.createTitledBorder( testStatus );
+            testStatusPane.setBorder(statusTitle);
+            testStatusPane.add( testStatusLabel, BorderLayout.CENTER );
+
             setLayout( new GridBagLayout() );
-            add( testConfigPane, loc(0, 0) );
-            add( testStatsPane, loc(0, 1) );
+            add( testStatusPane, loc(0, 0) );
+            add( testConfigPane, loc(0, 1) );
+            add( testStatsPane, loc(0, 2) );
 
             addWindowListener( new WindowAdapter() {
                 @Override
@@ -423,6 +442,16 @@ public class TestProgressRow implements
             });
 
             pack();
+        }
+
+        void updateTestStatus( String status ) {
+            if ( !StringUtil.isNotBlank( status ) ) {
+                return;
+            }
+            String old = testStatusLabel.getText();
+            if ( !status.equals( old ) ) {
+                testStatusLabel.setText(status);
+            }
         }
 
         void updateTestOption(ITesterRecord itr, TestCaseConfig testConfig ) {
@@ -475,7 +504,7 @@ public class TestProgressRow implements
 
         private JTextField newField() {
             JTextField f = new JTextField();
-            f.setPreferredSize( new Dimension( 100, 20 ));
+            f.setPreferredSize( new Dimension( 150, 20 ));
             f.setEditable( false );
             f.setText("0");
             return f;

@@ -1,7 +1,7 @@
 package com.bdcom.sys.cli;
 
 import com.bdcom.biz.pojo.BaseTestRecord;
-import org.jargp.*;
+import com.bdcom.sys.cli.jargp.*;
 
 /**
  * Created with IntelliJ IDEA. <br/>

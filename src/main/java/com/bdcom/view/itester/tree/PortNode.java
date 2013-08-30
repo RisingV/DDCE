@@ -49,7 +49,6 @@ public class PortNode extends DefaultMutableTreeNode implements CustomizedNode {
 
     @Override
     public Icon getCustomizedIcon() {
-        System.out.println("request port Icon" + counter++);
         boolean linked = deviceStatus.isLinked( cardId, portId );
         boolean used = deviceStatus.isUsed( cardId, portId );
         boolean locallyUsed = deviceStatus.isLocalUsed( cardId, portId );
