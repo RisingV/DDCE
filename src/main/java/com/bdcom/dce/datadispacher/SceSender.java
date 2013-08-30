@@ -1,6 +1,7 @@
 package com.bdcom.dce.datadispacher;
 
 import com.bdcom.dce.biz.pojo.Scenario;
+import com.bdcom.dce.util.CommuniConstants;
 import com.bdcom.dce.util.CommunicateStatus;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.sys.AppSession;

@@ -1,5 +1,6 @@
 package com.bdcom.dce.datadispacher;
 
+import com.bdcom.dce.util.CommuniConstants;
 import com.bdcom.dce.util.CommunicateStatus;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class DataSender implements
-        CommunicateStatus, CommuniConstants{
+        CommunicateStatus, CommuniConstants {
 	
 	private static final String MAGIC_ID = "BDCOMNM2012";
 	

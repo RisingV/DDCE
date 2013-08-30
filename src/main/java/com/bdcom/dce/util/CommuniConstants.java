@@ -1,4 +1,4 @@
-package com.bdcom.dce.datadispacher;
+package com.bdcom.dce.util;
 
 
 /**

@@ -1080,7 +1080,8 @@ public class SubmitFrame extends JPanel implements
 					new Scenario()
 					);
 			if ( null == currDataRec ) {
-				currDataRec = BaseTestRecord.newRecord();
+                String user = app.getStringAttr( USER.USER_NUM );
+				currDataRec = BaseTestRecord.newRecord( user );
 				refreshTextFieldGroup(currDataRec);	
 			}
 			setUsableOfAllCrt(true);
@@ -1162,7 +1163,8 @@ public class SubmitFrame extends JPanel implements
 		}
 		
 		if ( null == currDataRec ) {
-			currDataRec = BaseTestRecord.newRecord();
+            String user = app.getStringAttr( USER.USER_NUM );
+			currDataRec = BaseTestRecord.newRecord( user );
 			refreshTextFieldGroup(currDataRec);	
 		}
 	}
@@ -1241,7 +1243,8 @@ public class SubmitFrame extends JPanel implements
 					String text = jtf.getText();
 					if ( null != text && StringUtil.isNotBlank(text) ) {
 						if ( null == currDataRec) {
-							currDataRec = BaseTestRecord.newRecord();
+                            String user = app.getStringAttr( USER.USER_NUM );
+							currDataRec = BaseTestRecord.newRecord( user );
 						}
 						currDataRec.setAttrByFieldName(attrName, text);
 					}
@@ -1298,7 +1301,8 @@ public class SubmitFrame extends JPanel implements
 	private void updateTextFieldGroupByScenarioNoList() {
 		BaseTestRecord mergedRecord = null;
 		if ( null == currDataRec ) {
-			currDataRec = BaseTestRecord.newRecord();
+            String user = app.getStringAttr( USER.USER_NUM );
+			currDataRec = BaseTestRecord.newRecord( user );
 			mergedRecord = currDataRec;
 		} else {
 			mergedRecord = mergeDataRecWithScenario(currDataRec,
@@ -1317,7 +1321,8 @@ public class SubmitFrame extends JPanel implements
 					getScenarioByName(sceName);
 			currentSce = savedSce;
 			if ( null == currDataRec ) {
-				currDataRec = BaseTestRecord.newRecord();
+                String user = app.getStringAttr( USER.USER_NUM );
+				currDataRec = BaseTestRecord.newRecord( user );
 				mergedRecord = currDataRec;
 			} else {
 				mergedRecord = mergeDataRecWithScenario(currDataRec,
