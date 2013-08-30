@@ -31,8 +31,11 @@ public class ITesterLibLoader {
 
     private static boolean platformCheck() {
         String os = System.getProperty( "os.name" );
-        if ( os.indexOf( "Windows") > 0 || os.indexOf( "windows") > 0 ) {
+        System.out.println( "Platform: " + os );
+        if ( os.indexOf( "Windows") >= 0 || os.indexOf( "windows") >= 0 ) {
             return true;
+        } else {
+            System.out.println("No available jni support for this platform.");
         }
         return false;
     }

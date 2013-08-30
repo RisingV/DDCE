@@ -34,7 +34,7 @@ public abstract class DeviceInfoTreeBuilder {
     }
 
     public static JTree buildTree(DeviceStatus deviceStatus) {
-        return buildTree( deviceStatus, 1.5f );
+        return buildTree( deviceStatus, 1.8f );
     }
 
     public static JTree buildTree(DeviceStatus deviceStatus, float updateFrequency) {
@@ -42,12 +42,12 @@ public abstract class DeviceInfoTreeBuilder {
             loadIcons();
         }
         ServerNode serverNode = new ServerNode( deviceStatus, serverIcon );
-        int cardNum = deviceStatus.getCardCount();
-        for ( int cardId = 0; cardId < cardNum; cardId++ ) {
+                int cardNum = deviceStatus.getCardCount();
+                for ( int cardId = 0; cardId < cardNum; cardId++ ) {
 
-            CardNode cardNode = new CardNode( deviceStatus, cardId, cardIcon );
-            int portNum = deviceStatus.getPortCount( cardId );
-            for ( int portId = 0; portId < portNum; portId++ ) {
+                    CardNode cardNode = new CardNode( deviceStatus, cardId, cardIcon );
+                    int portNum = deviceStatus.getPortCount( cardId );
+                    for ( int portId = 0; portId < portNum; portId++ ) {
 
                 PortNode portNode = new PortNode.Builder()
                         .portInfo( deviceStatus , cardId, portId )
@@ -65,6 +65,9 @@ public abstract class DeviceInfoTreeBuilder {
         deviceInfoTree.setCellRenderer( new DeviceTreeCellRenderer() );
         new UpdateTimer( deviceInfoTree, updateFrequency ).start();
 
+        for (int i = deviceInfoTree.getRowCount() - 1; i >= 0; i--) {
+            deviceInfoTree.expandRow( i );
+        }
         return deviceInfoTree;
     }
 
@@ -73,7 +76,6 @@ public abstract class DeviceInfoTreeBuilder {
 
         private final JTree tree;
         private final long interval;
-        private static int counter = 0;
 
         UpdateTimer(JTree tree, float updateFrequency) {
             this.tree = tree;

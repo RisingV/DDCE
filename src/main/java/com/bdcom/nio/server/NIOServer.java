@@ -1,11 +1,11 @@
 package com.bdcom.nio.server;
 
 import com.bdcom.nio.RequestID;
-import naga.*;
+import com.bdcom.nio.naga.*;
 import com.bdcom.nio.BDPacket;
 import com.bdcom.nio.BDPacketUtil;
-import naga.packetreader.RegularPacketReader;
-import naga.packetwriter.RegularPacketWriter;
+import com.bdcom.nio.naga.packetreader.RegularPacketReader;
+import com.bdcom.nio.naga.packetwriter.RegularPacketWriter;
 
 import java.io.*;
 import java.util.HashMap;

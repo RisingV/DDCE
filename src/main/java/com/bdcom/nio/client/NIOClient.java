@@ -7,11 +7,11 @@ import com.bdcom.sys.config.ServerConfig;
 import com.bdcom.util.SerializeUtil;
 import com.bdcom.util.log.ErrorLogger;
 import com.bdcom.util.log.MsgLogger;
-import naga.NIOService;
-import naga.NIOSocket;
-import naga.SocketObserver;
-import naga.packetreader.RegularPacketReader;
-import naga.packetwriter.RegularPacketWriter;
+import com.bdcom.nio.naga.NIOService;
+import com.bdcom.nio.naga.NIOSocket;
+import com.bdcom.nio.naga.SocketObserver;
+import com.bdcom.nio.naga.packetreader.RegularPacketReader;
+import com.bdcom.nio.naga.packetwriter.RegularPacketWriter;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;

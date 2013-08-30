@@ -206,9 +206,9 @@ public class ITesterFrame extends JPanel
         buttonPane.setLayout(new GridBagLayout());
         buttonPane.setPreferredSize(new Dimension(600, 100));
         buttonPane.setBorder(bd);
-        buttonPane.add( addServerBt, new GBC(0, 0).setInsets(5, 10, 5, 10) );
+        buttonPane.add( addServerBt, new GBC(0, 0).setInsets( 5, 10, 5, 10 ) );
         buttonPane.add( addTestBt, new GBC(1, 0).setInsets( 5, 10 ,5, 10 ) );
-        buttonPane.add( commitBt, new GBC(2, 0).setInsets( 5, 10, 5, 10) );
+        buttonPane.add( commitBt, new GBC(2, 0).setInsets( 5, 10, 5, 10 ) );
     }
 
     private void initModePane() {
@@ -304,7 +304,7 @@ public class ITesterFrame extends JPanel
         TestProgressRow testProgressRow = new TestProgressRow( record, apiWrapper, testConfig );
         testProgressRow.setPanelOwner( this );
 
-        tprList.add(testProgressRow);
+        tprList.add( testProgressRow );
         progressesTable.addRow( testProgressRow );
     }
 
