@@ -1,11 +1,11 @@
 package com.bdcom.devtest;
 
-import com.bdcom.itester.api.ITesterAPI;
-import com.bdcom.itester.api.JniAPIImpl;
-import com.bdcom.itester.api.wrapper.DeviceStatus;
-import com.bdcom.itester.api.wrapper.ITesterAPIWrapper;
-import com.bdcom.itester.api.wrapper.ITesterException;
-import com.bdcom.view.itester.tree.DeviceInfoTreeBuilder;
+import com.bdcom.dce.itester.api.ITesterAPI;
+import com.bdcom.dce.itester.api.JniAPIImpl;
+import com.bdcom.dce.itester.api.wrapper.DeviceStatus;
+import com.bdcom.dce.itester.api.wrapper.ITesterAPIWrapper;
+import com.bdcom.dce.itester.api.wrapper.ITesterException;
+import com.bdcom.dce.view.itester.tree.DeviceInfoTreeBuilder;
 
 import javax.swing.*;
 import java.awt.*;
