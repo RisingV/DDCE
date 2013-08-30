@@ -1,6 +1,6 @@
 package com.bdcom.dce.biz.script;
 
-import com.bdcom.dce.datadispacher.CommunicateStatus;
+import com.bdcom.dce.util.CommunicateStatus;
 import com.bdcom.dce.sys.gui.Application;
 import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.biz.script.session.DefaultCrtSessions;

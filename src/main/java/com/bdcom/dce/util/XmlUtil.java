@@ -1,6 +1,5 @@
 package com.bdcom.dce.util;
 
-import com.bdcom.dce.datadispacher.CommunicateStatus;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

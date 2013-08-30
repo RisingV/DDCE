@@ -11,7 +11,7 @@ import com.bdcom.dce.view.util.GBC;
 import com.bdcom.dce.view.util.Hook;
 import com.bdcom.dce.view.util.MessageUtil;
 import com.bdcom.dce.view.util.MsgDialogUtil;
-import com.bdcom.dce.datadispacher.CommunicateStatus;
+import com.bdcom.dce.util.CommunicateStatus;
 import com.bdcom.dce.datadispacher.http.HttpClientWrapper;
 import com.bdcom.dce.nio.exception.ResponseException;
 import com.bdcom.dce.nio.client.ClientProxy;

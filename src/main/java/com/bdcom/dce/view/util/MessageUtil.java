@@ -1,6 +1,6 @@
 package com.bdcom.dce.view.util;
 
-import static com.bdcom.dce.datadispacher.CommunicateStatus.*;
+import static com.bdcom.dce.util.CommunicateStatus.*;
 import static com.bdcom.dce.view.util.Messages.*;
 
 import java.util.HashMap;

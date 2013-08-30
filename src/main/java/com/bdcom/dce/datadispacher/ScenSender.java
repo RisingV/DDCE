@@ -1,6 +1,7 @@
 package com.bdcom.dce.datadispacher;
 
 import com.bdcom.dce.sys.ConfigPath;
+import com.bdcom.dce.util.CommunicateStatus;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -14,7 +15,7 @@ import java.net.Socket;
  */
 
 public class ScenSender implements
-			CommunicateStatus, CommuniConstants{
+        CommunicateStatus, CommuniConstants{
 		
 //	private static final DateFormat DATE_FORMAT = AppSession.DATE_FORMAT;
 	
