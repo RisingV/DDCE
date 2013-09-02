@@ -1,11 +1,10 @@
 package com.bdcom.dce.biz.pojo;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * @author francis yuan <br>
@@ -17,7 +16,8 @@ import java.util.Set;
 public class Scenario implements Serializable {
 	
 	private static final long serialVersionUID = 458346062352593578L;
-	
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+
 	private static long _maxId = -1; //can't Serialize, should int by hand
 	
 	private long id = -1;
@@ -27,10 +27,34 @@ public class Scenario implements Serializable {
 	private String scenarioName;
 	
 	private String serialNum;
-	
+
+    private final Date dateCreate;
+
+    private Date dateModify;
+
 	private Map<String, String> restrictAttr = new HashMap<String, String>();
-	
-	public String getScenarioName() {
+
+    public Scenario() {
+        dateCreate = new Date();
+    }
+
+    public Date getDateCreate() {
+        return dateCreate;
+    }
+
+    public Date getDateModify() {
+        return dateModify;
+    }
+
+    public String getFormattedCreateDate() {
+        return DATE_FORMAT.format( dateCreate );
+    }
+
+    public String getFormattedModifyDate() {
+        return DATE_FORMAT.format( dateModify );
+    }
+
+    public String getScenarioName() {
 		return scenarioName;
 	}
 
@@ -43,6 +67,7 @@ public class Scenario implements Serializable {
 	}
 
 	public void setSerialNum(String serialNum) {
+        updateDateModify();
 		this.serialNum = serialNum;
 	}
 
@@ -51,6 +76,7 @@ public class Scenario implements Serializable {
 	}
 
 	public void setBeginIndex(int beginIndex) {
+        updateDateModify();
 		this.beginIndex = beginIndex;
 	}
 
@@ -89,10 +115,12 @@ public class Scenario implements Serializable {
 	}
 
 	public void setRestrictAttr(Map<String, String> attrs) {
+        updateDateModify();
 		restrictAttr = attrs;
 	}
 
 	public void putAttr(String attrName, String attrValue) {
+        updateDateModify();
 		restrictAttr.put(attrName, attrValue);
 	}
 	
@@ -105,6 +133,7 @@ public class Scenario implements Serializable {
 	}
 	
 	public void rmAttr(String attrName) {
+        updateDateModify();
 		restrictAttr.remove(attrName);
 	}
 	
@@ -113,8 +142,13 @@ public class Scenario implements Serializable {
 	}
 	
 	public void clearAllAttr() {
+        updateDateModify();
 		restrictAttr.clear();
 	}
+
+    private void updateDateModify() {
+        dateModify = new Date();
+    }
 	
 	public long getHashCode() {
 		long h = 0;

@@ -6,6 +6,7 @@ import com.bdcom.dce.nio.server.Message;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.biz.pojo.ITesterRecord;
 import com.bdcom.dce.biz.pojo.LoginAuth;
+import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 
@@ -51,7 +52,7 @@ public abstract class BDPacketUtil {
         byte[] data = intToByteArray(Message.INT.INVALID_VERSION);
 
         BDPacket pack = BDPacket.newPacket(requestID);
-        pack.setDataType( DataType.INTEGER  );
+        pack.setDataType( DataType.INVALID_VERSION_EXCEPTION  );
         pack.setData(data);
 
         return pack;
@@ -143,6 +144,7 @@ public abstract class BDPacketUtil {
             throw new ResponseException("Invalid Response!");
         }
         globalExceptionCheck(packet);
+        invalidVersionCheck(packet);
 
         int status = 0;
         if ( DataType.INTEGER == packet.getDataType() ) {
@@ -184,6 +186,16 @@ public abstract class BDPacketUtil {
         }
 
         return strArray;
+    }
+
+    public static void invalidVersionCheck(BDPacket pack) throws ResponseException {
+        if ( null == pack ||
+                DataType.INVALID_VERSION_EXCEPTION != pack.getDataType() ) {
+            return;
+        }
+        String msg0 = "Current client version is valid!";
+        String msg = LocaleUtil.getLocalName( msg0 );
+        throw new ResponseException( msg );
     }
 
     public static void globalExceptionCheck(BDPacket pack) throws GlobalException {

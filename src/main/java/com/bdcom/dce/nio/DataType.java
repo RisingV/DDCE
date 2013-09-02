@@ -27,6 +27,8 @@ public interface DataType {
     public static final int SCENARIO = 13;
 
     //System remained
+    public static final int INVALID_VERSION_EXCEPTION = Byte.MAX_VALUE - 2;
+
     public static final int LOCAL_EXCEPTION = Byte.MAX_VALUE - 1;
 
     public static final int GLOBAL_EXCEPTION = Byte.MAX_VALUE;

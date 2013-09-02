@@ -21,8 +21,8 @@ public class BDPacket {
     private int dataType;
     private byte[] data;
 
-    BDPacket() {
-        version = currentVersion;
+    private BDPacket(int version) {
+        this.version = version;
     }
 
     public int getVersion() {
@@ -88,7 +88,6 @@ public class BDPacket {
     }
 
     public static BDPacket parse(byte[] raw) throws IOException {
-        BDPacket packet = new BDPacket();
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(raw));
 
         int version = (int) in.readByte();
@@ -99,6 +98,7 @@ public class BDPacket {
         in.read(data);
         in.close();
 
+        BDPacket packet = new BDPacket( version );
         packet.setRequestID(requestID);
         packet.setDataType(dataType);
         packet.setData(data);
@@ -107,7 +107,12 @@ public class BDPacket {
     }
 
     public static BDPacket newPacket(int requestID) {
-        BDPacket newPack = new BDPacket();
+        return newPacket( requestID, currentVersion );
+    }
+
+
+    public static BDPacket newPacket(int requestID, int version) {
+        BDPacket newPack = new BDPacket( version );
         newPack.setRequestID( requestID );
 
         return newPack;
@@ -117,7 +122,7 @@ public class BDPacket {
         if ( null == pack ) {
             return null;
         }
-        BDPacket cloned = newPacket( pack.getRequestID() );
+        BDPacket cloned = newPacket( pack.getRequestID(), pack.getVersion() );
         cloned.setDataType( pack.getDataType() );
         cloned.setData( pack.getData() );
 
