@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AppContentAdaptor implements AppContent {
 
-    private static final int VER_SET_BY_HAND = 400;
+    private static final int VER_SET_BY_HAND = 40;
 
     static {
         initAppVersion();

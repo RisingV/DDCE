@@ -82,7 +82,8 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         SubmitFrame submitFrame = new SubmitFrame(clientProxy, this);
         ScenarioMgrFrame scenarioMgrFrame = new ScenarioMgrFrame( clientProxy, this );
         ScriptMgrFrame scriptMgrFrame = new ScriptMgrFrame( clientProxy, this );
-        ScriptList scriptList = new ScriptList(this);
+        //ScriptList scriptList = new ScriptList(this);
+        ResourceList resourceList = new ResourceList(this);
         MsgTable msgTable = new MsgTable(this);
 
         // test code start
@@ -103,7 +104,8 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         // test code end
 
         addAttribute( COMPONENT.MSG_TABLE, msgTable );
-        addAttribute( COMPONENT.SCRIPT_LIST, scriptList );
+        //addAttribute( COMPONENT.SCRIPT_LIST, scriptList );
+        addAttribute( COMPONENT.RESOURCE_LIST, resourceList );
         addAttribute( COMPONENT.SCENARIO_MGR_FRAME, scenarioMgrFrame );
         addAttribute( COMPONENT.SUBMIT_FRAME, submitFrame );
         addAttribute( COMPONENT.SCRIPT_MGR_FRAME, scriptMgrFrame );

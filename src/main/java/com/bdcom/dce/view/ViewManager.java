@@ -31,7 +31,9 @@ public class ViewManager implements ApplicationConstants {
 	
 	private ScriptMgrFrame scmTab;
 	
-	private ScriptList scriptListTab;
+	//private ScriptList scriptListTab;
+
+    private ResourceList resourceListTab;
 
     private ITesterFrame itesterTab;
 
@@ -59,8 +61,10 @@ public class ViewManager implements ApplicationConstants {
 		smTab = (ScenarioMgrFrame) getCompo(COMPONENT.SCENARIO_MGR_FRAME);
 		submitTab = (SubmitFrame) getCompo(COMPONENT.SUBMIT_FRAME);
 		scmTab = (ScriptMgrFrame) getCompo(COMPONENT.SCRIPT_MGR_FRAME );
-		scriptListTab = (ScriptList) getCompo(COMPONENT.SCRIPT_LIST);
+		//scriptListTab = (ScriptList) getCompo(COMPONENT.SCRIPT_LIST);
+        resourceListTab = (ResourceList) getCompo(COMPONENT.RESOURCE_LIST);
         itesterTab = (ITesterFrame) getCompo(COMPONENT.ITESTER_FRAME);
+
 
 		smTab.setScenarioListRefreshHook(
 	    		submitTab.getScenarioListRefreshHook() 
@@ -86,15 +90,20 @@ public class ViewManager implements ApplicationConstants {
 				getLocalName(SCRIPT_MANGEMENT )
 				);
 		
-		scriptListTab.setTabTitle(
-				getLocalName( SCRIPT_LIST )
-				);
+//		scriptListTab.setTabTitle(
+//				getLocalName( SCRIPT_LIST )
+//				);
+
+        resourceListTab.setTabTitle(
+                getLocalName( RESOURCE_LIST )
+        );
 		
 		mainFrame.addViewTab(submitTab);
         mainFrame.addViewTab(itesterTab);
 		mainFrame.addRootViewTab(smTab);
 		mainFrame.addRootViewTab(scmTab);
-		mainFrame.addRootViewTab(scriptListTab);
+		//mainFrame.addRootViewTab(scriptListTab);
+        mainFrame.addRootViewTab(resourceListTab);
 		mainFrame.addRefresher(smTab.getScenarioListRefreshHook());
 		mainFrame.addRefresher(submitTab.getFcAddHook());
 		mainFrame.addRefresher(scmTab.getScriptListRefreshHook());

@@ -58,7 +58,7 @@ public class FakeTestInterface implements PMInterface {
 
     @Override
     public int getRunningApplicationVersion() {
-        return 1;
+        return 40;
     }
 
     @Override

@@ -144,6 +144,8 @@ public interface ApplicationConstants {
 
     public static final String SCRIPT_LIST = "script list";
 
+    public static final String RESOURCE_LIST = "resource list";
+
     public static final String RECENT_ADD2DB = "recent added dr table(debug)";
 
     public static final String DEBUG_DR_LIST = "recent added datarecord(debug only)";
@@ -286,6 +288,8 @@ public interface ApplicationConstants {
         public static final String ITESTER_FRAME = "ITester Frame";
 
         public static final String SCRIPT_LIST = "Script List Frame";
+
+        public static final String RESOURCE_LIST = "Resource List Frame";
 
         public static final String SCENARIO_MGR = "Scenario Mgr";
 

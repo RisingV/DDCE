@@ -67,7 +67,6 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 
     private AbstractFrame frameAfterLogin;
 
-
 	public LoginFrame(ClientProxy clientProxy, GuiInterface app) {
         super(app);
         this.app = app;

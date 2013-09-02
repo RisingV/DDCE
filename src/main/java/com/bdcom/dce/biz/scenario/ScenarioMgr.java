@@ -257,6 +257,9 @@ public class ScenarioMgr {
             );
             for ( File savedFile : savedFiles ) {
                 Object obj = SerializeUtil.deserializeFromFile(savedFile);
+                if ( !(obj instanceof Scenario) ) {
+                    continue;
+                }
                 Scenario sce = (Scenario) obj;
                 if ( null == scenarios) {
                     scenarios = new HashMap<String, Scenario>();
