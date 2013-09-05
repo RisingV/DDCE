@@ -165,7 +165,7 @@ jstring str2jstring(JNIEnv* env, std::string str)
     return (jstring) env->NewObject(strClass, ctorID, bytes, encoding);  
 } 
 
-JNIEXPORT void JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_loadITesterDllLib
+JNIEXPORT void JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_loadITesterDllLib
   (JNIEnv* env, jclass loaderClz, jstring path) {
   	if ( NULL == iTesterLibDll) {
   		std::string dllpath_str = jstring2str(env, path);
@@ -264,9 +264,9 @@ JNIEXPORT void JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_loadITesterDl
 	}
 }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToServer
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_connectToServer
   (JNIEnv* env, jobject loader, jstring ipAddr) {
-  	jclass commuStatusClz = FindClass( env, "com/bdcom/itester/lib/CommuStatus" );
+  	jclass commuStatusClz = FindClass( env, "com/bdcom/dce/itester/lib/CommuStatus" );
   	jobject commuStatusObj = env->AllocObject( commuStatusClz );
   	jmethodID setConnected = FindMethodID( env, commuStatusClz, "commuStatus_setConnected", 
 													"setConnected", "(Z)V");
@@ -318,7 +318,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToS
   	return commuStatusObj;
  }
  
- JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_disconnectToServer
+ JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_disconnectToServer
   (JNIEnv * env, jobject loader, jint socketId ) {
   	int status = 1;
   	if ( socketId >=0 && NULL != DisconnectToServerFunc ) {
@@ -350,9 +350,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_connectToS
     return (jint) status;
   }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getChassisInfo
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getChassisInfo
   (JNIEnv * env, jobject loader, jint socketId ) {
-  	jclass chassisInfoClz = FindClass( env, "com/bdcom/itester/lib/ChassisInfo" ); 
+  	jclass chassisInfoClz = FindClass( env, "com/bdcom/dce/itester/lib/ChassisInfo" );
 	jobject chassisInfoObj = env->AllocObject( chassisInfoClz );
 	
 	jmethodID setChassisType = FindMethodID( env, chassisInfoClz, "chassis_setChassisType",
@@ -415,9 +415,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getChassis
 	return chassisInfoObj;
 }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getCardInfo
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getCardInfo
   (JNIEnv* env, jobject loader, jint socketId, jint cardId) {
-  	jclass CardInfoClz = FindClass(env, "com/bdcom/itester/lib/CardInfo");
+  	jclass CardInfoClz = FindClass(env, "com/bdcom/dce/itester/lib/CardInfo");
   	jobject CardInfoObj = env->AllocObject( CardInfoClz );
   	
   	jmethodID setCardId = FindMethodID( env, CardInfoClz, "cardInfo_setCardId",
@@ -480,9 +480,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getCardInf
   	return CardInfoObj;
 }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getEthernetPhysical
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getEthernetPhysical
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId) {
-	jclass EthPhyProperClz = FindClass(env, "com/bdcom/itester/lib/EthPhyProper");
+	jclass EthPhyProperClz = FindClass(env, "com/bdcom/dce/itester/lib/EthPhyProper");
   	jobject EthPhyProperObj = env->AllocObject( EthPhyProperClz );
   	
 	jmethodID setLinked = FindMethodID( env, EthPhyProperClz, "epp_setLinked", 
@@ -558,7 +558,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getEtherne
   	return EthPhyProperObj;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_clearStatReliably
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_clearStatReliably
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId) {
   	int status = 1;
   	if ( socketId >= 0 && NULL != ClearStatReliablyFunc ) {
@@ -595,7 +595,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_clearStatReli
   	return (jint) status;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setHeader
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, 
   				jint validStreamCount, jint length, jintArray StrHead) {
 	int status = 1;
@@ -656,7 +656,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setHeader
  	
  	return (jint) status;
 }
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setPayload
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setPayload
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId,
   			 jint length, jint data, jint type) {
  	int status = 1;
@@ -709,7 +709,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setPayload
 	return (jint) status;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setDelayCount
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setDelayCount
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, jint delayCount) {
   	int status = 1;
   	if ( socketId >= 0 && NULL != SetDelayCountFunc ) {
@@ -748,7 +748,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setDelayCount
 	return (jint) status;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setTxMode
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setTxMode
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, jint mode, jint burstNum) {
   	int status = 1;
   	if ( socketId >= 0 && NULL != SetTxModeFunc ) {
@@ -789,7 +789,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setTxMode
  	 return (jint) status;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_startPort
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_startPort
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId) {
 	int status = 1;
 	if ( socketId >= 0 && NULL != StartPortFunc ) {
@@ -826,7 +826,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_startPort
 	return (jint) status;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_stopPort
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_stopPort
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId) {
   	int status = 1;
   	if ( socketId >= 0 && NULL != StopPortFunc ) {
@@ -864,9 +864,9 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_stopPort
 }
 
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAllStats
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getPortAllStats
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, jint length ) {
-  	jclass PortStatsClz = FindClass( env, "com/bdcom/itester/lib/PortStats" );
+  	jclass PortStatsClz = FindClass( env, "com/bdcom/dce/itester/lib/PortStats" );
   	
   	jobject PortStatsObj = env->AllocObject( PortStatsClz );	
   	jmethodID setStats = FindMethodID( env, PortStatsClz, "portStats_setStats", 
@@ -938,9 +938,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getPortAll
 }
 
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getLinkStatus
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getLinkStatus
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId) {
-	jclass linkStatusClz = FindClass( env, "com/bdcom/itester/lib/LinkStatus" );
+	jclass linkStatusClz = FindClass( env, "com/bdcom/dce/itester/lib/LinkStatus" );
 	
 	jobject linkStatusObj = env->AllocObject( linkStatusClz );	
 	jmethodID setLinked = FindMethodID( env, linkStatusClz, "linkStatus_setLinked",
@@ -991,9 +991,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getLinkSta
 	return linkStatusObj;
 }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getWorkInfo
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getWorkInfo
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId) {
-  	jclass workInfoClz = FindClass( env, "com/bdcom/itester/lib/WorkInfo" );
+  	jclass workInfoClz = FindClass( env, "com/bdcom/dce/itester/lib/WorkInfo" );
   	jobject workInfoObj = env->AllocObject( workInfoClz );
   	
   	jmethodID setWorkNow = FindMethodID( env, workInfoClz, "workInfo_setWorkNow", 
@@ -1044,7 +1044,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getWorkInf
 	return workInfoObj;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setUsedState
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setUsedState
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, jint iUsedState) {
   	int status = 1;
   	
@@ -1084,9 +1084,9 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setUsedState
   	return (jint) status;
 }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getUsedState
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getUsedState
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId ) {
-  	jclass usedStateClz = FindClass( env, "com/bdcom/itester/lib/UsedState" );
+  	jclass usedStateClz = FindClass( env, "com/bdcom/dce/itester/lib/UsedState" );
   	jobject usedStateObj = env->AllocObject( usedStateClz );
   	
   	jmethodID setUsed = FindMethodID( env, usedStateClz, "usedState_setUsed", 
@@ -1136,7 +1136,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getUsedSta
 	return usedStateObj;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setStreamId
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setStreamId
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, 
 				jint portId, jint iStartId, jint iIdNum ) {
 	int status = 1;	
@@ -1179,7 +1179,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setStreamId
 	return (jint) status;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setEthernetPhysicalForATT
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setEthernetPhysicalForATT
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, 
   				jint nego, jint speed, jint fullDuplex, jint loopback) {
 	int status = 1;
@@ -1226,7 +1226,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setEthernetPh
 	return (jint) status;				  	
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setFramLengthChange
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setFramLengthChange
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, jint isChange ) {
 	int status = 1;
 	if ( socketId >= 0 && NULL != SetFramLengthChangeFunc ) {
@@ -1266,7 +1266,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setFramLength
 	return (jint) status;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_loadFPGA
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_loadFPGA
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint speed ) {
 	int status = 1;
 	if ( socketId >= 0 && NULL != LoadFpgaFunc ) {
@@ -1303,7 +1303,7 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_loadFPGA
 	return (jint) status;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_resetFPGA
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_resetFPGA
   (JNIEnv* env, jobject loader, jint socketId, jint cardId) {
   	int status = 1;
   	if ( socketId >= 0 && NULL != ResetFpgaFunc ) {
@@ -1338,9 +1338,9 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_resetFPGA
 	return (jint) status;
 }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getStreamSendInfo
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getStreamSendInfo
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, jint streamId) {
-	jclass streamInfoClz = FindClass( env, "com/bdcom/itester/lib/StreamInfo" );
+	jclass streamInfoClz = FindClass( env, "com/bdcom/dce/itester/lib/StreamInfo" );
 	jobject streamInfoObj = env->AllocObject( streamInfoClz );
 	
 	jmethodID setPacketCount = FindMethodID( env, streamInfoClz, "streamInfo_setPacketCount",
@@ -1394,9 +1394,9 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getStreamS
 	return streamInfoObj;
 }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getStreamRecInfo
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_getStreamRecInfo
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, jint streamId) {	
-	jclass streamInfoClz = FindClass( env, "com/bdcom/itester/lib/StreamInfo" );
+	jclass streamInfoClz = FindClass( env, "com/bdcom/dce/itester/lib/StreamInfo" );
 	jobject streamInfoObj = env->AllocObject( streamInfoClz );
 	
 	jmethodID setPacketCount = FindMethodID( env, streamInfoClz, "streamInfo_setPacketCount",
@@ -1450,7 +1450,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_getStreamR
 	return streamInfoObj;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_startCapture
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_startCapture
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId) {
 	int status = 1;
 	if ( socketId >= 0 && NULL != StartCaptureFunc ) {
@@ -1487,9 +1487,9 @@ JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_startCapture
 	return status;
 }
 
-JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_stopCapture
+JNIEXPORT jobject JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_stopCapture
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId ) {
-	jclass captureResultClz = FindClass( env, "com/bdcom/itester/lib/CaptureResult" );
+	jclass captureResultClz = FindClass( env, "com/bdcom/dce/itester/lib/CaptureResult" );
 	jobject captureResultObj = env->AllocObject( captureResultClz );
 	
 	jmethodID setFrames = FindMethodID( env, captureResultClz, "cpr_setFrames",
@@ -1542,7 +1542,7 @@ JNIEXPORT jobject JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_stopCaptur
 	return captureResultObj;
 }
 
-JNIEXPORT jint JNICALL Java_com_bdcom_itester_lib_ITesterLibLoader_setStreamLength
+JNIEXPORT jint JNICALL Java_com_bdcom_dce_itester_lib_ITesterLibLoader_setStreamLength
   (JNIEnv* env, jobject loader, jint socketId, jint cardId, jint portId, 
   			jint streamId, jint length ) {
 	int status = 1;
