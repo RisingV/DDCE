@@ -24,9 +24,9 @@ public abstract class MsgLogger {
 	
 	private static final DateFormat DATE_FORMAT = Application.DATE_FORMAT;
 	
-	private static final String LOG_DIR = _SPT+"logger"+_SPT+"msg"+_SPT;
+	private static final String LOG_DIR = _SPT+"log"+_SPT+"msg"+_SPT;
 	
-	private static final String _END_FIX = ".logger.txt";
+	private static final String _END_FIX = ".log.txt";
 	
 	private static String LOG_FILE_NAME;
 	

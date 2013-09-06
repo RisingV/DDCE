@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
 
 /**
@@ -36,42 +37,18 @@ public class TestProgressTable extends JTable {
 
     public void addRow(TestProgressRow row) {
         if ( null != row ) {
-            tableModel.addRow( row );
-            tableModel.fireTableDataChanged();
-        //    updateUI();
+            tableModel.addRow(row);
         }
     }
 
     public void removeRow(TestProgressRow row) {
         if ( null != row ) {
             tableModel.removeRow(row);
-            tableModel.fireTableDataChanged();
-//            if ( 0 == tableModel.getRowCount() ) {
-//                updateUI();
-//            } else {
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        updateUI();
-//                    }
-//                });
-//            }
         }
     }
 
     public void removeRow(int rowIndex) {
-        tableModel.removeRow( rowIndex );
-        tableModel.fireTableDataChanged();
-//            if ( 0 == tableModel.getRowCount() ) {
-//                updateUI();
-//            } else {
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        updateUI();
-//                    }
-//                });
-//            }
+        tableModel.removeRow(rowIndex);
     }
 
     private void initUI() {
@@ -84,9 +61,9 @@ public class TestProgressTable extends JTable {
         TableColumn statusTc = getColumn( status );
         TableColumn operationTc = getColumn( OPERATION );
 
-        setRowHeight( 28 );
+        setRowHeight( 32 );
         progressTc.setPreferredWidth( 220 );
-        statusTc.setPreferredWidth( 30 );
+        statusTc.setPreferredWidth( 40 );
         operationTc.setPreferredWidth( 250 );
 
         ProgressCell progressCell = new ProgressCell( tableModel );
@@ -100,6 +77,10 @@ public class TestProgressTable extends JTable {
         progressTc.setCellEditor( progressCell );
         statusTc.setCellEditor( statusLabelCell );
         operationTc.setCellEditor( buttonPanelCell );
+
+//        MouseListener[] mls = getMouseListeners();
+//        System.out.println( "number of mouseListener: " + mls.length );
+        //TableUI ui = getUI();
     }
 
     private class ProgressCell extends AbstractCellEditor
@@ -140,8 +121,19 @@ public class TestProgressTable extends JTable {
 
         @Override
         public Object getCellEditorValue() {
-            return progressBar;
+            return "";
         }
+
+        @Override
+        public boolean isCellEditable(EventObject e) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldSelectCell(EventObject anEvent) {
+            return false;
+        }
+
     }
 
     private class StatusLabelCell extends AbstractCellEditor
@@ -179,11 +171,20 @@ public class TestProgressTable extends JTable {
             }
             return label;
         }
+        public Object getCellEditorValue() {
+            return "";
+        }
 
         @Override
-        public Object getCellEditorValue() {
-            return label;
+        public boolean isCellEditable(EventObject e) {
+            return true;
         }
+
+        @Override
+        public boolean shouldSelectCell(EventObject anEvent) {
+            return false;
+        }
+
     }
 
     private class ButtonPanelCell extends AbstractCellEditor
@@ -224,8 +225,19 @@ public class TestProgressTable extends JTable {
 
         @Override
         public Object getCellEditorValue() {
-            return pane;
+            return "";
         }
+
+        @Override
+        public boolean isCellEditable(EventObject e) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldSelectCell(EventObject anEvent) {
+            return false;
+        }
+
     }
 
     private static class ProgressTableModel extends AbstractTableModel {
@@ -235,7 +247,7 @@ public class TestProgressTable extends JTable {
         static final String OPERATION = "Operation";
 
         private String[] titles = {
-                LocaleUtil.getLocalName(PROGRESS),
+                LocaleUtil.getLocalName( PROGRESS ),
                 LocaleUtil.getLocalName( STATUS ),
                 LocaleUtil.getLocalName( OPERATION )
         };
@@ -259,17 +271,22 @@ public class TestProgressTable extends JTable {
         void addRow( TestProgressRow row ) {
             rowList.add( row );
             row.setUpdateAction( new UpdateAction( tableRef ) );
-            row.setRemoveAction( new RemoveAction( tableRef, row ) );
+            row.setRemoveAction( new RemoveAction( tableRef ) );
+            int rowIndex = rowList.indexOf( row );
+            fireTableRowsInserted( rowIndex, rowIndex );
         }
 
         void removeRow( TestProgressRow row ) {
+            int rowIndex = rowList.lastIndexOf( row );
             rowList.remove( row );
+            fireTableRowsDeleted( rowIndex, rowIndex );
         }
 
         void removeRow( int rowIndex ) {
             if ( rowIndex < getRowCount() ) {
                 rowList.remove( rowIndex );
             }
+            fireTableRowsDeleted( rowIndex, rowIndex );
         }
 
         @Override
@@ -289,7 +306,7 @@ public class TestProgressTable extends JTable {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return null;
+            return "";
         }
 
         @Override
@@ -316,15 +333,15 @@ public class TestProgressTable extends JTable {
 
         class RemoveAction implements ActionListener {
             final TestProgressTable tableRef;
-            final TestProgressRow rowToRemove;
-            RemoveAction(TestProgressTable tableRef, TestProgressRow rowToRemove) {
+            RemoveAction(TestProgressTable tableRef ) {
                 this.tableRef = tableRef;
-                this.rowToRemove = rowToRemove;
             }
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                tableRef.removeRow(rowToRemove);
+                int rowIndex = tableRef.getEditingRow();
+                tableRef.getCellEditor().stopCellEditing();
+                ((ProgressTableModel) tableRef.getModel()).removeRow( rowIndex );
             }
         }
 

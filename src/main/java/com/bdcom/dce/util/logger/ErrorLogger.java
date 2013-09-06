@@ -28,11 +28,11 @@ public abstract class ErrorLogger {
 	public static final DateFormat DATA_FILE_DATE_FORMAT = 
 							new SimpleDateFormat("yyyy-MM-dd"); 
 	
-	private static final String LOG_DIR = _SPT+"logger"+_SPT+"err"+_SPT;
+	private static final String LOG_DIR = _SPT+"log"+_SPT+"err"+_SPT;
 	
-	private static final String DATA_DIR = _SPT+"logger"+_SPT+"data"+_SPT;
+	private static final String DATA_DIR = _SPT+"log"+_SPT+"data"+_SPT;
 	
-	private static final String _END_FIX = ".logger.txt";
+	private static final String _END_FIX = ".log.txt";
 	
 	private static String LOG_FILE_NAME;
 	

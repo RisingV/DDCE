@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Date: 13-7-5    <br/>
  * Time: 15:30  <br/>
  */
-public class ITesterRecord implements Serializable {
+public class ITesterRecord extends TestTypeRecord implements Serializable {
 
     private static final long serialVersionUID = 8721480492204072805L;
 
@@ -42,6 +42,8 @@ public class ITesterRecord implements Serializable {
 
     private final String userName;
 
+    private int testTime;
+
     private boolean workOrderValid;
 
     private boolean everTested;
@@ -54,6 +56,7 @@ public class ITesterRecord implements Serializable {
                           String workOrder,
                           String barCode,
                           String userName) {
+        super();
         this.type = type;
         this.workOrder = workOrder;
         this.barCode = barCode;
@@ -78,6 +81,14 @@ public class ITesterRecord implements Serializable {
 
     public String getUserName() {
         return userName;
+    }
+
+    public int getTestTime() {
+        return testTime;
+    }
+
+    public void setTestTime(int testTime) {
+        this.testTime = testTime;
     }
 
     public boolean isWorkOrderValid() {
@@ -111,4 +122,5 @@ public class ITesterRecord implements Serializable {
     public void setSaved(boolean saved) {
         this.saved = saved;
     }
+
 }

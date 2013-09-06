@@ -1,21 +1,23 @@
-package com.bdcom.dce.sys.gui;
+package com.bdcom.dce.sys.rpc;
 
 import com.bdcom.dce.biz.scenario.ScenarioMgr;
 import com.bdcom.dce.biz.script.ScriptExecutor;
 import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.itester.api.ITesterAPI;
-import com.bdcom.dce.itester.api.JniAPIImpl;
+import com.bdcom.dce.itester.rpc.RpcClient;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.sys.AppContentAdaptor;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.sys.configure.ServerConfig;
+import com.bdcom.dce.sys.gui.GuiInterface;
 import com.bdcom.dce.sys.service.Dialect;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.*;
 import com.bdcom.dce.view.itester.ITesterFrame;
 
 import javax.swing.*;
+import java.io.File;
 import java.text.DateFormat;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -79,8 +81,6 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         addAttribute( COMPONENT.DIALECT, dialect );
 
         //init util compo
-        ViewManager.initLookAndFeel(); // set global lookAndFeel first!
-
         SubmitFrame submitFrame = new SubmitFrame(clientProxy, this);
         ScenarioMgrFrame scenarioMgrFrame = new ScenarioMgrFrame( clientProxy, this );
         ScriptMgrFrame scriptMgrFrame = new ScriptMgrFrame( clientProxy, this );
@@ -88,10 +88,19 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         ResourceList resourceList = new ResourceList(this);
         MsgTable msgTable = new MsgTable(this);
 
-        ITesterAPI api = JniAPIImpl.getInstance();
+        // test code start
+        PathConfig xpathConfig = new PathConfig(
+                RUN_TIME.CURRENT_DIR + File.separator + "RPC-configure" );
+
+        ServerConfig xserverConfig = new ServerConfig( xpathConfig );
+        xserverConfig.setDefaultIP("172.16.22.222");
+        xserverConfig.setDefaultPort( 7777 );
+        xserverConfig.writeToConfigFile("172.16.22.222", "7777");
+        ITesterAPI api = new RpcClient(xserverConfig);
         ITesterFrame iTesterFrame = new ITesterFrame( api, clientProxy, this );
         addAttribute( COMPONENT.ITESTER_API, api );
         addAttribute( COMPONENT.ITESTER_FRAME, iTesterFrame );
+        // test code end
 
         addAttribute( COMPONENT.MSG_TABLE, msgTable );
         //addAttribute( COMPONENT.SCRIPT_LIST, scriptList );

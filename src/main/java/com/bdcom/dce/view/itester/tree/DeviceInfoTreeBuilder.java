@@ -34,7 +34,7 @@ public abstract class DeviceInfoTreeBuilder {
     }
 
     public static JTree buildTree(DeviceStatus deviceStatus) {
-        return buildTree( deviceStatus, 1.8f );
+        return buildTree( deviceStatus, 3.0f );
     }
 
     public static JTree buildTree(DeviceStatus deviceStatus, float updateFrequency) {
@@ -65,10 +65,14 @@ public abstract class DeviceInfoTreeBuilder {
         deviceInfoTree.setCellRenderer( new DeviceTreeCellRenderer() );
         new UpdateTimer( deviceInfoTree, updateFrequency ).start();
 
-        for (int i = deviceInfoTree.getRowCount() - 1; i >= 0; i--) {
-            deviceInfoTree.expandRow( i );
-        }
+        expandTree( deviceInfoTree );
         return deviceInfoTree;
+    }
+
+    private static void expandTree(JTree tree) {
+        for (int i = tree.getRowCount() - 1; i >= 0; i--) {
+            tree.expandRow( i );
+        }
     }
 
     private static class UpdateTimer extends Thread {

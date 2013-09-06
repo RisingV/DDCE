@@ -57,7 +57,7 @@ public class CliParser {
 
         // print usage information if problem with parameters
         if ( record.isHelpFlag() ) {
-            System.out.println("\nUsage: java -jar cmd.jar [-options] extra\n" +
+            System.out.println("\nUsage: java -jar cli.jar [-options] extra\n" +
                     "Options are:");
             proc.listParameters(80, System.out);
         }

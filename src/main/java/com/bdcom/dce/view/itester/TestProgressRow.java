@@ -60,9 +60,14 @@ public class TestProgressRow implements
 
     TestProgressRow(ITesterRecord iTesterRecord, ITesterAPIWrapper apiWrapper,
                     TestCaseConfig testConfig) {
+        iTesterRecord.setTestTime(
+                testConfig.getSeconds()
+        );
+
         this.iTesterRecord = iTesterRecord;
         this.apiWrapper = apiWrapper;
         this.testConfig = testConfig;
+
         initUI();
     }
 
@@ -103,6 +108,7 @@ public class TestProgressRow implements
                     testConfig.getDstPortId(),
                     testConfig.getSeconds()
             );
+            progressBar.setForeground( Color.blue );
             testTask = new TestTask( testSession );
             testTask.addPropertyChangeListener(this);
             testTask.execute();
@@ -155,7 +161,9 @@ public class TestProgressRow implements
         progressBar.setPreferredSize( new Dimension( 180, 15 ) );
 
         String untested = LocaleUtil.getLocalName( UNTESTED );
+        Font f = new Font( null, Font.PLAIN, 20 );
         statusLabel = new JLabel( untested );
+        statusLabel.setFont( f );
         detailDialog.updateTestStatus(untested);
 
         buttonPanel = new JPanel();
@@ -181,6 +189,7 @@ public class TestProgressRow implements
     private void handleTestException(ITesterException e) {
         String abnormal = LocaleUtil.getLocalName( ABNORMAL );
         statusLabel.setText( abnormal );
+        progressBar.setForeground( Color.yellow );
         if ( null != updateAction ) {
             updateAction.actionPerformed( null );
         }
@@ -205,16 +214,14 @@ public class TestProgressRow implements
         protected Void doInBackground() throws Exception {
             int progress = 0;
             do {
-                boolean connected = true;
+                boolean interrupted = false;
                 try {
                     progress = session.getProgressPercent();
                 } catch (ITesterException e) {
-                    if ( e.getErrType() == ITesterException.CONNECT_FAIL ) {
-                        connected = false;
-                    }
+                    interrupted = true;
                     handleTestException(e);
                 } finally {
-                    if ( !connected ) {
+                    if ( interrupted ) {
                         break;
                     }
                 }
@@ -250,23 +257,29 @@ public class TestProgressRow implements
                 startButton.setText( restart );
             }
 
-            boolean isPass = session.isTestPass();
-            iTesterRecord.setTestPass( isPass );
-            String status = null;
-            if ( isPass ) {
-                status = LocaleUtil.getLocalName( SUCCESS );
-                progressBar.setForeground( Color.green );
-            } else {
-                status = LocaleUtil.getLocalName( FAIL );
-                progressBar.setForeground(Color.red);
-            }
-            statusLabel.setText( status );
-            detailDialog.updateTestStatus( status );
+            try {
+                boolean isPass = session.isTestPass( testConfig.getPercent() );
+                iTesterRecord.setTestPass( isPass );
+                String status = null;
+                if ( isPass ) {
+                    status = LocaleUtil.getLocalName( SUCCESS );
+                    progressBar.setForeground( Color.green );
+                } else {
+                    status = LocaleUtil.getLocalName( FAIL );
+                    progressBar.setForeground(Color.red);
+                }
+                statusLabel.setText( status );
+                detailDialog.updateTestStatus( status );
 
-            PortStats ps = session.getPortStats();
-            detailDialog.updateStats( ps );
-            tested = true;
-            running = false;
+                PortStats ps0 = session.getSrcPortStats();
+                PortStats ps1 = session.getDstPortStats();
+                detailDialog.updateStats( ps0, ps1 );
+                tested = true;
+            } catch (ITesterException e) {
+                handleTestException( e );
+            } finally {
+                running = false;
+            }
         }
 
     }
@@ -287,6 +300,8 @@ public class TestProgressRow implements
         private static final String BAR_CODE = "bar code:";
         private static final String SRC_PORT = "source port";
         private static final String DST_PORT = "destination port";
+        private static final String TEST_TIME = "test time(s)";
+        private static final String STREAM_PERCENT = "stream percent";
         private static final String TEST_OPTION = "test option";
         private static final String TEST_STATS = "test data stats";
         private static final String TEST_STATUS = "Test Status";
@@ -296,6 +311,8 @@ public class TestProgressRow implements
         private JLabel barCodeLabel;
         private JLabel srcPortLabel;
         private JLabel dstPortLabel;
+        private JLabel testTimeLabel;
+        private JLabel percentLabel;
         private JLabel txPacketsLabel;
         private JLabel txPpsLabel;
         private JLabel txBpsLabel;
@@ -309,6 +326,8 @@ public class TestProgressRow implements
         private JTextField barCodeField;
         private JTextField srcPortField;
         private JTextField dstPortField;
+        private JTextField testTimeField;
+        private JTextField percentField;
         private JTextField txPacketsField;
         private JTextField txPpsField;
         private JTextField txBpsField;
@@ -318,12 +337,21 @@ public class TestProgressRow implements
         private JTextField rxPpsField;
         private JTextField rxBpsField;
 
+        private ButtonGroup buttonGroup;
+        private JRadioButton srcPortMode;
+        private JRadioButton dstPortMode;
+        private JPanel modePane;
+
         private JPanel testConfigPane;
         private JPanel testStatsPane;
         private JPanel testStatusPane;
+        private JPanel testStatusOuterPane;
 
         private final ITesterRecord itr;
         private final TestCaseConfig testConfig;
+
+        private PortStats srcPortStats;
+        private PortStats dstPortStats;
 
         DetailDialog( ITesterRecord itr, TestCaseConfig testConfig ) {
             this.itr = itr;
@@ -346,6 +374,8 @@ public class TestProgressRow implements
             String barCode = LocaleUtil.getLocalName( BAR_CODE );
             String srcPort = LocaleUtil.getLocalName( SRC_PORT );
             String dstPort = LocaleUtil.getLocalName( DST_PORT );
+            String testTime = LocaleUtil.getLocalName( TEST_TIME );
+            String streamPercent = LocaleUtil.getLocalName( STREAM_PERCENT );
             String testOption = LocaleUtil.getLocalName( TEST_OPTION );
             String testStats = LocaleUtil.getLocalName( TEST_STATS );
             String testStatus = LocaleUtil.getLocalName( TEST_STATUS );
@@ -354,6 +384,8 @@ public class TestProgressRow implements
             barCodeLabel = newLabel( barCode );
             srcPortLabel = newLabel( srcPort );
             dstPortLabel = newLabel( dstPort );
+            testTimeLabel = newLabel( testTime );
+            percentLabel = newLabel( streamPercent );
 
             txPacketsLabel = newLabel(txPackets);
             txPpsLabel = newLabel(txPps);
@@ -368,6 +400,8 @@ public class TestProgressRow implements
             barCodeField = newField();
             srcPortField = newField();
             dstPortField = newField();
+            testTimeField = newField();
+            percentField = newField();
 
             txPacketsField = newField();
             txPpsField = newField();
@@ -377,6 +411,16 @@ public class TestProgressRow implements
             rxPayloadErrorsField = newField();
             rxPpsField = newField();
             rxBpsField = newField();
+
+            buttonGroup = new ButtonGroup();
+            srcPortMode = new JRadioButton( srcPort );
+            dstPortMode = new JRadioButton( dstPort );
+            buttonGroup.add( srcPortMode );
+            buttonGroup.add( dstPortMode );
+            modePane = new JPanel();
+            modePane.setLayout( new GridBagLayout() );
+            modePane.add(srcPortMode, new GBC(0, 0).setInsets(5, 20, 5, 20));
+            modePane.add( dstPortMode, new GBC( 1,0 ).setInsets( 5, 20, 5, 20 ) );
 
             testConfigPane = new JPanel();
             testConfigPane.setLayout( new GridBagLayout() );
@@ -392,12 +436,13 @@ public class TestProgressRow implements
             testConfigPane.add( srcPortField, loc(1, 2) );
             testConfigPane.add( dstPortLabel, loc(2, 2) );
             testConfigPane.add( dstPortField, loc(3, 2) );
+            testConfigPane.add( testTimeLabel, loc(0, 3) );
+            testConfigPane.add( testTimeField, loc(1, 3) );
+            testConfigPane.add( percentLabel, loc(2, 3) );
+            testConfigPane.add( percentField, loc(3, 3) );
 
             testStatsPane = new JPanel();
             testStatsPane.setLayout(new GridBagLayout());
-            testStatsPane.setBorder(
-                    BorderFactory.createTitledBorder( testStats )
-            );
 
             testStatsPane.add(txPacketsLabel, loc(0, 0));
             testStatsPane.add(txPacketsField, loc(1, 0));
@@ -426,10 +471,18 @@ public class TestProgressRow implements
             testStatusPane.setBorder(statusTitle);
             testStatusPane.add( testStatusLabel, BorderLayout.CENTER );
 
-            setLayout( new GridBagLayout() );
+            testStatusOuterPane = new JPanel();
+            testStatusOuterPane.setLayout( new GridBagLayout() );
+            testStatusOuterPane.setBorder(
+                    BorderFactory.createTitledBorder(testStats)
+            );
+            testStatusOuterPane.add(modePane, new GBC(0, 0));
+            testStatusOuterPane.add( testStatsPane, new GBC( 0,1 ) );
+
+            setLayout(new GridBagLayout());
             add( testStatusPane, loc(0, 0) );
             add( testConfigPane, loc(0, 1) );
-            add( testStatsPane, loc(0, 2) );
+            add( testStatusOuterPane, loc(0, 2) );
 
             addWindowListener( new WindowAdapter() {
                 @Override
@@ -441,7 +494,27 @@ public class TestProgressRow implements
                 }
             });
 
+            bindModeListeners();
             pack();
+        }
+
+        void bindModeListeners() {
+            ActionListener al = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if ( srcPortMode.isSelected() ) {
+                        if ( null != srcPortStats ) {
+                            updateStats( srcPortStats );
+                        }
+                    } else if ( dstPortMode.isSelected() ) {
+                        if ( null != dstPortStats ) {
+                            updateStats( dstPortStats );
+                        }
+                    }
+                }
+            };
+            srcPortMode.addActionListener( al );
+            dstPortMode.addActionListener( al );
         }
 
         void updateTestStatus( String status ) {
@@ -473,14 +546,24 @@ public class TestProgressRow implements
             String barCode = itr.getBarCode();
             String srcPort = sb0.toString();
             String dstPort = sb1.toString();
+            String testTime = String.valueOf( testConfig.getSeconds() );
+            String streamPercent = String.valueOf( testConfig.getPercent() );
 
             workOrderField.setText( workOrder );
             barCodeField.setText( barCode );
             srcPortField.setText( srcPort );
             dstPortField.setText( dstPort );
+            testTimeField.setText( testTime );
+            percentField.setText( streamPercent );
         }
 
-        void updateStats(PortStats ps) {
+        void updateStats(PortStats srcPortStats, PortStats dstPortStats) {
+            this.srcPortStats = srcPortStats;
+            this.dstPortStats = dstPortStats;
+            srcPortMode.setSelected( true );
+            updateStats( srcPortStats );
+        }
+        private void updateStats(PortStats ps) {
             long[] stats = ps.getStats();
             setField( txPacketsField, stats[0] );
             setField( txPpsField, stats[1] );

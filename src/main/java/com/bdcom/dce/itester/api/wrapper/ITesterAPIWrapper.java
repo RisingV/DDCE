@@ -163,7 +163,7 @@ public class ITesterAPIWrapper {
         api.startPort( socketId, cd1, pd1 );
 
         return new TestSession( api, pktNum, socketId,
-                new int[] { cd0, pd0, cd1, pd1 }, streamIDs );
+                new int[] { cd0, pd0, cd1, pd1 }, streamIDs, ip );
     }
 
     public void closeCurrConnection() {

@@ -18,7 +18,7 @@ import java.util.Map.Entry;
  * @see <code>ScenarioUtil<code>'s getFocusedAttrs method <br>
  * @warning never change name of any fields!
  * */
-public class BaseTestRecord implements Serializable {
+public class BaseTestRecord extends TestTypeRecord implements Serializable {
 
 	@Dumb
 	private static final long serialVersionUID = -3184815715296232530L;
@@ -91,6 +91,10 @@ public class BaseTestRecord implements Serializable {
 	
 	@Dumb
 	private String randomID;
+
+    public BaseTestRecord() {
+        super();
+    }
 	
 	public Map<String, String> toKVSet() {
 		Map<String, String> KV = new HashMap<String, String>();

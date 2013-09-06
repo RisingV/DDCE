@@ -1,6 +1,7 @@
 package com.bdcom.dce.view;
 
 import com.bdcom.dce.biz.pojo.LoginAuth;
+import com.bdcom.dce.biz.pojo.TestTypeRecord;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.nio.exception.GlobalException;
 import com.bdcom.dce.nio.exception.ResponseException;
@@ -34,6 +35,10 @@ import static com.bdcom.dce.view.util.Messages.BLANK_USR_NAME;
 public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 
 	private static final long serialVersionUID = 2496780458803597888L;
+
+    private static final String BASE_TEST_LOGIN = "Base Test Login";
+
+    private static final String RE_TEST_LOGIN = "Retest Login";
 	
 	private JFrame thisFrame = this;
 	
@@ -56,6 +61,12 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 	private JButton loginBt;
 	
 	private JButton exitBt;
+
+    private ButtonGroup buttonGroup;
+
+    private JRadioButton baseTestMode;
+
+    private JRadioButton reTestMode;
 	
 	private Image image;
 
@@ -201,7 +212,30 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 		portTextField.setText(
 				String.valueOf( serverConfig.getPort() )
 				);
-		
+
+        baseTestMode = new JRadioButton( getLocalName( BASE_TEST_LOGIN ) );
+        reTestMode = new JRadioButton( getLocalName( RE_TEST_LOGIN ) );
+        ActionListener al = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int testType = 0;
+                if ( baseTestMode.isSelected() ) {
+                    testType = TestTypeRecord.BASE_TEST;
+                } else if ( reTestMode.isSelected() ) {
+                    testType = TestTypeRecord.RE_TEST;
+                } else {
+                    return;
+                }
+                TestTypeRecord.setCurrentTestType(testType);
+                app.addAttribute( TEST_ATTR.TEST_TYPE, new Integer( testType ) );
+            }
+        };
+        baseTestMode.addActionListener( al );
+        reTestMode.addActionListener( al );
+        buttonGroup = new ButtonGroup();
+        buttonGroup.add( baseTestMode );
+        buttonGroup.add( reTestMode );
+
 		loginBt = new JButton();
 		exitBt = new JButton();
 		loginBt.setText(
@@ -240,58 +274,15 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 	}
 	
 	private void doLogin() {
-		boolean nullError = false;
-		String usrName = usrTextField.getText();
-		String passwd = pwdTextField.getText();
-		String ip = ipTextField.getText();
-		String port = portTextField.getText();
-		
-		if ( !StringUtil.isNotBlank(usrName) ) {
-			MsgDialogUtil.showErrorDialog(
-					MessageUtil.getLocalisedMessage(BLANK_USR_NAME)
-					);
-			nullError = true;
-		}
-		
-		if ( !StringUtil.isNotBlank(passwd) ) {
-			MsgDialogUtil.showErrorDialog(
-					MessageUtil.getLocalisedMessage(BLANK_PASSWD)
-					);
-			nullError = true;
-		}
-		
-		if ( !StringUtil.isNotBlank(ip) ) {
-			MsgDialogUtil.showErrorDialog(
-					MessageUtil.getLocalisedMessage(NULL_IP)
-					);
-			nullError = true;
-		}
-		
-		if ( !StringUtil.isNotBlank(port) ) {
-			MsgDialogUtil.showErrorDialog(
-					MessageUtil.getLocalisedMessage(NULL_PORT)
-					);
-			nullError = true;
-		}
-		
-		if ( !StringUtil.isValidIp(ip) ) {
-			MsgDialogUtil.showErrorDialog(
-					MessageUtil.getLocalisedMessage(INVAILD_IP)
-					);
-			nullError = true;
-		}
-		
-		if ( !StringUtil.isValidNumber(port) ) {
-			MsgDialogUtil.showErrorDialog(
-					MessageUtil.getLocalisedMessage(INVAILD_PORT)
-					);
-			nullError = true;
-		}
-		
-		if ( nullError ) {
+		if ( !inputValidation() ) {
 			return;
 		}
-		
+
+        String usrName = usrTextField.getText();
+        String passwd = pwdTextField.getText();
+        String ip = ipTextField.getText();
+        String port = portTextField.getText();
+
 		LoginAuth auth = new LoginAuth();
 		auth.setUserName(usrName);
 		auth.setUserPasswd(passwd);
@@ -342,6 +333,58 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 //		} else {
 //		}
 	}
+
+    private boolean inputValidation() {
+        String usrName = usrTextField.getText();
+        if ( !StringUtil.isNotBlank(usrName) ) {
+            MsgDialogUtil.showErrorDialog(
+                    MessageUtil.getLocalisedMessage(BLANK_USR_NAME)
+            );
+            return false;
+        }
+
+        String passwd = pwdTextField.getText();
+        if ( !StringUtil.isNotBlank(passwd) ) {
+            MsgDialogUtil.showErrorDialog(
+                    MessageUtil.getLocalisedMessage(BLANK_PASSWD)
+            );
+            return false;
+        }
+
+        String ip = ipTextField.getText();
+        if ( !StringUtil.isNotBlank(ip) ) {
+            MsgDialogUtil.showErrorDialog(
+                    MessageUtil.getLocalisedMessage(NULL_IP)
+            );
+            return false;
+        }
+        if ( !StringUtil.isValidIp(ip) ) {
+            MsgDialogUtil.showErrorDialog(
+                    MessageUtil.getLocalisedMessage(INVAILD_IP)
+            );
+            return false;
+        }
+
+        String port = portTextField.getText();
+        if ( !StringUtil.isNotBlank(port) ) {
+            MsgDialogUtil.showErrorDialog(
+                    MessageUtil.getLocalisedMessage(NULL_PORT)
+            );
+            return false;
+        }
+        if ( !StringUtil.isValidNumber(port) ) {
+            MsgDialogUtil.showErrorDialog(
+                    MessageUtil.getLocalisedMessage(INVAILD_PORT)
+            );
+            return false;
+        }
+
+        if ( !baseTestMode.isSelected() && !reTestMode.isSelected() ) {
+            return false;
+        }
+
+        return true;
+    }
 
 	private void showFrameAfterLogin() {
 		thisFrame.setVisible(false);

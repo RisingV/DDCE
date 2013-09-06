@@ -65,7 +65,8 @@ public class NIOClient implements ClientPackChan {
         String host = serverConfig.getIpAddrStr();
         int port = serverConfig.getPort();
 
-        System.out.println("host:" +host);
+        System.out.println("Remote server info:");
+        System.out.println("host:" + host);
         System.out.println("port:" + port);
 
         nioService = new NIOService();

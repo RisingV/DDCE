@@ -86,6 +86,9 @@ public class Dialect implements ApplicationConstants {
     }
 
     public void CloseClient() {
+        if ( null == client ) {
+            return;
+        }
         BDPacket closeReq = BDPacketUtil.terminalRequest();
         client.sendPacket( closeReq );
 
@@ -146,8 +149,10 @@ public class Dialect implements ApplicationConstants {
         public BDPacket handle(BDPacket bdPacket) {
 
             Map<String, Object> infomap = new HashMap<String, Object>();
-            boolean isFC = app.getBoolAttr( BASE_TEST.IS_FC );
-            infomap.put(BASE_TEST.IS_FC, Boolean.valueOf( isFC ));
+            boolean isFC = app.getBoolAttr( TEST_ATTR.IS_FC );
+            Integer testType = (Integer) app.getAttribute( TEST_ATTR.TEST_TYPE );
+            infomap.put( TEST_ATTR.IS_FC, Boolean.valueOf( isFC ) );
+            infomap.put( TEST_ATTR.TEST_TYPE, testType );
 
             byte[] data = null;
             try {

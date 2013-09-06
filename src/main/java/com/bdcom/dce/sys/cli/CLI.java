@@ -1,6 +1,7 @@
 package com.bdcom.dce.sys.cli;
 
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
+import com.bdcom.dce.biz.pojo.TestTypeRecord;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.DataType;
 import com.bdcom.dce.nio.RequestID;
@@ -16,6 +17,7 @@ import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -44,26 +46,43 @@ public class CLI extends AppContentAdaptor implements Applicable, ApplicationCon
     }
 
     public void start(String[] args) {
-        BaseTestRecord record = parseCMD(args);
         ClientPackChan chan = startDialect();
 
         Map<String, Object> infomap = readExtraInfo(chan);
-        Boolean isFC = (Boolean) infomap.get(BASE_TEST.IS_FC);
-        record.setFC( null!=isFC && isFC.booleanValue() );
+        if ( null != infomap ) {
+            if ( infoMapValidation( infomap ) ) {
+                Integer testType = (Integer) infomap.get( TEST_ATTR.TEST_TYPE );
+                TestTypeRecord.setCurrentTestType( testType );
 
-        BDPacket sendStatus = sendBaseReord(record);
-        chan.sendPacket( sendStatus );
+                BaseTestRecord record = parseCMD(args);
+                Boolean isFC = (Boolean) infomap.get(TEST_ATTR.IS_FC);
+                record.setFC( null!=isFC && isFC.booleanValue() );
 
-        startExitTimer();
-        try {
-            chan.receivePacket();  // make sure GUI Client receive send status report
-        } catch (InterruptedException e) {
-            String msg = "From CLI Application: report sending status interrupted: "
-                    + e.getMessage();
-            ErrorLogger.log( msg );
+                BDPacket sendStatus = sendBaseReord(record);
+                chan.sendPacket( sendStatus );
+
+                startExitTimer();
+                try {
+                    chan.receivePacket();  //making sure GUI Client receive send status report
+                } catch (InterruptedException e) {
+                    String msg = "From CLI Application: report sending status interrupted: "
+                            + e.getMessage();
+                    ErrorLogger.log( msg );
+                }
+            } else {
+                System.out.println( "can't get enough information from GUI-client!" );
+            }
+        } else {
+            System.out.println( "There is no running script on gui-client" );
         }
 
         terminal();
+    }
+
+    private boolean infoMapValidation(Map<String, Object> infomap) {
+        return ( null != infomap ) &&
+               ( infomap.containsKey( TEST_ATTR.IS_FC ) ) &&
+               ( infomap.containsKey( TEST_ATTR.TEST_TYPE ) );
     }
 
     private void initContent() {
@@ -126,8 +145,7 @@ public class CLI extends AppContentAdaptor implements Applicable, ApplicationCon
         byte[] data = extraInfo.getData();
         Map<String, Object> infomap = null;
         try {
-            infomap = (Map<String, Object>)
-                    SerializeUtil.deserializeFromByteArray(data);
+            infomap = deserialize( data );
         } catch (IOException e) {
             String msg = "From CLI Application: deserialize infomap fail! :"
                     + e.getMessage();
@@ -138,6 +156,21 @@ public class CLI extends AppContentAdaptor implements Applicable, ApplicationCon
         }
 
         return infomap;
+    }
+
+    private Map<String, Object> deserialize(byte[] data) throws IOException, ClassNotFoundException {
+        Object obj = SerializeUtil.deserializeFromByteArray(data);
+        Map<String, Object> map = null;
+        if ( obj instanceof ConnectException ) {
+            System.out.println( "Can't connect to dialect service of gui client!" );
+            terminal(); //exit point
+        } else if ( obj instanceof Map) {
+            map = (Map<String, Object>) obj;
+        } else {
+            terminal(); //exit point
+        }
+
+        return map;
     }
 
     private BDPacket sendBaseReord(BaseTestRecord record)  {
@@ -171,6 +204,9 @@ public class CLI extends AppContentAdaptor implements Applicable, ApplicationCon
 
     private void startExitTimer() {
         Thread timerThread = new Thread() {
+            {
+                setDaemon( true );
+            }
             @Override
             public void run() {
                 try {

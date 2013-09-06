@@ -327,7 +327,7 @@ public class SubmitFrame extends JPanel implements
 								isFC = false;
 							}
                             app.addAttribute(
-                                    BASE_TEST.IS_FC, Boolean.valueOf(isFC));
+                                    TEST_ATTR.IS_FC, Boolean.valueOf(isFC));
 						}
 					}
 				);

@@ -16,21 +16,28 @@ public class TestSession {
     private int socketId;
     private int[] idList; //{ srcCardId, srcPortId, dstCardId, dstPortId }
     private int[] streamIDs;
+    private String ip;
     private boolean finished = false;
     private Boolean passed = null;
-    private PortStats ps;
+    private PortStats ps0;
+    private PortStats ps1;
 
     TestSession(ITesterAPI api, int pktNum, int socketId,
-                int[] idList, int[] streamIDs) {
+                int[] idList, int[] streamIDs, String ip) {
         this.api = api;
         this.pktNum = pktNum;
         this.socketId = socketId;
         this.idList = idList;
         this.streamIDs = streamIDs;
+        this.ip = ip;
     }
 
-    public PortStats getPortStats() {
-        return ps;
+    public PortStats getSrcPortStats() {
+        return ps0;
+    }
+
+    public PortStats getDstPortStats() {
+        return ps1;
     }
 
     public boolean isTestDone() throws ITesterException {
@@ -48,7 +55,7 @@ public class TestSession {
                 int sid = streamIDs[i];
                 StreamInfo si = api.getStreamSendInfo( socketId, idList[0], idList[1], sid);
                 if ( !si.isConnected() ) {
-                    throw new ITesterException( ITesterException.CONNECT_FAIL );
+                    throw new ITesterException( ITesterException.CONNECT_FAIL, ip );
                 }
                 pktSentNum += si.getPacketCount();
             }
@@ -59,26 +66,43 @@ public class TestSession {
         return percent;
     }
 
-    public boolean isTestPass() {
+    public boolean isTestPass() throws ITesterException {
+        return isTestPass( 100 );
+    }
+
+    public boolean isTestPass(int percent) throws ITesterException {
         if ( !finished ) {
             return false;
         }
-        getTestResultAndStop();
+        getTestResultAndStop( percent );
         return passed.booleanValue();
     }
 
-    public void forceClose() {
+    public void forceClose() throws ITesterException {
+        forceClose( 100 );
+    }
+
+    public void forceClose( int percent ) throws ITesterException {
         if ( !finished ) {
-            getTestResultAndStop();
+            getTestResultAndStop( percent );
             finished = true;
         }
     }
 
-    private void getTestResultAndStop() {
+    private void getTestResultAndStop(int percent) throws ITesterException {
+        if ( percent < 1 || 100 < percent ) {
+            percent = 100;
+        }
         if ( null == passed ) {
-            ps = api.getPortAllStats( socketId, idList[0], idList[1], 8 );
-            long[] stats = ps.getStats();
-            if ( stats[0] == stats[3] ) {
+            ps0 = api.getPortAllStats( socketId, idList[0], idList[1], 8 );
+            connectionCheck( ps0 );
+            ps1 = api.getPortAllStats( socketId, idList[2], idList[3], 8 );
+            connectionCheck( ps1 );
+
+            long[] stats0 = ps0.getStats();
+            long[] stats1 = ps1.getStats();
+            if ( ( stats0[0]*percent/100 ) <= stats0[3] &&
+                    ( stats1[0]*percent/100 ) <= stats1[3] ) {
                 passed = Boolean.TRUE;
             } else {
                 passed = Boolean.FALSE;
@@ -88,6 +112,12 @@ public class TestSession {
 
             api.setUsedState( socketId, idList[0], idList[1], ITesterAPIWrapper.NOT_USE );
             api.setUsedState( socketId, idList[2], idList[3], ITesterAPIWrapper.NOT_USE );
+        }
+    }
+
+    private void connectionCheck(PortStats ps) throws ITesterException {
+        if ( !ps.isConnected() ) {
+            throw  new ITesterException( ITesterException.CONNECT_FAIL, ip );
         }
     }
 

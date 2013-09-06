@@ -15,15 +15,17 @@ public class TestCaseConfig {
     private final int dstCardId;
     private final int dstPortId;
     private final int seconds;
+    private final int percent;
 
     TestCaseConfig(String ip, int srcCardId, int srcPortId,
-                   int dstCardId, int dstPortId, int seconds) {
+               int dstCardId, int dstPortId, int seconds, int percent) {
         this.ip = ip;
         this.srcCardId = srcCardId;
         this.srcPortId = srcPortId;
         this.dstCardId = dstCardId;
         this.dstPortId = dstPortId;
         this.seconds = seconds;
+        this.percent = percent;
     }
 
     public String getIp() {
@@ -50,6 +52,10 @@ public class TestCaseConfig {
         return seconds;
     }
 
+    public int getPercent() {
+        return percent;
+    }
+
     public static class Builder {
         private String ip;
         private int srcCardId;
@@ -57,6 +63,7 @@ public class TestCaseConfig {
         private int dstCardId;
         private int dstPortId;
         private int seconds;
+        private int percent = 100;
 
         public Builder ip(String ip) {
             this.ip = ip;
@@ -88,6 +95,11 @@ public class TestCaseConfig {
             return this;
         }
 
+        public Builder percent(int percent) {
+            this.percent = percent;
+            return this;
+        }
+
         public TestCaseConfig build() {
             return new TestCaseConfig(
                     this.ip,
@@ -95,7 +107,8 @@ public class TestCaseConfig {
                     this.srcPortId,
                     this.dstCardId,
                     this.dstPortId,
-                    this.seconds
+                    this.seconds,
+                    this.percent
             );
         }
 

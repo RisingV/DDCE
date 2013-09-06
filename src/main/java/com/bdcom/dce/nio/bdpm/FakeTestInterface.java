@@ -63,11 +63,13 @@ public class FakeTestInterface implements PMInterface {
 
     @Override
     public int login(LoginAuth auth) {
+        System.out.println(auth.getUserName() + " has login!");
         return 2;
     }
 
     @Override
     public int saveBaseTestRecord(BaseTestRecord record) {
+        System.out.println("BaseTestRecord saved!");
         return 1;
     }
 

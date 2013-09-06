@@ -17,6 +17,7 @@ import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.ViewTab;
 import com.bdcom.dce.view.itester.tree.DeviceInfoTreeBuilder;
 import com.bdcom.dce.view.util.GBC;
+import com.bdcom.dce.view.util.LimitedDocument;
 import com.bdcom.dce.view.util.MsgDialogUtil;
 
 import javax.swing.*;
@@ -140,9 +141,9 @@ public class ITesterFrame extends JPanel
         addServerBt = new JButton( addServ );
         addTestBt = new JButton( addTest );
         commitBt = new JButton( commitResult );
-        addServerBt.setPreferredSize( new Dimension(120, 30) );
+        addServerBt.setPreferredSize( new Dimension(140, 30) );
         addTestBt.setPreferredSize(new Dimension(110, 30) );
-        commitBt.setPreferredSize(new Dimension(110, 30) );
+        commitBt.setPreferredSize(new Dimension(130, 30) );
 
         addServerBt.addActionListener(new ActionListener() {
             @Override
@@ -161,18 +162,18 @@ public class ITesterFrame extends JPanel
         commitBt.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TestProgressRow[] rows = getTestedProgressPanels();
+                TestProgressRow[] rows = getTestedProgressRows();
                 int total = rows.length;
                 ITesterRecord[] records = new ITesterRecord[total];
                 for ( int i=0; i < total; i++ ) {
                     records[i] = rows[i].getTestResult();
                 }
-                List<TestProgressRow> panelsToRemove = new ArrayList<TestProgressRow>();
+                List<TestProgressRow> rowsToRemove = new ArrayList<TestProgressRow>();
                 try {
                     commitDialog.display();
                     for ( int i=0; i < total; i++ ) {
                         sendITesterRecord( records[i] );
-                        panelsToRemove.add(rows[i]);
+                        rowsToRemove.add(rows[i]);
                     }
                 } catch (GlobalException ex) {
                     reportSendException( ex );
@@ -181,9 +182,9 @@ public class ITesterFrame extends JPanel
                 } catch (IOException ex) {
                     reportSendException( ex );
                 } finally {
-                    int committedNum = panelsToRemove.size();
+                    int committedNum = rowsToRemove.size();
                     TestProgressRow[] tpRows = new TestProgressRow[committedNum];
-                    tpRows = panelsToRemove.toArray( tpRows );
+                    tpRows = rowsToRemove.toArray( tpRows );
                     removeProgressRows(tpRows);
 
                     String committedNumMsg = LocaleUtil.getLocalName( COMMITTED_NUM );
@@ -311,15 +312,15 @@ public class ITesterFrame extends JPanel
         progressesTable.addRow( testProgressRow );
     }
 
-    private TestProgressRow[] getTestedProgressPanels() {
-        List<TestProgressRow> tpl = new ArrayList<TestProgressRow>();
+    private TestProgressRow[] getTestedProgressRows() {
+        List<TestProgressRow> tpr = new ArrayList<TestProgressRow>();
         for ( TestProgressRow row : tprList) {
             if ( row.isTested() ) {
-                tpl.add(row);
+                tpr.add(row);
             }
         }
-        TestProgressRow[] rows = new TestProgressRow[tpl.size()];
-        rows = tpl.toArray( rows );
+        TestProgressRow[] rows = new TestProgressRow[tpr.size()];
+        rows = tpr.toArray( rows );
         return rows;
     }
 
@@ -534,7 +535,7 @@ public class ITesterFrame extends JPanel
 
             buttonPane = new JPanel();
             buttonPane.setLayout( new GridBagLayout() );
-            buttonPane.add(okBt, new GBC(0, 0).setInsets(5, 10, 5, 10));
+            buttonPane.add( okBt, new GBC(0, 0).setInsets(5, 10, 5, 10) );
             buttonPane.add( cancelBt, new GBC(1, 0).setInsets( 5, 10, 5, 10) );
 
             setLayout( new GridBagLayout() );
@@ -880,9 +881,11 @@ public class ITesterFrame extends JPanel
         private static final String DST_PORT = "destination port";
         private static final String TEST_SERVER_LIST = "test server list";
         private static final String TEST_TIME = "test time(s)";
+        private static final String STREAM_PERCENT = "stream percent";
         private static final String SELECT_SRC_PORT = "please select source port!";
         private static final String SELECT_DST_PORT = "please select destination port!";
         private static final String SELECT_DIFF_PORT = "please select different port!";
+        private static final String INPUT_VALID_PERCENT = "valid stream percent is 1 to 100";
         private static final String CONFIRM = "confirm";
         private static final String TEST_OPTION = "test option";
 
@@ -894,11 +897,13 @@ public class ITesterFrame extends JPanel
         private JScrollPane dstPortPane;
         private JLabel secondsLabel;
         private JComboBox secondsBox;
+        private JLabel percentLabel;
+        private JTextField percentField;
         private JButton okBt;
 
         private ServerListPane serverListPane;
         private JPanel portListPane;
-        private JPanel secondsPane;
+        private JPanel extraPane;
         private JPanel buttonPane;
 
         private ITesterRecord itr;
@@ -913,7 +918,7 @@ public class ITesterFrame extends JPanel
             setDialogTitle();
             initServerListPane();
             initPortListPane();
-            initSecondsPane();
+            initExtraPane();
             initButtonPane();
             setLayout(new GridBagLayout());
             add(serverListPane, new GBC(0, 0)
@@ -922,7 +927,7 @@ public class ITesterFrame extends JPanel
             add(portListPane, new GBC(0, 1)
                     .setAnchor(GBC.WEST)
                     .setInsets(5,10,5,10));
-            add( secondsPane, new GBC(0, 2)
+            add(extraPane, new GBC(0, 2)
                     .setAnchor( GBC.WEST )
                     .setInsets(5,10,5,10) );
             add(buttonPane, new GBC(0, 3)
@@ -967,14 +972,23 @@ public class ITesterFrame extends JPanel
             portListPane.add( dstPortPane, new GBC(1, 0).setInsets(10) );
         }
 
-        private void initSecondsPane() {
-            String title = LocaleUtil.getLocalName( TEST_TIME );
-            secondsLabel = new JLabel( title );
+        private void initExtraPane() {
+            String testTime = LocaleUtil.getLocalName( TEST_TIME );
+            String streamPercent = LocaleUtil.getLocalName( STREAM_PERCENT );
+            secondsLabel = new JLabel( testTime );
             secondsBox = new JComboBox( new String[] {"30", "20", "10"} );
-            secondsPane = new JPanel();
-            secondsPane.setLayout( new GridBagLayout() );
-            secondsPane.add( secondsLabel, new GBC(0, 0).setInsets( 5, 10, 5, 10 ) );
-            secondsPane.add( secondsBox, new GBC(1, 0).setInsets( 5, 10, 5, 10 ) );
+
+            percentLabel = new JLabel( streamPercent );
+            percentField = new JTextField();
+            percentField.setDocument(
+                    new LimitedDocument(LimitedDocument.NUMBER, 3) );
+
+            extraPane = new JPanel();
+            extraPane.setLayout( new GridBagLayout() );
+            extraPane.add(secondsLabel, new GBC(0, 0).setInsets(5, 10, 5, 10));
+            extraPane.add(secondsBox, new GBC(1, 0).setInsets(5, 10, 5, 10));
+            extraPane.add(percentLabel, new GBC(2, 0).setInsets(5, 10, 5, 10));
+            extraPane.add(percentField, new GBC(3, 0).setInsets(5, 10, 5, 10));
         }
 
         private void initButtonPane() {
@@ -992,7 +1006,8 @@ public class ITesterFrame extends JPanel
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if ( isNoPortSelected() || isSamePortSelected() ) {
+            if ( isNoPortSelected() || isSamePortSelected() ||
+                    isStreamPercentInvalid() ) {
                 return;
             }
             super.actionPerformed( e );
@@ -1008,6 +1023,9 @@ public class ITesterFrame extends JPanel
             int seconds = Integer.parseInt(
                     (String) secondsBox.getSelectedItem()
             );
+            int percent = Integer.parseInt(
+                    percentField.getText()
+            );
 
             TestCaseConfig tcConfig = new TestCaseConfig.Builder()
                     .ip( ip )
@@ -1015,7 +1033,9 @@ public class ITesterFrame extends JPanel
                     .srcPortId( src.getPortId() )
                     .dstCardId( dst.getCardId() )
                     .dstPortId( dst.getPortId() )
-                    .seconds( seconds ).build();
+                    .seconds( seconds )
+                    .percent( percent )
+                    .build();
 
             ITesterFrame.this.addTestCase( itr, tcConfig );
         }
@@ -1047,14 +1067,43 @@ public class ITesterFrame extends JPanel
             return false;
         }
 
+        private boolean isStreamPercentInvalid() {
+            String percentStr = percentField.getText();
+            String msg = LocaleUtil.getLocalName( INPUT_VALID_PERCENT );
+            if ( !StringUtil.isValidNumber( percentStr ) ) {
+                MsgDialogUtil.showMsgDialog( dialog, msg );
+                return true;
+            }
+            int percent = Integer.parseInt( percentStr );
+            if ( percent < 1 || 100 < percent ) {
+                MsgDialogUtil.showMsgDialog( dialog, msg );
+                return true;
+            }
+            return false;
+        }
+
         public void display(ITesterRecord itr) {
             this.itr = itr;
+            updateDialog();
+            super.display();
+        }
+
+        private void updateDialog() {
             serverListPane.update( getIpList() );
             String serverIP = serverListPane.getSelectedServerIP();
             if ( null != serverIP ) {
                 updatePortLists( serverIP );
             }
-            super.display();
+
+            String old = percentField.getText();
+            if ( !"100".equals( old ) ) {
+                percentField.setText( "100" );
+            }
+
+            int index = secondsBox.getSelectedIndex();
+            if ( 0 != index ) {
+                secondsBox.setSelectedIndex( index );
+            }
         }
 
         void updatePortLists(String serverIP) {

@@ -313,9 +313,11 @@ public interface ApplicationConstants {
 
     }
 
-    abstract class BASE_TEST {
+    abstract class TEST_ATTR {
 
         public static final String IS_FC = "is fc";
+        public static final String TEST_TYPE = "Test Type";
+
     }
 
 }

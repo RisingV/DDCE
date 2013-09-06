@@ -1,14 +1,16 @@
 package com.bdcom.dce.view;
 
-import com.bdcom.dce.view.itester.ITesterFrame;
-import com.bdcom.dce.view.util.ViewUtil;
 import com.bdcom.dce.sys.Applicable;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
+import com.bdcom.dce.view.itester.ITesterFrame;
+import com.bdcom.dce.view.util.ViewUtil;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
+import java.util.Enumeration;
 
 /**
  * @author francis yuan <br>
@@ -41,7 +43,6 @@ public class ViewManager implements ApplicationConstants {
 
 	public ViewManager( Applicable app ) {
         this.app = app;
-		setLookAndFeel();
 		init();
 	}
 	
@@ -117,8 +118,11 @@ public class ViewManager implements ApplicationConstants {
 		
 	}
 	
-	private void setLookAndFeel() {
+	public static void initLookAndFeel() {
 		UIManager.put("swing.boldMetal", Boolean.FALSE);
+        String song = LocaleUtil.getLocalName( "Song Typeface" );
+        Font f = new Font( song, Font.PLAIN, 12 );
+        initGlobalFont(f);
 		try {
 			UIManager.setLookAndFeel(UIManager
 					.getSystemLookAndFeelClassName() );
@@ -139,6 +143,18 @@ public class ViewManager implements ApplicationConstants {
 
     private Object getCompo(String name) {
         return app.getAttribute( name );
+    }
+
+    private static void initGlobalFont(Font font) {
+        FontUIResource fontRes = new FontUIResource(font);
+        for (Enumeration<Object> keys = UIManager.getDefaults().keys();
+             keys.hasMoreElements(); ) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value instanceof FontUIResource) {
+                UIManager.put(key, fontRes);
+            }
+        }
     }
 	
 }
