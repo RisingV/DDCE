@@ -40,6 +40,9 @@ public class ServerStarter implements Runnable {
                 put( RequestID.GET_SCRIPT_FILE_LIST, new ScriptFileListHandler(pm) );
                 put( RequestID.DOWNLOAD_SCRIPT, new ScriptDownloadHandler(pm) );
                 put( RequestID.DELETE_BACKUP_SCRIPTS, new ScriptDeleteHandler(pm) );
+                put( RequestID.UPLOAD_LOCAL_STORAGE, new UploadResourceHandler(pm) );
+                put( RequestID.DOWNLOAD_LOCAL_STORAGE, new DownloadResourceHandler(pm) );
+                put( RequestID.GET_COMPLETE_SERIAL, new GetCompleteSerialHandler(pm) );
                 put( RequestID.ECHO, new EchoHandler(pm) );
                 put( RequestID.TERMINAL, new TerminalHandler() );
             }

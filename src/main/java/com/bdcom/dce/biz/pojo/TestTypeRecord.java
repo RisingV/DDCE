@@ -10,6 +10,7 @@ public abstract class TestTypeRecord {
 
     public static final int BASE_TEST = 1;
     public static final int RE_TEST = 2;
+    public static final int OTHER_TEST = 3;
 
     private static int currentTestType = BASE_TEST;
 

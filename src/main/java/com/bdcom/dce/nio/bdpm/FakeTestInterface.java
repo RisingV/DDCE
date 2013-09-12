@@ -86,4 +86,9 @@ public class FakeTestInterface implements PMInterface {
         return record;
     }
 
+    @Override
+    public String getCompleteSerial(String serial) {
+        return serial;
+    }
+
 }

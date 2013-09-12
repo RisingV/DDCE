@@ -78,9 +78,6 @@ public class TestProgressTable extends JTable {
         statusTc.setCellEditor( statusLabelCell );
         operationTc.setCellEditor( buttonPanelCell );
 
-//        MouseListener[] mls = getMouseListeners();
-//        System.out.println( "number of mouseListener: " + mls.length );
-        //TableUI ui = getUI();
     }
 
     private class ProgressCell extends AbstractCellEditor

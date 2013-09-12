@@ -3,7 +3,6 @@ package com.bdcom.dce.biz.scenario;
 import com.bdcom.dce.biz.pojo.Scenario;
 import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.util.SerializeUtil;
-import com.bdcom.dce.util.StringUtil;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -68,7 +67,7 @@ public class ScenarioMgr {
             scenario.setScenarioName(scenarioName);
         }
 
-        String serial = scenario.getSerialNum();
+        String serial = scenario.getSerial();
         addToScenarioEntry( scenarioName, scenario );
         addToSerialMapping( serial, scenario );
 
@@ -234,10 +233,6 @@ public class ScenarioMgr {
         return sb.toString();
     }
 
-    private static String generateSessionId() {
-        return StringUtil.getRandomString(15);
-    }
-
     private void loadSavedScenarios() {
         StringBuffer sb = new StringBuffer();
         sb.append(pathConfig.getConfDir()).append(SCENARIO_DIR);
@@ -269,7 +264,7 @@ public class ScenarioMgr {
                         sce
                 );
                 addToSerialMapping(
-                        sce.getSerialNum(),
+                        sce.getSerial(),
                         sce
                 );
             }

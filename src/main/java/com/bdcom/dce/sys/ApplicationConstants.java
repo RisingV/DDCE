@@ -295,6 +295,10 @@ public interface ApplicationConstants {
 
         public static final String SCRIPT_MGR = "Script Mgr";
 
+        public static final String STORABLE_MGR = "Storable Mgr";
+
+        public static final String MESSAGE_RECORDER = "Message Recorder";
+
     }
 
     abstract class CONFIG {
@@ -304,6 +308,8 @@ public interface ApplicationConstants {
         public static final String SERVER_CONFIG = "Server Config";
 
         public static final String LOCAL_SERVER_CONFIG = "Local Server Config";
+
+        public static final String SCRIPT_ENV_CONFIG = "Script Env Config";
 
     }
 

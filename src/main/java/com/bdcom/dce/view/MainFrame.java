@@ -1,5 +1,6 @@
 package com.bdcom.dce.view;
 
+import com.bdcom.dce.view.common.MsgTable;
 import com.bdcom.dce.view.util.Hook;
 import com.bdcom.dce.view.util.ViewUtil;
 import com.bdcom.dce.datadispacher.http.HttpClientWrapper;

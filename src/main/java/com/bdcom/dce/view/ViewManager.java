@@ -5,6 +5,7 @@ import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.itester.ITesterFrame;
+import com.bdcom.dce.view.resource.ResourceMgrFrame;
 import com.bdcom.dce.view.util.ViewUtil;
 
 import javax.swing.*;
@@ -35,7 +36,7 @@ public class ViewManager implements ApplicationConstants {
 	
 	//private ScriptList scriptListTab;
 
-    private ResourceList resourceListTab;
+    private ResourceMgrFrame resourceMgrFrameTab;
 
     private ITesterFrame itesterTab;
 
@@ -63,7 +64,7 @@ public class ViewManager implements ApplicationConstants {
 		submitTab = (SubmitFrame) getCompo(COMPONENT.SUBMIT_FRAME);
 		scmTab = (ScriptMgrFrame) getCompo(COMPONENT.SCRIPT_MGR_FRAME );
 		//scriptListTab = (ScriptList) getCompo(COMPONENT.SCRIPT_LIST);
-        resourceListTab = (ResourceList) getCompo(COMPONENT.RESOURCE_LIST);
+        resourceMgrFrameTab = (ResourceMgrFrame) getCompo(COMPONENT.RESOURCE_LIST);
         itesterTab = (ITesterFrame) getCompo(COMPONENT.ITESTER_FRAME);
 
 
@@ -95,7 +96,7 @@ public class ViewManager implements ApplicationConstants {
 //				getLocalName( SCRIPT_LIST )
 //				);
 
-        resourceListTab.setTabTitle(
+        resourceMgrFrameTab.setTabTitle(
                 getLocalName( RESOURCE_LIST )
         );
 		
@@ -104,7 +105,7 @@ public class ViewManager implements ApplicationConstants {
 		mainFrame.addRootViewTab(smTab);
 		mainFrame.addRootViewTab(scmTab);
 		//mainFrame.addRootViewTab(scriptListTab);
-        mainFrame.addRootViewTab(resourceListTab);
+        mainFrame.addRootViewTab(resourceMgrFrameTab);
 		mainFrame.addRefresher(smTab.getScenarioListRefreshHook());
 		mainFrame.addRefresher(submitTab.getFcAddHook());
 		mainFrame.addRefresher(scmTab.getScriptListRefreshHook());

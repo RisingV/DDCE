@@ -3,10 +3,14 @@ package com.bdcom.dce.view.itester;
 import com.bdcom.dce.biz.pojo.ITesterRecord;
 import com.bdcom.dce.itester.api.wrapper.*;
 import com.bdcom.dce.itester.lib.PortStats;
+import com.bdcom.dce.nio.client.ClientProxy;
+import com.bdcom.dce.nio.exception.GlobalException;
+import com.bdcom.dce.nio.exception.ResponseException;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.util.GBC;
+import com.bdcom.dce.view.util.MsgDialogUtil;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -17,6 +21,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,8 +43,9 @@ public class TestProgressRow implements
     private static final String DETAIL = "Detail";
     private static final String DELETE = "Delete";
 
-    private final ITesterRecord iTesterRecord;
     private final ITesterAPIWrapper apiWrapper;
+    private final ClientProxy client;
+    private final ITesterRecord iTesterRecord;
     private final TestCaseConfig testConfig;
 
     private TestTask testTask;
@@ -58,14 +64,15 @@ public class TestProgressRow implements
     private boolean tested;
     private boolean running;
 
-    TestProgressRow(ITesterRecord iTesterRecord, ITesterAPIWrapper apiWrapper,
+    TestProgressRow(ITesterAPIWrapper apiWrapper, ClientProxy client, ITesterRecord iTesterRecord,
                     TestCaseConfig testConfig) {
         iTesterRecord.setTestTime(
                 testConfig.getSeconds()
         );
 
-        this.iTesterRecord = iTesterRecord;
         this.apiWrapper = apiWrapper;
+        this.client = client;
+        this.iTesterRecord = iTesterRecord;
         this.testConfig = testConfig;
 
         initUI();
@@ -202,6 +209,39 @@ public class TestProgressRow implements
         detailDialog.updateTestStatus( status );
     }
 
+    private void submitRecord(ITesterRecord record) {
+        if ( null == record ) {
+            return;
+        }
+
+        boolean commitSuccess = true;
+        String committing = LocaleUtil.getLocalName( DetailDialog.COMMITTING );
+        detailDialog.updateCommitStatus( committing );
+
+        try {
+            client.sendITesterRecord( record );
+        } catch (IOException e) {
+            commitSuccess = false;
+            ErrorLogger.log( "Auto commit iTesterRecord fail: " + e.getMessage() );
+        } catch (ResponseException e) {
+            commitSuccess = false;
+            ErrorLogger.log( "Auto commit iTesterRecord fail: " + e.getMessage() );
+        } catch (GlobalException e) {
+            commitSuccess = false;
+            ErrorLogger.log( "Auto commit iTesterRecord fail: " + e.getMessage() );
+            MsgDialogUtil.reportGlobalException( e );
+        } finally {
+            String commitStatus = null;
+            if ( commitSuccess ) {
+                commitStatus = DetailDialog.COMMIT_SUCCESS;
+            } else {
+                commitStatus = DetailDialog.COMMIT_FAIL;
+            }
+            commitStatus = LocaleUtil.getLocalName( commitStatus );
+            detailDialog.updateCommitStatus( commitStatus );
+        }
+    }
+
     class TestTask extends SwingWorker<Void, Void> {
 
         private final TestSession session;
@@ -275,6 +315,8 @@ public class TestProgressRow implements
                 PortStats ps1 = session.getDstPortStats();
                 detailDialog.updateStats( ps0, ps1 );
                 tested = true;
+
+                submitRecord( iTesterRecord );
             } catch (ITesterException e) {
                 handleTestException( e );
             } finally {
@@ -305,7 +347,14 @@ public class TestProgressRow implements
         private static final String TEST_OPTION = "test option";
         private static final String TEST_STATS = "test data stats";
         private static final String TEST_STATUS = "Test Status";
+        private static final String COMMIT_STATUS = "Commit Status";
 
+        public static final String COMMITTING = "Committing...";
+        public static final String NOT_COMMITTED = "Not Committed!";
+        public static final String COMMIT_SUCCESS = "Commit Success!";
+        public static final String COMMIT_FAIL = "Commit Fail!";
+
+        private JLabel commitStatusLabel;
         private JLabel testStatusLabel;
         private JLabel workOrderLabel;
         private JLabel barCodeLabel;
@@ -344,6 +393,7 @@ public class TestProgressRow implements
 
         private JPanel testConfigPane;
         private JPanel testStatsPane;
+        private JPanel commitStatusPane;
         private JPanel testStatusPane;
         private JPanel testStatusOuterPane;
 
@@ -370,6 +420,8 @@ public class TestProgressRow implements
             String rxPps = LocaleUtil.getLocalName( RX_PPS );
             String rxBps = LocaleUtil.getLocalName( RX_BPS );
 
+            String notCommitted = LocaleUtil.getLocalName( NOT_COMMITTED );
+            String commitStatus = LocaleUtil.getLocalName( COMMIT_STATUS );
             String workOrderNum = LocaleUtil.getLocalName( WORK_ORDER_NUM );
             String barCode = LocaleUtil.getLocalName( BAR_CODE );
             String srcPort = LocaleUtil.getLocalName( SRC_PORT );
@@ -422,11 +474,20 @@ public class TestProgressRow implements
             modePane.add(srcPortMode, new GBC(0, 0).setInsets(5, 20, 5, 20));
             modePane.add( dstPortMode, new GBC( 1,0 ).setInsets( 5, 20, 5, 20 ) );
 
+            commitStatusPane = new JPanel();
+            commitStatusPane.setLayout(new GridBagLayout());
+            commitStatusPane.setBorder(
+                    BorderFactory.createTitledBorder(commitStatus)
+            );
+
+
+            commitStatusLabel = new JLabel( notCommitted );
+            testStatusLabel.setPreferredSize( new Dimension( 588, 35 ) );
             testConfigPane = new JPanel();
-            testConfigPane.setLayout( new GridBagLayout() );
             testConfigPane.setBorder(
                     BorderFactory.createTitledBorder( testOption )
             );
+            testConfigPane.add( commitStatusLabel, BorderLayout.CENTER );
 
             testConfigPane.add( workOrderLabel, loc(0, 0) );
             testConfigPane.add( workOrderField, loc(1, 0) );
@@ -481,8 +542,9 @@ public class TestProgressRow implements
 
             setLayout(new GridBagLayout());
             add( testStatusPane, loc(0, 0) );
-            add( testConfigPane, loc(0, 1) );
-            add( testStatusOuterPane, loc(0, 2) );
+            add( commitStatusPane, loc(0, 1) );
+            add( testConfigPane, loc(0, 2) );
+            add( testStatusOuterPane, loc(0, 3) );
 
             addWindowListener( new WindowAdapter() {
                 @Override
@@ -524,6 +586,16 @@ public class TestProgressRow implements
             String old = testStatusLabel.getText();
             if ( !status.equals( old ) ) {
                 testStatusLabel.setText(status);
+            }
+        }
+
+        void updateCommitStatus( String status ) {
+            if ( !StringUtil.isNotBlank( status ) ) {
+                return;
+            }
+            String old = commitStatusLabel.getText();
+            if ( !status.equals( old ) ) {
+                commitStatusLabel.setText(status);
             }
         }
 

@@ -110,7 +110,6 @@ public class BDPacket {
         return newPacket( requestID, currentVersion );
     }
 
-
     public static BDPacket newPacket(int requestID, int version) {
         BDPacket newPack = new BDPacket( version );
         newPack.setRequestID( requestID );

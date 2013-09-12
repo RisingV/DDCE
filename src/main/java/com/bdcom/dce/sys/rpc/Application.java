@@ -14,7 +14,9 @@ import com.bdcom.dce.sys.gui.GuiInterface;
 import com.bdcom.dce.sys.service.Dialect;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.*;
+import com.bdcom.dce.view.common.MsgTable;
 import com.bdcom.dce.view.itester.ITesterFrame;
+import com.bdcom.dce.view.resource.ResourceMgrFrame;
 
 import javax.swing.*;
 import java.io.File;
@@ -85,7 +87,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         ScenarioMgrFrame scenarioMgrFrame = new ScenarioMgrFrame( clientProxy, this );
         ScriptMgrFrame scriptMgrFrame = new ScriptMgrFrame( clientProxy, this );
         //ScriptList scriptList = new ScriptList(this);
-        ResourceList resourceList = new ResourceList(this);
+        ResourceMgrFrame resourceMgrFrame = new ResourceMgrFrame(this);
         MsgTable msgTable = new MsgTable(this);
 
         // test code start
@@ -104,7 +106,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
 
         addAttribute( COMPONENT.MSG_TABLE, msgTable );
         //addAttribute( COMPONENT.SCRIPT_LIST, scriptList );
-        addAttribute( COMPONENT.RESOURCE_LIST, resourceList );
+        addAttribute( COMPONENT.RESOURCE_LIST, resourceMgrFrame);
         addAttribute( COMPONENT.SCENARIO_MGR_FRAME, scenarioMgrFrame );
         addAttribute( COMPONENT.SUBMIT_FRAME, submitFrame );
         addAttribute( COMPONENT.SCRIPT_MGR_FRAME, scriptMgrFrame );

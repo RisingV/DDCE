@@ -32,6 +32,12 @@ public interface RequestID {
 
     public static final int DELETE_BACKUP_SCRIPTS = 11;
 
+    public static final int UPLOAD_LOCAL_STORAGE = 12;
+
+    public static final int DOWNLOAD_LOCAL_STORAGE = 13;
+
+    public static final int GET_COMPLETE_SERIAL = 14;
+
     //rarely used
     public static final int BROADCAST = Byte.MAX_VALUE - 2;
 

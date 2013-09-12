@@ -5,6 +5,8 @@ import com.bdcom.dce.biz.pojo.ITesterRecord;
 import com.bdcom.dce.biz.pojo.LoginAuth;
 import com.bdcom.dce.biz.scenario.ScenarioMgr;
 import com.bdcom.dce.biz.script.ScriptMgr;
+import com.bdcom.dce.biz.storage.Item;
+import com.bdcom.dce.biz.storage.StorableMgr;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
@@ -16,6 +18,9 @@ import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -27,15 +32,17 @@ import java.util.concurrent.TimeoutException;
 public class ClientProxy {
 
     ClientWrapper client;
-
     ScenarioTransfer scenarioTransfer;
-
     ScriptTransfer scriptTransfer;
+    StorageTransfer storageTransfer;
+    TimeoutWrapper timeoutWrapper;
 
     public ClientProxy(ServerConfig serverConfig) {
         client = new ClientWrapper(serverConfig);
         scenarioTransfer = new ScenarioTransfer(client);
         scriptTransfer = new ScriptTransfer(client);
+        timeoutWrapper = new TimeoutWrapper(client);
+        storageTransfer = new StorageTransfer( client );
     }
 
     public ServerConfig getServerConfig() {
@@ -49,7 +56,6 @@ public class ClientProxy {
     public int sendLoginAuth(LoginAuth auth)
             throws IOException, ResponseException, GlobalException, TimeoutException {
         int status = -1;
-        TimeoutWrapper timeoutWrapper = new TimeoutWrapper(client);
         try {
             BDPacket packet = BDPacketUtil.encapsulateToPacket(auth);
             BDPacket response = timeoutWrapper.send(packet, 2);
@@ -62,6 +68,37 @@ public class ClientProxy {
         }
 
         return status;
+    }
+
+    public String getCompleteSerial(String serial) throws IOException, GlobalException {
+        BDPacket request = BDPacket.newPacket( RequestID.GET_COMPLETE_SERIAL );
+        request.setDataType( DataType.STRING );
+        request.setData( serial.getBytes() );
+
+        BDPacket response = client.send( request );
+        serial = new String( response.getData() );
+
+        return serial;
+    }
+
+    public void uploadResource(StorableMgr mgr) throws IOException, GlobalException {
+        Item[] itemSet = mgr.getAll();
+        Map<String, Item> itemMap = new HashMap<String, Item>(itemSet.length);
+        for ( Item i : itemSet ) {
+            if ( null != i ) {
+                itemMap.put( i.getSerial(), i );
+            }
+        }
+
+        storageTransfer.uploadStorage( itemMap );
+    }
+
+    public void downloadResource(StorableMgr mgr) throws IOException, GlobalException {
+        Map<String, Item> itemMap = storageTransfer.downloadStorage();
+        Collection<Item> c = itemMap.values();
+        for ( Item i : c ) {
+            mgr.addItem( i );
+        }
     }
 
     public int sendBaseTestRecord(BaseTestRecord record)

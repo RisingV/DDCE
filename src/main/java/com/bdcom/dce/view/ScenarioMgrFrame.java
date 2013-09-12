@@ -5,6 +5,7 @@ import com.bdcom.dce.biz.scenario.ScenarioMgr;
 import com.bdcom.dce.biz.scenario.ScenarioUtil;
 import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.nio.exception.GlobalException;
+import com.bdcom.dce.view.common.MsgTable;
 import com.bdcom.dce.view.util.GBC;
 import com.bdcom.dce.view.util.Hook;
 import com.bdcom.dce.view.util.LimitedDocument;
@@ -358,7 +359,7 @@ public class ScenarioMgrFrame extends JPanel implements
 							private void handler(DocumentEvent e) {
 								String serialNum = sNumField.getText();
 								if (null != serialNum&& StringUtil.isNotBlank( serialNum ) ) {
-									currentSce.setSerialNum(serialNum);
+									currentSce.setSerial(serialNum);
 								}
 							}
 						}
@@ -725,7 +726,7 @@ public class ScenarioMgrFrame extends JPanel implements
 			MsgDialogUtil.showErrorDialogLocalised(SCE_NAME_REDUPLICATED);
 			return false;
 		}
-		String serialNum = currentSce.getSerialNum();
+		String serialNum = currentSce.getSerial();
 		if ( !StringUtil.isNotBlank(serialNum) ) {
 			MsgDialogUtil.showErrorDialogLocalised("serial number can't be blank!");
 			return false;
@@ -921,7 +922,7 @@ public class ScenarioMgrFrame extends JPanel implements
 			JTextField biField = textFieldGroup.get(BEGIN_INDEX);
 			
 			String sName = currentSce.getScenarioName();
-			String sNum = currentSce.getSerialNum();
+			String sNum = currentSce.getSerial();
 			int beginIndex = currentSce.getBeginIndex();
 			if ( StringUtil.isNotBlank(sName) ) {
 				sField.setText(sName);

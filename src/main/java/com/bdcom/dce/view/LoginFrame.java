@@ -11,6 +11,7 @@ import com.bdcom.dce.sys.gui.GuiInterface;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
+import com.bdcom.dce.view.common.MsgTable;
 import com.bdcom.dce.view.util.GBC;
 import com.bdcom.dce.view.util.MessageUtil;
 import com.bdcom.dce.view.util.MsgDialogUtil;
@@ -37,45 +38,34 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 	private static final long serialVersionUID = 2496780458803597888L;
 
     private static final String BASE_TEST_LOGIN = "Base Test Login";
-
     private static final String RE_TEST_LOGIN = "Retest Login";
+    private static final String OTHER_LOGIN = "Other Login";
+    private static final String SELECT_LOGIN_MODE = "Please select login mode!";
 	
 	private JFrame thisFrame = this;
 	
 	private JLabel usrLabel;
-	
 	private JLabel pwdLabel;
-	
 	private JLabel ipLabel;
-	
 	private JLabel portLabel;
-	
+
 	private JTextField usrTextField;
-	
 	private JTextField pwdTextField;
-	
 	private JTextField ipTextField;
-	
 	private JTextField portTextField;
 	
 	private JButton loginBt;
-	
 	private JButton exitBt;
 
     private ButtonGroup buttonGroup;
-
     private JRadioButton baseTestMode;
-
     private JRadioButton reTestMode;
-	
+    private JRadioButton otherMode;
+
 	private Image image;
-
     private final ClientProxy clientProxy;
-
     private final GuiInterface app;
-
     private ServerConfig serverConfig;
-
     private AbstractFrame frameAfterLogin;
 
 	public LoginFrame(ClientProxy clientProxy, GuiInterface app) {
@@ -121,8 +111,10 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 		con.setLayout(new GridBagLayout());
 		
 		JPanel textPanel = new JPanel();
+        JPanel modePanel = new JPanel();
 		JPanel btPanel = new JPanel();
-		textPanel.setLayout(new GridBagLayout()); 
+		textPanel.setLayout(new GridBagLayout());
+        modePanel.setLayout(new GridBagLayout());
 		btPanel.setLayout(new GridBagLayout()); 
 		
 		textPanel.add(usrLabel, new GBC(0, 0)
@@ -157,6 +149,15 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 					.setInsets(20, 10, 10, 50) 
 					.setFill(GBC.BOTH)
 					);
+        modePanel.add( baseTestMode, new GBC(0, 0)
+                    .setInsets(20, 50, 10, 10)
+                    .setFill(GBC.BOTH)
+                    );
+        modePanel.add( reTestMode, new GBC(1, 0)
+                    .setInsets(20, 10, 10, 50)
+                    .setFill(GBC.BOTH)
+                    );
+
 		btPanel.add(loginBt, new GBC(0, 2) 
 					.setInsets(10, 55, 10, 14) 
 					.setFill(GBC.BOTH)
@@ -166,14 +167,13 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 					.setFill(GBC.BOTH)
 					);
 		
-		con.add(textPanel, new GBC(0, 0) ); 
-		con.add(btPanel, new GBC(0, 1) );
+		con.add(textPanel, new GBC(0, 0) );
+        con.add(modePanel, new GBC(0, 1) );
+		con.add(btPanel, new GBC(0, 2) );
 	}
 	
 	private void initCompos() {
-		this.setTitle(
-				LocaleUtil.getLocalName(SYS_NAME)
-				);
+		this.setTitle( LocaleUtil.getLocalName(SYS_NAME) );
 		
 		usrLabel = new JLabel();
 		pwdLabel = new JLabel();
@@ -183,20 +183,11 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 		pwdLabel.setPreferredSize( new Dimension(80,20) );
 		ipLabel.setPreferredSize( new Dimension(80, 20) );
 		portLabel.setPreferredSize( new Dimension(80, 20) );
-		usrLabel.setText(
-				getLocalName(USER_NAME)
-				);
-		pwdLabel.setText(
-				getLocalName(PASS_WORD)
-				);
-		ipLabel.setText(
-				getLocalName(IP_ADDR)
-				);
-		portLabel.setText(
-				getLocalName(_PORT)
-				);
-		
-		
+		usrLabel.setText(getLocalName(USER_NAME));
+		pwdLabel.setText( getLocalName(PASS_WORD) );
+		ipLabel.setText( getLocalName(IP_ADDR) );
+		portLabel.setText( getLocalName(_PORT) );
+
 		usrTextField = new JTextField();
 		pwdTextField = new JPasswordField();
 		ipTextField = new JTextField();
@@ -215,6 +206,7 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 
         baseTestMode = new JRadioButton( getLocalName( BASE_TEST_LOGIN ) );
         reTestMode = new JRadioButton( getLocalName( RE_TEST_LOGIN ) );
+        otherMode = new JRadioButton( getLocalName( OTHER_LOGIN ) );
         ActionListener al = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -223,6 +215,8 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
                     testType = TestTypeRecord.BASE_TEST;
                 } else if ( reTestMode.isSelected() ) {
                     testType = TestTypeRecord.RE_TEST;
+                } else if ( otherMode.isSelected() ) {
+                    testType = TestTypeRecord.OTHER_TEST;
                 } else {
                     return;
                 }
@@ -232,18 +226,16 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
         };
         baseTestMode.addActionListener( al );
         reTestMode.addActionListener( al );
+        otherMode.addActionListener( al );
         buttonGroup = new ButtonGroup();
         buttonGroup.add( baseTestMode );
         buttonGroup.add( reTestMode );
+        buttonGroup.add( otherMode );
 
 		loginBt = new JButton();
 		exitBt = new JButton();
-		loginBt.setText(
-				getLocalName(LOG_IN)
-				); 
-		exitBt.setText(
-				getLocalName(_EXIT)
-				);
+		loginBt.setText( getLocalName(LOG_IN) );
+		exitBt.setText( getLocalName(_EXIT) );
 		
 		loginBt.setPreferredSize(new Dimension(80, 25));
 		exitBt.setPreferredSize(new Dimension(80, 25));
@@ -326,12 +318,6 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
             showFrameAfterLogin();
         }
 
-//        if ( status <= 0 ) {
-//			MsgDialogUtil.showErrorDialog(
-//					MessageUtil.getMessageByStatusCode(status)
-//					);
-//		} else {
-//		}
 	}
 
     private boolean inputValidation() {
@@ -380,6 +366,9 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
         }
 
         if ( !baseTestMode.isSelected() && !reTestMode.isSelected() ) {
+            MsgDialogUtil.showErrorDialog(
+                    MessageUtil.getLocalisedMessage(SELECT_LOGIN_MODE)
+            );
             return false;
         }
 

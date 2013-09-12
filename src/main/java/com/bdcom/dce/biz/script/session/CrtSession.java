@@ -14,15 +14,10 @@ import java.io.IOException;
  */
 
 public class CrtSession implements ScriptXmlConfConstants {
-	
-	private CrtSession crts = this;
-	
+
 	private Process process;
-	
 	private String crtSessionName;
-	
 	private String interpreterPath;
-	
 	private boolean running = false;
 
 	public String getInterpreterPath() {
@@ -45,51 +40,68 @@ public class CrtSession implements ScriptXmlConfConstants {
 		return running;
 	}
 
-	public void setRunning(boolean running) {
-		this.running = running;
-	}
-	
-	public void runScript(String scriptPath) throws IOException, InterruptedException {
+    public void runScript(String scriptPath) throws IOException, InterruptedException {
+        process = runScript0( scriptPath, true );
+    }
+
+    public int runScriptAndWait(String scriptPath) throws IOException, InterruptedException {
+        process = runScript0( scriptPath, false );
+        return process.waitFor();
+    }
+
+	private Process runScript0(String scriptPath, boolean runWaitThread) throws IOException, InterruptedException {
 		String cmd = getCmd(interpreterPath, crtSessionName, scriptPath);
 		System.out.println(cmd);
 		if ( running ) {
 			killRunningProcess();
 		}
-		
+
+		Process process = null;
 		if ( StringUtil.isNotBlank(cmd) ) {
 			running = true;
 			process = Runtime.getRuntime().exec(cmd);
-			waitingThread();
+            if ( runWaitThread ) {
+                waitingThread( scriptPath );
+            }
 		}
+
+        return process;
 	}
 	
 	public void killRunningProcess() {
 		if ( null != process ) {
-			running = false;
 			process.destroy();
-		} else {
-			running = false;
 		}
+        synchronized ( this ) {
+            running = false;
+            notifyAll();
+        }
 	}
 	
-	private void waitingThread() {
-		new Thread(
-				new Runnable() {
-					@Override
-					public void run() {
-						if ( null != process) {
-							int status = 0;
-							try {
-								status = process.waitFor();
-							} catch (InterruptedException e) {
-								ErrorLogger.log(e.getMessage() +
-                                        "exit code: " + status);
-							}
-						}
-						crts.setRunning(false);
-					}
-				}
-				).start();
+	private void waitingThread(final String path) {
+        new Thread() {
+            @Override
+            public void run() {
+                if ( null != process) {
+                    int status = 0;
+                    try {
+                        status = process.waitFor();
+                    } catch (InterruptedException e) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append( "Script " ).append( path )
+                          .append( "executing interrupted :" )
+                          .append( e.getMessage()  )
+                          .append( "exit code: " )
+                          .append( status );
+                        ErrorLogger.log( sb.toString() );
+                    }
+                }
+                synchronized ( CrtSession.this ) {
+                  CrtSession.this.running = false;
+                  CrtSession.this.notifyAll();
+                }
+            }
+        }.start();
 	}
 	
 	public String getCmd(String interpreterPath, String crtSessionName, String scriptPath) {
@@ -109,6 +121,6 @@ public class CrtSession implements ScriptXmlConfConstants {
 		}
 		
 		return sb.toString();
-//		return scriptPath;
 	}
+
 }

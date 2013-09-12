@@ -1,7 +1,7 @@
 package com.bdcom.dce.sys;
 
 import com.bdcom.dce.view.AbstractFrame;
-import com.bdcom.dce.view.MsgTable;
+import com.bdcom.dce.view.common.MsgTable;
 import com.bdcom.dce.view.ViewManager;
 import com.bdcom.dce.view.util.AppConstants;
 import com.bdcom.dce.datadispacher.DataSender;
@@ -225,7 +225,7 @@ public abstract class AppSession
 			scenario.setScenarioName(scenarioName);
 		}
 		
-		String serial = scenario.getSerialNum();
+		String serial = scenario.getSerial();
 		addToScenarioEntry( scenarioName, scenario );
 		addToSerialMapping( serial, scenario );
 		
@@ -420,7 +420,7 @@ public abstract class AppSession
 						sce
 						);
 				addToSerialMapping(
-						sce.getSerialNum(),
+						sce.getSerial(),
 						sce
 						);
 			}

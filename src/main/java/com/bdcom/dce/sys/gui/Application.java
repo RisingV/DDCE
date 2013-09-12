@@ -3,6 +3,8 @@ package com.bdcom.dce.sys.gui;
 import com.bdcom.dce.biz.scenario.ScenarioMgr;
 import com.bdcom.dce.biz.script.ScriptExecutor;
 import com.bdcom.dce.biz.script.ScriptMgr;
+import com.bdcom.dce.biz.storage.StorableMgr;
+import com.bdcom.dce.biz.storage.StoreMgr;
 import com.bdcom.dce.itester.api.ITesterAPI;
 import com.bdcom.dce.itester.api.JniAPIImpl;
 import com.bdcom.dce.nio.client.ClientProxy;
@@ -13,11 +15,12 @@ import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.sys.service.Dialect;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.*;
+import com.bdcom.dce.view.common.MsgTable;
 import com.bdcom.dce.view.itester.ITesterFrame;
+import com.bdcom.dce.view.resource.ResourceMgrFrame;
 
 import javax.swing.*;
 import java.text.DateFormat;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,8 +46,6 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         instance.run();
     }
 
-    private Map<String, Object> attributes;
-
     private Application() {}
 
     private void run() {
@@ -63,6 +64,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         addAttribute( CONFIG.SERVER_CONFIG, serverConfig );
 
         //int logical compo
+        StorableMgr storableMgr = new StoreMgr( pathConfig );
         ScriptMgr scriptMgr = new ScriptMgr( pathConfig );
         ScenarioMgr scenarioMgr = new ScenarioMgr((pathConfig));
         ClientProxy clientProxy = new ClientProxy( serverConfig );
@@ -72,6 +74,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
 
         scriptMgr.reloadScripts();
 
+        addAttribute( COMPONENT.STORABLE_MGR, storableMgr );
         addAttribute( COMPONENT.SCRIPT_EXECUTOR, scriptExecutor );
         addAttribute( COMPONENT.SCRIPT_MGR, scriptMgr );
         addAttribute( COMPONENT.SCENARIO_MGR, scenarioMgr );
@@ -85,7 +88,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         ScenarioMgrFrame scenarioMgrFrame = new ScenarioMgrFrame( clientProxy, this );
         ScriptMgrFrame scriptMgrFrame = new ScriptMgrFrame( clientProxy, this );
         //ScriptList scriptList = new ScriptList(this);
-        ResourceList resourceList = new ResourceList(this);
+        ResourceMgrFrame resourceMgrFrame = new ResourceMgrFrame(this);
         MsgTable msgTable = new MsgTable(this);
 
         ITesterAPI api = JniAPIImpl.getInstance();
@@ -95,7 +98,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
 
         addAttribute( COMPONENT.MSG_TABLE, msgTable );
         //addAttribute( COMPONENT.SCRIPT_LIST, scriptList );
-        addAttribute( COMPONENT.RESOURCE_LIST, resourceList );
+        addAttribute( COMPONENT.RESOURCE_LIST, resourceMgrFrame);
         addAttribute( COMPONENT.SCENARIO_MGR_FRAME, scenarioMgrFrame );
         addAttribute( COMPONENT.SUBMIT_FRAME, submitFrame );
         addAttribute( COMPONENT.SCRIPT_MGR_FRAME, scriptMgrFrame );
@@ -139,6 +142,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         }
 
         disconnectAndKillScriptExecutor();
+        saveResources();
         try {
             TimeUnit.MILLISECONDS.sleep(450);
         } catch (InterruptedException e) {
@@ -160,6 +164,13 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         System.gc();
     }
 
+    private void saveResources() {
+        StorableMgr mgr = (StorableMgr) getAttribute( COMPONENT.STORABLE_MGR );
+        if ( null != mgr && mgr.isStorageLoaded() ) {
+            mgr.saveToLocalStorage();
+        }
+    }
+
     private void disconnectAndKillScriptExecutor() {
         ClientProxy clientProxy = (ClientProxy)
                 getAttribute( COMPONENT.NIO_CLIENT );
@@ -173,24 +184,6 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
             scriptExecutor.killAllRunningScript();
         }
     }
-
-//    public UserInfo getUserInfo() {
-//        UserInfo userInfo = (UserInfo) getAttribute( USER.USER_INFO );
-//        if ( null == userInfo ) {
-//            String userNum = getStringAttr( USER.USER_NUM );
-//            String userRank = getStringAttr( USER.USER_RANK );
-//
-//            userInfo = new UserInfo();
-//            userInfo.setUserNum( userNum );
-//            if ( USER.ROOT.equals( userRank ) ) {
-//                userInfo.setSupervisor( true );
-//            } else {
-//                userInfo.setSupervisor( false );
-//            }
-//        }
-//
-//        return userInfo;
-//    }
 
     public AbstractFrame getFrame(String name) {
         Object frame = getAttribute( name );

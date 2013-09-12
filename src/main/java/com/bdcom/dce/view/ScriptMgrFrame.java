@@ -3,6 +3,7 @@ package com.bdcom.dce.view;
 import com.bdcom.dce.biz.scenario.ScenarioMgr;
 import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.nio.exception.GlobalException;
+import com.bdcom.dce.view.common.MsgTable;
 import com.bdcom.dce.view.util.*;
 import com.bdcom.dce.util.CommunicateStatus;
 import com.bdcom.dce.nio.exception.ResponseException;

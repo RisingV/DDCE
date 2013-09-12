@@ -1,5 +1,6 @@
-package com.bdcom.dce.view;
+package com.bdcom.dce.view.common;
 
+import com.bdcom.dce.view.AbstractFrame;
 import com.bdcom.dce.view.util.MessageUtil;
 import com.bdcom.dce.sys.Applicable;
 import com.bdcom.dce.sys.ApplicationConstants;
@@ -30,7 +31,7 @@ import static com.bdcom.dce.util.CommunicateStatus.NO_RUNNING_SCRIPT;
 public class MsgTable extends JFrame implements AbstractFrame, ApplicationConstants {
 	
 	private static final long serialVersionUID = 3620791577756543685L;
-	
+
 	public static final DateFormat DATE_FORMAT = 
 			new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
 	

@@ -31,4 +31,6 @@ public interface PMInterface {
 
     public ITesterRecord handlerITesterRecord(ITesterRecord record);
 
+    public String getCompleteSerial(String serial);
+
 }

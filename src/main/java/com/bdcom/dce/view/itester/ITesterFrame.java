@@ -212,7 +212,7 @@ public class ITesterFrame extends JPanel
         buttonPane.setBorder(bd);
         buttonPane.add( addServerBt, new GBC(0, 0).setInsets( 5, 10, 5, 10 ) );
         buttonPane.add( addTestBt, new GBC(1, 0).setInsets( 5, 10 ,5, 10 ) );
-        buttonPane.add( commitBt, new GBC(2, 0).setInsets( 5, 10, 5, 10 ) );
+//        buttonPane.add( commitBt, new GBC(2, 0).setInsets( 5, 10, 5, 10 ) );
     }
 
     private void initModePane() {
@@ -305,7 +305,8 @@ public class ITesterFrame extends JPanel
     }
 
     void addTestCase(ITesterRecord record, TestCaseConfig testConfig) {
-        TestProgressRow testProgressRow = new TestProgressRow( record, apiWrapper, testConfig );
+        TestProgressRow testProgressRow =
+                new TestProgressRow( apiWrapper, client, record, testConfig );
         testProgressRow.setPanelOwner( this );
 
         tprList.add( testProgressRow );
@@ -1251,7 +1252,7 @@ public class ITesterFrame extends JPanel
             }
             dialog.setAlwaysOnTop( true );
             dialog.pack();
-            dialog.setResizable(false);
+            dialog.setResizable( false );
             dialog.setLocationRelativeTo( null );
             dialog.setVisible( true );
         }
