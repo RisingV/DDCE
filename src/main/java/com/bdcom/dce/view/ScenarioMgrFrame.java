@@ -5,7 +5,7 @@ import com.bdcom.dce.biz.scenario.ScenarioMgr;
 import com.bdcom.dce.biz.scenario.ScenarioUtil;
 import com.bdcom.dce.biz.script.ScriptMgr;
 import com.bdcom.dce.nio.exception.GlobalException;
-import com.bdcom.dce.view.common.MsgTable;
+import com.bdcom.dce.view.message.MsgTable;
 import com.bdcom.dce.view.util.GBC;
 import com.bdcom.dce.view.util.Hook;
 import com.bdcom.dce.view.util.LimitedDocument;

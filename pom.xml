@@ -59,12 +59,12 @@
                       <mainClass>com.bdcom.dce.sys.gui.Application</mainClass>
                   </manifest>
               <!--
+                      <mainClass>com.bdcom.dce.sys.cli.CLI</mainClass>
+                      <mainClass>com.bdcom.dce.sys.gui.Application</mainClass>
                       <mainClass>com.bdcom.dce.nio.ServerTester</mainClass>
                       <mainClass>com.bdcom.dce.itester.rpc.RpcServer</mainClass>
-                      <mainClass>com.bdcom.dce.sys.cli.CLI</mainClass>
                       <mainClass>just.devtestest.ServerTester</mainClass>
                       <mainClass>just.devtestest.DeviceTreeTester</mainClass>
-                      <mainClass>com.bdcom.dce.sys.gui.Application</mainClass>
                 -->
               </archive>
               <descriptorRefs> 

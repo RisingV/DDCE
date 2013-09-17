@@ -395,7 +395,7 @@ public class TestProgressRow implements
         private JPanel testStatsPane;
         private JPanel commitStatusPane;
         private JPanel testStatusPane;
-        private JPanel testStatusOuterPane;
+        private JPanel testStatsOuterPane;
 
         private final ITesterRecord itr;
         private final TestCaseConfig testConfig;
@@ -421,6 +421,7 @@ public class TestProgressRow implements
             String rxBps = LocaleUtil.getLocalName( RX_BPS );
 
             String notCommitted = LocaleUtil.getLocalName( NOT_COMMITTED );
+            String unTested = LocaleUtil.getLocalName( UNTESTED );
             String commitStatus = LocaleUtil.getLocalName( COMMIT_STATUS );
             String workOrderNum = LocaleUtil.getLocalName( WORK_ORDER_NUM );
             String barCode = LocaleUtil.getLocalName( BAR_CODE );
@@ -474,20 +475,19 @@ public class TestProgressRow implements
             modePane.add(srcPortMode, new GBC(0, 0).setInsets(5, 20, 5, 20));
             modePane.add( dstPortMode, new GBC( 1,0 ).setInsets( 5, 20, 5, 20 ) );
 
+            commitStatusLabel = new JLabel( notCommitted );
+            commitStatusLabel.setPreferredSize(new Dimension(588, 35));
             commitStatusPane = new JPanel();
-            commitStatusPane.setLayout(new GridBagLayout());
             commitStatusPane.setBorder(
                     BorderFactory.createTitledBorder(commitStatus)
             );
+            commitStatusPane.add(commitStatusLabel, BorderLayout.CENTER);
 
-
-            commitStatusLabel = new JLabel( notCommitted );
-            testStatusLabel.setPreferredSize( new Dimension( 588, 35 ) );
             testConfigPane = new JPanel();
+            testConfigPane.setLayout( new GridBagLayout() );
             testConfigPane.setBorder(
-                    BorderFactory.createTitledBorder( testOption )
+                    BorderFactory.createTitledBorder(testOption)
             );
-            testConfigPane.add( commitStatusLabel, BorderLayout.CENTER );
 
             testConfigPane.add( workOrderLabel, loc(0, 0) );
             testConfigPane.add( workOrderField, loc(1, 0) );
@@ -525,26 +525,26 @@ public class TestProgressRow implements
             testStatsPane.add(rxBpsLabel, loc(2, 3));
             testStatsPane.add(rxBpsField, loc(3, 3));
 
-            testStatusLabel = new JLabel();
+            testStatusLabel = new JLabel( unTested );
             testStatusLabel.setPreferredSize( new Dimension( 588, 35 ) );
             testStatusPane = new JPanel();
             Border statusTitle = BorderFactory.createTitledBorder( testStatus );
             testStatusPane.setBorder(statusTitle);
             testStatusPane.add( testStatusLabel, BorderLayout.CENTER );
 
-            testStatusOuterPane = new JPanel();
-            testStatusOuterPane.setLayout( new GridBagLayout() );
-            testStatusOuterPane.setBorder(
+            testStatsOuterPane = new JPanel();
+            testStatsOuterPane.setLayout(new GridBagLayout());
+            testStatsOuterPane.setBorder(
                     BorderFactory.createTitledBorder(testStats)
             );
-            testStatusOuterPane.add(modePane, new GBC(0, 0));
-            testStatusOuterPane.add( testStatsPane, new GBC( 0,1 ) );
+            testStatsOuterPane.add(modePane, new GBC(0, 0));
+            testStatsOuterPane.add(testStatsPane, new GBC(0, 1));
 
             setLayout(new GridBagLayout());
             add( testStatusPane, loc(0, 0) );
             add( commitStatusPane, loc(0, 1) );
             add( testConfigPane, loc(0, 2) );
-            add( testStatusOuterPane, loc(0, 3) );
+            add( testStatsOuterPane, loc(0, 3) );
 
             addWindowListener( new WindowAdapter() {
                 @Override

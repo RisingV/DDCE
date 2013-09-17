@@ -101,6 +101,27 @@ public class ClientProxy {
         }
     }
 
+    public boolean resourceMD5Check(StorableMgr mgr) throws IOException,
+            GlobalException, ResponseException {
+        String localMd5 = mgr.getMD5String();
+        byte[] data = localMd5.getBytes();
+
+        BDPacket request = BDPacket.newPacket( RequestID.STORAGE_MD5_CHECK );
+        request.setDataType( DataType.STRING );
+        request.setData( data );
+
+        BDPacket response = client.send( request );
+        int isSame = BDPacketUtil.parseIntResponse( response, request.getRequestID() );
+        return isSame == 0;
+    }
+
+    public void checkAndDownloadResource(StorableMgr mgr) throws GlobalException,
+            IOException, ResponseException {
+        if ( !resourceMD5Check( mgr ) ) {
+            downloadResource( mgr );
+        }
+    }
+
     public int sendBaseTestRecord(BaseTestRecord record)
             throws IOException, ResponseException, GlobalException {
 

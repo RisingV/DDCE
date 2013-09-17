@@ -8,6 +8,8 @@ package com.bdcom.dce.biz.storage;
  */
 public interface StorableMgr extends ItemMgr {
 
+    public byte[] getMD5Bytes();
+    public String getMD5String();
     public boolean isStorageLoaded();
     public void loadStorage();
     public void saveToLocalStorage();

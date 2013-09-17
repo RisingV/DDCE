@@ -263,6 +263,8 @@ public interface ApplicationConstants {
 
         public static final String DIALECT = "Dialect";
 
+        public static final String AUTO_DOWNLOAD_SERVICE = "Auto Download Service";
+
         public static final String NIO_CLIENT = "NIO Client";
 
         public static final String DISPLAYING_FRAME = "Displaying Frame";
@@ -299,6 +301,14 @@ public interface ApplicationConstants {
 
         public static final String MESSAGE_RECORDER = "Message Recorder";
 
+        public static final String MESSAGE_TABLE = "Message Table0";
+
+        public static final String SUBMIT_HISTORY_TABLE ="Submit History Table";
+
+        public static final String SCRIPT_TEST_FRAME = "Script Test Frame";
+
+        public static final String SCRIPT_ENV_CONFIG_DIALOG = "Script Env Config Dialog";
+
     }
 
     abstract class CONFIG {
@@ -316,14 +326,22 @@ public interface ApplicationConstants {
     abstract class CONTENT {
 
         public static final String SERIAL_NUM_SET = "Serial Number Set";
+        public static final String TITLE_SUFFIX = "Title Suffix";
 
     }
 
     abstract class TEST_ATTR {
 
+        public static final String TESTER_NUM = "Tester Number";
         public static final String IS_FC = "is fc";
         public static final String TEST_TYPE = "Test Type";
 
+    }
+
+    abstract class DIALECT {
+
+        public static final String BASE_RECORD = "Base Record";
+        public static final String SEND_STATUS = "Send Status";
     }
 
 }

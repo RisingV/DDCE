@@ -1,7 +1,7 @@
 package com.bdcom.dce.sys;
 
 import com.bdcom.dce.view.AbstractFrame;
-import com.bdcom.dce.view.common.MsgTable;
+import com.bdcom.dce.view.message.MsgTable;
 import com.bdcom.dce.view.ViewManager;
 import com.bdcom.dce.view.util.AppConstants;
 import com.bdcom.dce.datadispacher.DataSender;
@@ -142,7 +142,7 @@ public abstract class AppSession
 		dataSender = null;
 		getScriptExecutor().killAllRunningScript();
 		if ( null != _mainFrame ) {
-			_mainFrame.hideFrame();
+			_mainFrame.close();
 			viewManager.reinit();
 		}
 		if ( null != _loginFrame ) {

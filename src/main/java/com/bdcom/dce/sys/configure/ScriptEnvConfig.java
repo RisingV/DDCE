@@ -66,7 +66,7 @@ public class ScriptEnvConfig implements Serializable {
             File serializedFile = new File( path );
             if ( serializedFile.exists() ) {
                 Object serialized = SerializeUtil.deserializeFromFile( serializedFile );
-                if ( serialized instanceof ServerConfig ) {
+                if ( serialized instanceof ScriptEnvConfig ) {
                     scriptEnvConfig = (ScriptEnvConfig) serialized;
                 }
             }

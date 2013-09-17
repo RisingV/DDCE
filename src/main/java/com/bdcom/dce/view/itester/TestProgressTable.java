@@ -258,8 +258,10 @@ public class TestProgressTable extends JTable {
         }
 
         TestProgressRow getRow(int rowIndex ) {
-            if ( rowIndex < getRowCount() ) {
-                return rowList.get( rowIndex );
+            int rowCount = getRowCount();
+            int lastIndex = rowCount - 1;
+            if ( rowIndex < rowCount ) {
+                return rowList.get(lastIndex - rowIndex);
             } else {
                 return null;
             }

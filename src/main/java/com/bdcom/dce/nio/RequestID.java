@@ -38,6 +38,8 @@ public interface RequestID {
 
     public static final int GET_COMPLETE_SERIAL = 14;
 
+    public static final int STORAGE_MD5_CHECK = 15;
+
     //rarely used
     public static final int BROADCAST = Byte.MAX_VALUE - 2;
 

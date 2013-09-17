@@ -57,6 +57,8 @@ public class ScenarioUtil {
 				ErrorLogger.log(e.getMessage());
 			}
 		}
+
+        newRec.setSerialNumber( scenario.getSerial() );
 		return newRec;
 	}
 	

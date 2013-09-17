@@ -1,4 +1,4 @@
-package com.bdcom.dce.view.common;
+package com.bdcom.dce.view.message;
 
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.biz.pojo.ITesterRecord;
@@ -13,7 +13,7 @@ public interface MessageRecorder {
 
     public void addMessage(String type, String msg);
 
-    public void addBaseTestRecord(BaseTestRecord record, String extraMsg);
+    public void addBaseTestRecord(BaseTestRecord record, int sendStatus, String extraMsg);
 
     public void addITesterRecord(ITesterRecord record, String extraMsg);
 

@@ -43,6 +43,7 @@ public class ServerStarter implements Runnable {
                 put( RequestID.UPLOAD_LOCAL_STORAGE, new UploadResourceHandler(pm) );
                 put( RequestID.DOWNLOAD_LOCAL_STORAGE, new DownloadResourceHandler(pm) );
                 put( RequestID.GET_COMPLETE_SERIAL, new GetCompleteSerialHandler(pm) );
+                put( RequestID.STORAGE_MD5_CHECK, new StorageMD5CheckHandler(pm) );
                 put( RequestID.ECHO, new EchoHandler(pm) );
                 put( RequestID.TERMINAL, new TerminalHandler() );
             }

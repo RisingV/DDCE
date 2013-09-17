@@ -1,4 +1,4 @@
-package com.bdcom.dce.view.common;
+package com.bdcom.dce.view.message;
 
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.util.LocaleUtil;

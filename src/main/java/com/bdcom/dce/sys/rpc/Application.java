@@ -1,27 +1,38 @@
 package com.bdcom.dce.sys.rpc;
 
 import com.bdcom.dce.biz.scenario.ScenarioMgr;
-import com.bdcom.dce.biz.script.ScriptExecutor;
+import com.bdcom.dce.biz.script.ScriptExecutor0;
 import com.bdcom.dce.biz.script.ScriptMgr;
+import com.bdcom.dce.biz.storage.StorableMgr;
+import com.bdcom.dce.biz.storage.StoreMgr;
 import com.bdcom.dce.itester.api.ITesterAPI;
 import com.bdcom.dce.itester.rpc.RpcClient;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.sys.AppContentAdaptor;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.sys.configure.PathConfig;
+import com.bdcom.dce.sys.configure.ScriptEnvConfig;
 import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.sys.gui.GuiInterface;
+import com.bdcom.dce.sys.service.AutoDownloadService;
 import com.bdcom.dce.sys.service.Dialect;
 import com.bdcom.dce.util.logger.ErrorLogger;
-import com.bdcom.dce.view.*;
-import com.bdcom.dce.view.common.MsgTable;
+import com.bdcom.dce.view.AbstractFrame;
+import com.bdcom.dce.view.LoginFrame;
+import com.bdcom.dce.view.MainFrame;
+import com.bdcom.dce.view.ViewManager;
 import com.bdcom.dce.view.itester.ITesterFrame;
+import com.bdcom.dce.view.message.MessageRecorder;
+import com.bdcom.dce.view.message.MessageRecorderImpl;
+import com.bdcom.dce.view.message.MessageTable;
+import com.bdcom.dce.view.message.SubmitHistoryTable;
 import com.bdcom.dce.view.resource.ResourceMgrFrame;
+import com.bdcom.dce.view.scripttest.ScriptEnvConfigDialog;
+import com.bdcom.dce.view.scripttest.ScriptTestFrame;
 
 import javax.swing.*;
 import java.io.File;
 import java.text.DateFormat;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,8 +58,6 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         instance.run();
     }
 
-    private Map<String, Object> attributes;
-
     private Application() {}
 
     private void run() {
@@ -62,54 +71,67 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         //int configure
         PathConfig pathConfig = new PathConfig( CURRENT_DIR );
         ServerConfig serverConfig = new ServerConfig( pathConfig );
+        ScriptEnvConfig scriptEnvConfig = ScriptEnvConfig.getInstance(pathConfig);
 
         addAttribute( CONFIG.PATH_CONFIG, pathConfig );
         addAttribute( CONFIG.SERVER_CONFIG, serverConfig );
+        addAttribute( CONFIG.SCRIPT_ENV_CONFIG, scriptEnvConfig );
 
         //int logical compo
+        StorableMgr storableMgr = new StoreMgr( pathConfig );
         ScriptMgr scriptMgr = new ScriptMgr( pathConfig );
         ScenarioMgr scenarioMgr = new ScenarioMgr((pathConfig));
         ClientProxy clientProxy = new ClientProxy( serverConfig );
+        AutoDownloadService autoDownloadService = new AutoDownloadService( clientProxy, storableMgr );
 
-        ScriptExecutor scriptExecutor = new ScriptExecutor(this);
+        //ScriptExecutor scriptExecutor = new ScriptExecutor(this);
+        ScriptExecutor0 scriptExecutor = new ScriptExecutor0( this );
         Dialect dialect = new Dialect(this);
 
         scriptMgr.reloadScripts();
 
+        addAttribute( COMPONENT.STORABLE_MGR, storableMgr );
         addAttribute( COMPONENT.SCRIPT_EXECUTOR, scriptExecutor );
         addAttribute( COMPONENT.SCRIPT_MGR, scriptMgr );
         addAttribute( COMPONENT.SCENARIO_MGR, scenarioMgr );
         addAttribute( COMPONENT.NIO_CLIENT, clientProxy );
         addAttribute( COMPONENT.DIALECT, dialect );
+        addAttribute( COMPONENT.AUTO_DOWNLOAD_SERVICE, autoDownloadService );
 
         //init util compo
-        SubmitFrame submitFrame = new SubmitFrame(clientProxy, this);
-        ScenarioMgrFrame scenarioMgrFrame = new ScenarioMgrFrame( clientProxy, this );
-        ScriptMgrFrame scriptMgrFrame = new ScriptMgrFrame( clientProxy, this );
+        ViewManager.initLookAndFeel(); // set global lookAndFeel first!
+
+        //SubmitFrame submitFrame = new SubmitFrame(clientProxy, this);
+        ///ScenarioMgrFrame scenarioMgrFrame = new ScenarioMgrFrame( clientProxy, this );
+        //ScriptMgrFrame scriptMgrFrame = new ScriptMgrFrame( clientProxy, this );
         //ScriptList scriptList = new ScriptList(this);
+        ScriptTestFrame scriptTestFrame = new ScriptTestFrame(this);
         ResourceMgrFrame resourceMgrFrame = new ResourceMgrFrame(this);
-        MsgTable msgTable = new MsgTable(this);
+        //MsgTable msgTable = new MsgTable(this);
 
-        // test code start
-        PathConfig xpathConfig = new PathConfig(
-                RUN_TIME.CURRENT_DIR + File.separator + "RPC-configure" );
+        MessageTable messageTable = new MessageTable();
+        SubmitHistoryTable submitHistoryTable = new SubmitHistoryTable(this);
+        MessageRecorder messageRecorder = new MessageRecorderImpl( messageTable, submitHistoryTable );
+        ScriptEnvConfigDialog scriptEnvConfigDialog = new ScriptEnvConfigDialog( this, null );
 
-        ServerConfig xserverConfig = new ServerConfig( xpathConfig );
-        xserverConfig.setDefaultIP("172.16.22.222");
-        xserverConfig.setDefaultPort( 7777 );
-        xserverConfig.writeToConfigFile("172.16.22.222", "7777");
-        ITesterAPI api = new RpcClient(xserverConfig);
-        ITesterFrame iTesterFrame = new ITesterFrame( api, clientProxy, this );
-        addAttribute( COMPONENT.ITESTER_API, api );
-        addAttribute( COMPONENT.ITESTER_FRAME, iTesterFrame );
-        // test code end
+        addAttribute( COMPONENT.MESSAGE_TABLE, messageTable );
+        addAttribute( COMPONENT.SUBMIT_HISTORY_TABLE, submitHistoryTable );
+        addAttribute( COMPONENT.MESSAGE_RECORDER, messageRecorder );
+        addAttribute( COMPONENT.SCRIPT_ENV_CONFIG_DIALOG, scriptEnvConfigDialog );
 
-        addAttribute( COMPONENT.MSG_TABLE, msgTable );
+        initRPCStuff(clientProxy);
+//        ITesterAPI api = JniAPIImpl.getInstance();
+//        ITesterFrame iTesterFrame = new ITesterFrame( api, clientProxy, this );
+//        addAttribute( COMPONENT.ITESTER_API, api );
+//        addAttribute( COMPONENT.ITESTER_FRAME, iTesterFrame );
+
+        //addAttribute( COMPONENT.MSG_TABLE, msgTable );
         //addAttribute( COMPONENT.SCRIPT_LIST, scriptList );
-        addAttribute( COMPONENT.RESOURCE_LIST, resourceMgrFrame);
-        addAttribute( COMPONENT.SCENARIO_MGR_FRAME, scenarioMgrFrame );
-        addAttribute( COMPONENT.SUBMIT_FRAME, submitFrame );
-        addAttribute( COMPONENT.SCRIPT_MGR_FRAME, scriptMgrFrame );
+        addAttribute( COMPONENT.SCRIPT_TEST_FRAME, scriptTestFrame );
+        addAttribute( COMPONENT.RESOURCE_LIST, resourceMgrFrame );
+        //addAttribute( COMPONENT.SCENARIO_MGR_FRAME, scenarioMgrFrame );
+        //addAttribute( COMPONENT.SUBMIT_FRAME, submitFrame );
+        //addAttribute( COMPONENT.SCRIPT_MGR_FRAME, scriptMgrFrame );
 
         //init toplevel frame
         LoginFrame loginFrame = new LoginFrame( clientProxy, this );
@@ -123,10 +145,27 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         addAttribute( COMPONENT.VIEW_MGR, viewManager );
     }
 
+    private void initRPCStuff(ClientProxy clientProxy) {
+        PathConfig xpathConfig = new PathConfig(
+                RUN_TIME.CURRENT_DIR + File.separator + "RPC-configure" );
+
+        ServerConfig xserverConfig = new ServerConfig( xpathConfig );
+        xserverConfig.setDefaultIP("172.16.22.222");
+        xserverConfig.setDefaultPort( 7777 );
+        xserverConfig.writeToConfigFile("172.16.22.222", "7777");
+        ITesterAPI api = new RpcClient(xserverConfig);
+        ITesterFrame iTesterFrame = new ITesterFrame( api, clientProxy, this );
+        addAttribute( COMPONENT.ITESTER_API, api );
+        addAttribute( COMPONENT.ITESTER_FRAME, iTesterFrame );
+    }
+
     private void startSysService() {
         Dialect dialect = (Dialect) getAttribute(COMPONENT.DIALECT);
-
         dialect.startServer();
+
+        AutoDownloadService autoDownloadService =
+                (AutoDownloadService) getAttribute( COMPONENT.AUTO_DOWNLOAD_SERVICE );
+        autoDownloadService.start();
     }
 
     private void startViewMgr() {
@@ -146,7 +185,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
     public void terminal() {
         AbstractFrame displayingFrame = this.getCurrentDisplay();
         if ( null != displayingFrame ) {
-            displayingFrame.hideFrame();
+            displayingFrame.close();
         }
 
         disconnectAndKillScriptExecutor();
@@ -162,7 +201,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
         disconnectAndKillScriptExecutor();
 
         AbstractFrame mainFrame = (AbstractFrame) getAttribute( COMPONENT.MAIN_FRAME );
-        mainFrame.hideFrame();
+        mainFrame.close();
 
         init();
 
@@ -178,7 +217,7 @@ public class Application extends AppContentAdaptor implements GuiInterface, Appl
             clientProxy.shutdown();
         }
 
-        ScriptExecutor scriptExecutor = (ScriptExecutor)
+        ScriptExecutor0 scriptExecutor = (ScriptExecutor0)
                 getAttribute( COMPONENT.SCRIPT_EXECUTOR );
         if ( null != scriptExecutor ) {
             scriptExecutor.killAllRunningScript();

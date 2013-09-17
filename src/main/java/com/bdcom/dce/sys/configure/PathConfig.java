@@ -6,6 +6,7 @@ import com.bdcom.dce.util.logger.ErrorLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -13,7 +14,9 @@ import java.io.IOException;
  * Date: 13-7-14    <br/>
  * Time: 18:09  <br/>
  */
-public class PathConfig {
+public class PathConfig implements Serializable {
+
+    private static final long serialVersionUID = -5779224876302921651L;
 
     public static final String _SPT = File.separator;
 
@@ -31,7 +34,7 @@ public class PathConfig {
 
 	private static final String DEFAULT_CONF_FILE_NAME = "local.xml";
 
-	private File confFile;
+    private File confFile;
 
 	private boolean isFileCreated;
 

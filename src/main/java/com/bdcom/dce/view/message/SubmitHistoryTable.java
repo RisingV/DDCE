@@ -1,4 +1,4 @@
-package com.bdcom.dce.view.common;
+package com.bdcom.dce.view.message;
 
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.sys.Applicable;
@@ -54,6 +54,23 @@ public class SubmitHistoryTable extends JFrame {
         Container con = this.getContentPane();
 		con.add(span, BorderLayout.CENTER);
 
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+
+    public void display() {
+        if ( null != image ) {
+            setIconImage( image );
+        }
+        pack();
+        setVisible( true );
+    }
+
+    public void close() {
+        setVisible( false );
     }
 
     public void addBaseTestRecord(BaseTestRecord record) {

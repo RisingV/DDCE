@@ -1,4 +1,4 @@
-package com.bdcom.dce.view.common;
+package com.bdcom.dce.view.message;
 
 import com.bdcom.dce.view.AbstractFrame;
 import com.bdcom.dce.view.util.MessageUtil;
@@ -197,7 +197,7 @@ public class MsgTable extends JFrame implements AbstractFrame, ApplicationConsta
 		this.setVisible(true);
 	}
 	
-	public void hideFrame() {
+	public void close() {
 		this.setVisible(false);
 	}
 

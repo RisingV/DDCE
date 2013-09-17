@@ -1,12 +1,14 @@
 package com.bdcom.dce.view;
 
-import com.bdcom.dce.view.common.MsgTable;
-import com.bdcom.dce.view.util.Hook;
-import com.bdcom.dce.view.util.ViewUtil;
-import com.bdcom.dce.datadispacher.http.HttpClientWrapper;
+import com.bdcom.dce.sys.AppContent;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.sys.gui.GuiInterface;
 import com.bdcom.dce.util.LocaleUtil;
+import com.bdcom.dce.view.message.MessageTable;
+import com.bdcom.dce.view.message.SubmitHistoryTable;
+import com.bdcom.dce.view.scripttest.ScriptEnvConfigDialog;
+import com.bdcom.dce.view.util.Hook;
+import com.bdcom.dce.view.util.ViewUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,35 +26,32 @@ import java.util.List;
 public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 	
 	private static final long serialVersionUID = -2215630151199687633L;
+
+    private static final String SUBMIT_HISTORY_TABLE = "Submit History Table";
+    private static final String EXECUTOR_CONFIG = "Script Executor Config";
 	
 	private List<Hook> refreshers;
 	
 	private JFrame thisFrame = this;
 	
 	private List<ViewTab> tabs;
-	
-	private List<ViewTab> rtabs;
-	
+	private List<ViewTab> rootTabs;
 	private JTabbedPane mainPanel;
 	
-	private boolean inited = false;
-	
+	private boolean init = false;
 	private Image image;
-	
-	private MsgTable msgTable;
-	
-	private DebugRecordTable drTable;
-	
+	//private MsgTable msgTable;
+    private MessageTable messageTable;
+    private SubmitHistoryTable submitHistoryTable;
+    private ScriptEnvConfigDialog scriptEnvConfigDialog;
+	//private DebugRecordTable drTable;
 	private JMenuBar mb;
-	
 	private JMenu menu;
-	
-	private JCheckBoxMenuItem cbmi;
-	
-	private JCheckBoxMenuItem debugRec;
-	
-	private JMenuItem logoutMi;
-
+	private JCheckBoxMenuItem ifDisplayMsgTable;
+	//private JCheckBoxMenuItem debugRec;
+    private JCheckBoxMenuItem ifDisplayHistoryTable;
+    private JMenuItem configScriptEnvItem;
+	private JMenuItem logoutItem;
     private final GuiInterface app;
 	
 	public MainFrame(GuiInterface app) {
@@ -65,54 +64,80 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 		this.image = image;
 	}
 	
-	public MsgTable getMsgTable() {
-		return msgTable;
-	}
+//	public MsgTable getMsgTable() {
+//		return msgTable;
+//	}
 
 	private void preInit() {
-        msgTable = (MsgTable) app.getAttribute( COMPONENT.MSG_TABLE );
+//        msgTable = (MsgTable) app.getAttribute( COMPONENT.MSG_TABLE );
+        messageTable = (MessageTable) app.getAttribute( COMPONENT.MESSAGE_TABLE );
+        submitHistoryTable = (SubmitHistoryTable) app.getAttribute( COMPONENT.SUBMIT_HISTORY_TABLE );
+        scriptEnvConfigDialog = (ScriptEnvConfigDialog) app.getAttribute( COMPONENT.SCRIPT_ENV_CONFIG_DIALOG );
 
 		mb = new JMenuBar();
-		menu = new JMenu(
-				LocaleUtil.getLocalName(_OTHER)
-				);
-		cbmi = new JCheckBoxMenuItem(
-				LocaleUtil.getLocalName(MSG_LIST)
-				);
-		logoutMi = new JMenuItem(
-				LocaleUtil.getLocalName(_LOG_OUT)
-				);
-		cbmi.addItemListener(
-				new ItemListener() {
-					@Override
-					public void itemStateChanged(ItemEvent e) {
-                        AbstractFrame msgTable =
-                                app.getFrame( COMPONENT.MSG_TABLE );
-						if ( cbmi.isSelected() ) {
-							msgTable.display();
-						} else {
-							msgTable.hideFrame();
-						}
-					}
-				}
-			);
-		logoutMi.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-                        app.logout();
-					}
-				}
-			);
-		msgTable.addWindowListener(
-				new WindowAdapter() {
-					public void windowClosing(WindowEvent e) {
-						cbmi.setSelected(false);
-					}
-				}
-			);
-		menu.add(cbmi);
-		menu.add(logoutMi);
+		menu = new JMenu( LocaleUtil.getLocalName(_OTHER) );
+		ifDisplayMsgTable = new JCheckBoxMenuItem( LocaleUtil.getLocalName(MSG_LIST) );
+        ifDisplayHistoryTable = new JCheckBoxMenuItem( LocaleUtil
+                .getLocalName(SUBMIT_HISTORY_TABLE) );
+        configScriptEnvItem = new JMenuItem( LocaleUtil.getLocalName( EXECUTOR_CONFIG ) );
+		logoutItem = new JMenuItem( LocaleUtil.getLocalName(_LOG_OUT) );
+		ifDisplayMsgTable.addItemListener( new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+//                        AbstractFrame msgTable =
+//                                app.getFrame(COMPONENT.MSG_TABLE);
+                if (ifDisplayMsgTable.isSelected()) {
+                    messageTable.display();
+                } else {
+                    messageTable.close();
+                }
+            }
+        });
+        ifDisplayHistoryTable.addItemListener( new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (ifDisplayHistoryTable.isSelected()) {
+                    submitHistoryTable.display();
+                } else {
+                    submitHistoryTable.close();
+                }
+            }
+        });
+        configScriptEnvItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                scriptEnvConfigDialog.display();
+            }
+        });
+		logoutItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.logout();
+            }
+        });
+        messageTable.addWindowListener( new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                ifDisplayMsgTable.setSelected(false);
+            }
+         });
+        submitHistoryTable.addWindowListener( new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                ifDisplayHistoryTable.setSelected(false);
+            }
+        }
+        );
+//		msgTable.addWindowListener(
+//                new WindowAdapter() {
+//                    public void windowClosing(WindowEvent e) {
+//                        ifDisplayMsgTable.setSelected(false);
+//                    }
+//                }
+//        );
+		menu.add(ifDisplayMsgTable);
+        menu.add(ifDisplayHistoryTable);
+        menu.add(configScriptEnvItem);
+		menu.add(logoutItem);
 		mb.add(menu);
 		this.setJMenuBar(mb);
 	}
@@ -127,10 +152,10 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 					JOptionPane.YES_NO_OPTION);
 			if ( ok == 0) {
 				thisFrame.setVisible( true );
-				if ( app.getBoolAttr( USER.SUPERVISOR ) ) {
-					HttpClientWrapper.getInstance()
-						.clearDebugRecordsViaHttp();
-				}
+//				if ( app.getBoolAttr( USER.SUPERVISOR ) ) {
+//					HttpClientWrapper.getInstance()
+//						.clearDebugRecordsViaHttp();
+//				}
                 app.terminal();
 			} else {
 				return;
@@ -140,15 +165,17 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
     }  
 	
 	public void init() {
-		if (inited) {
+		if (init) {
 			return;
 		}
 		
 		this.setIconImage(image);
-		msgTable.setImage(image);
-		this.setTitle(
-				LocaleUtil.getLocalName(SYS_NAME)
-				);
+        messageTable.setImage(image);
+        submitHistoryTable.setImage(image);
+		//msgTable.setImage(image);
+        String title = LocaleUtil.getLocalName(SYS_NAME) +
+                getTitleSuffix( app );
+		this.setTitle( title );
 		
 		if ( null != tabs ) {
 			for (ViewTab viewTab : tabs ) {
@@ -161,8 +188,8 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 			}
 		}
 		
-		if ( null != rtabs && app.getBoolAttr( USER.SUPERVISOR ) ) {
-			for (ViewTab viewTab : rtabs ) {
+		if ( null != rootTabs && app.getBoolAttr( USER.SUPERVISOR ) ) {
+			for (ViewTab viewTab : rootTabs) {
 				mainPanel.addTab(
 						viewTab.getTabTitle(),
 						viewTab.getTabIcon(),
@@ -172,69 +199,68 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 			}
 		}
 		
-		if ( app.getBoolAttr( USER.SUPERVISOR )) {
-			if ( null == drTable ) {
-				drTable = new DebugRecordTable(app);
-				drTable.setImage(image);
-				drTable.addWindowListener(
-						new WindowAdapter() {
-							public void windowClosing(WindowEvent e) {
-								debugRec.setSelected(false);
-							}
-						}
-					);
-			}
-			if ( null == debugRec ) {
-				debugRec = new JCheckBoxMenuItem(
-					LocaleUtil.getLocalName(RECENT_ADD2DB)
-				);
-				debugRec.addItemListener(
-					new ItemListener() {
-						@Override
-						public void itemStateChanged(ItemEvent e) {
-							if ( debugRec.isSelected() ) {
-								drTable.display();
-							} else {
-								drTable.hideFrame();
-							}
-						}
-					}
-				);
-			}
-			
-			menu.removeAll();
-			menu.add(cbmi);
-			menu.add(debugRec);
-			menu.add(logoutMi);
-		}
+//		if ( app.getBoolAttr( USER.SUPERVISOR )) {
+//			if ( null == drTable ) {
+//				drTable = new DebugRecordTable(app);
+//				drTable.setImage(image);
+//				drTable.addWindowListener(
+//						new WindowAdapter() {
+//							public void windowClosing(WindowEvent e) {
+//								debugRec.setSelected(false);
+//							}
+//						}
+//					);
+//			}
+//			if ( null == debugRec ) {
+//				debugRec = new JCheckBoxMenuItem(
+//					LocaleUtil.getLocalName(RECENT_ADD2DB)
+//				);
+//				debugRec.addItemListener(
+//					new ItemListener() {
+//						@Override
+//						public void itemStateChanged(ItemEvent e) {
+//							if ( debugRec.isSelected() ) {
+//								drTable.display();
+//							} else {
+//								drTable.hideFrame();
+//							}
+//						}
+//					}
+//				);
+//			}
+//			menu.removeAll();
+//			menu.add(ifDisplayMsgTable);
+//			menu.add(debugRec);
+//			menu.add(logoutItem);
+//		}
 
 		Container con = this.getContentPane();
-		con.add(mainPanel, BorderLayout.CENTER);
+		con.add( mainPanel, BorderLayout.CENTER );
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setResizable(false);
 		this.pack();
 		ViewUtil.centerWindow(this);
 		
-//		msgTable.startListener();
-		inited = true;
+		init = true;
 	}
 	
 	public void display0() {
 		
 		if ( (null == tabs || tabs.size() == 0) &&
-				(null == rtabs || rtabs.size() == 0) ) {
+				(null == rootTabs || rootTabs.size() == 0) ) {
 			return;
 		}
 		
-		if ( !inited ) {
+		if ( !init) {
 			init();
 		}
 		this.setVisible(true);
 	}
 	
-	public void hideFrame() {
-		cbmi.setSelected(false);
-		msgTable.hideFrame();
+	public void close() {
+		ifDisplayMsgTable.setSelected(false);
+		//msgTable.close();
+        messageTable.close();
 		thisFrame.setVisible(false);
 	}
 	
@@ -256,10 +282,10 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 		if ( null == mainPanel ) {
 		    mainPanel = new JTabbedPane();
 		}
-		if ( null == rtabs ) {
-			rtabs = new ArrayList<ViewTab>();
+		if ( null == rootTabs) {
+			rootTabs = new ArrayList<ViewTab>();
 		}
-		rtabs.add(viewTab);
+		rootTabs.add(viewTab);
 	}
 	
 	public void removeViewTab(ViewTab viewTab) {
@@ -287,5 +313,9 @@ public class MainFrame extends TopLevelFrame implements ApplicationConstants {
 			refresher.invoke();
 		}
 	}
+
+    private String getTitleSuffix(AppContent app) {
+        return app.getStringAttr( CONTENT.TITLE_SUFFIX );
+    }
 	
 }

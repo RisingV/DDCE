@@ -5,13 +5,14 @@ import com.bdcom.dce.biz.pojo.TestTypeRecord;
 import com.bdcom.dce.nio.client.ClientProxy;
 import com.bdcom.dce.nio.exception.GlobalException;
 import com.bdcom.dce.nio.exception.ResponseException;
+import com.bdcom.dce.sys.AppContent;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.sys.gui.GuiInterface;
 import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
-import com.bdcom.dce.view.common.MsgTable;
+import com.bdcom.dce.view.message.MessageRecorder;
 import com.bdcom.dce.view.util.GBC;
 import com.bdcom.dce.view.util.MessageUtil;
 import com.bdcom.dce.view.util.MsgDialogUtil;
@@ -98,7 +99,7 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 		this.setVisible(true);
 	}
 	
-	public void hideFrame() {
+	public void close() {
 		thisFrame.setVisible(false);
 	}
 	
@@ -150,13 +151,17 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 					.setFill(GBC.BOTH)
 					);
         modePanel.add( baseTestMode, new GBC(0, 0)
-                    .setInsets(20, 50, 10, 10)
+                    .setInsets(20, 40, 10, 10)
                     .setFill(GBC.BOTH)
                     );
         modePanel.add( reTestMode, new GBC(1, 0)
-                    .setInsets(20, 10, 10, 50)
+                    .setInsets(20, 10, 10, 10)
                     .setFill(GBC.BOTH)
                     );
+        modePanel.add( otherMode, new GBC(2, 0)
+                .setInsets(20, 10, 10, 40)
+                .setFill(GBC.BOTH)
+        );
 
 		btPanel.add(loginBt, new GBC(0, 2) 
 					.setInsets(10, 55, 10, 14) 
@@ -204,24 +209,33 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
 				String.valueOf( serverConfig.getPort() )
 				);
 
-        baseTestMode = new JRadioButton( getLocalName( BASE_TEST_LOGIN ) );
-        reTestMode = new JRadioButton( getLocalName( RE_TEST_LOGIN ) );
-        otherMode = new JRadioButton( getLocalName( OTHER_LOGIN ) );
+        final String baseTestLogin = getLocalName( BASE_TEST_LOGIN );
+        final String reTestLogin = getLocalName( RE_TEST_LOGIN );
+        final String otherTestLogin = getLocalName( OTHER_LOGIN );
+
+        baseTestMode = new JRadioButton( baseTestLogin );
+        reTestMode = new JRadioButton( reTestLogin );
+        otherMode = new JRadioButton( otherTestLogin );
         ActionListener al = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int testType = 0;
+                String titleSuffix = null;
                 if ( baseTestMode.isSelected() ) {
                     testType = TestTypeRecord.BASE_TEST;
+                    titleSuffix = baseTestLogin;
                 } else if ( reTestMode.isSelected() ) {
                     testType = TestTypeRecord.RE_TEST;
+                    titleSuffix = reTestLogin;
                 } else if ( otherMode.isSelected() ) {
                     testType = TestTypeRecord.OTHER_TEST;
+                    titleSuffix = otherTestLogin;
                 } else {
                     return;
                 }
                 TestTypeRecord.setCurrentTestType(testType);
                 app.addAttribute( TEST_ATTR.TEST_TYPE, new Integer( testType ) );
+                app.addAttribute( CONTENT.TITLE_SUFFIX, "("+titleSuffix+")");
             }
         };
         baseTestMode.addActionListener( al );
@@ -365,7 +379,8 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
             return false;
         }
 
-        if ( !baseTestMode.isSelected() && !reTestMode.isSelected() ) {
+        if ( !baseTestMode.isSelected() && !reTestMode.isSelected()
+                && !otherMode.isSelected() ) {
             MsgDialogUtil.showErrorDialog(
                     MessageUtil.getLocalisedMessage(SELECT_LOGIN_MODE)
             );
@@ -393,9 +408,15 @@ public class LoginFrame extends TopLevelFrame implements ApplicationConstants {
         }
 
 		String loginMsg = LocaleUtil.getLocalName(LOGIN_MSG);
-        MsgTable msgTable = (MsgTable) app.getAttribute(COMPONENT.MSG_TABLE);
-        msgTable.addSysMsg( userName + loginMsg );
+        //MsgTable msgTable = (MsgTable) app.getAttribute(COMPONENT.MSG_TABLE);
+        //msgTable.addSysMsg( userName + loginMsg );
+        MessageRecorder recorder = getMessageRecorder( app );
+        recorder.addMessage( "", userName + loginMsg );
 	}
+
+    private MessageRecorder getMessageRecorder(AppContent app) {
+        return (MessageRecorder) app.getAttribute( COMPONENT.MESSAGE_RECORDER );
+    }
 
 
 	@Override

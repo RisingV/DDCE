@@ -70,6 +70,7 @@ public class FakeTestInterface implements PMInterface {
     @Override
     public int saveBaseTestRecord(BaseTestRecord record) {
         System.out.println("BaseTestRecord saved!");
+        System.out.println( "testType: "+ record.getTestType() );
         return 1;
     }
 

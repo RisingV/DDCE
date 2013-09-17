@@ -29,11 +29,14 @@ public class ScriptExecutor0 implements ApplicationConstants {
     }
 
     public void execute(String scriptPath, String[] sessions) {
+        ScriptEnvConfig config = getScriptEnvConfig( app );
+        String executorPath = config.getSecureCrtPath();
         for ( String sessionName : sessions ) {
             CrtSession crtSession = crtSessions.get( sessionName );
             if ( null == crtSession ) {
                 crtSession = new CrtSession();
                 crtSession.setCrtSessionName(sessionName);
+                crtSession.setInterpreterPath( executorPath );
                 crtSessions.put(sessionName, crtSession);
             }
 

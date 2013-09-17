@@ -80,6 +80,7 @@ public class ScriptEnvConfigDialog extends JDialog
         contentPane = new JPanel();
         contentPane.setLayout(new GridBagLayout());
         contentPane.add( crtPathLabel, new GBC(0, 0).setInsets(5, 10, 5, 10) );
+        contentPane.add( crtPathField, new GBC(1, 0).setInsets(5, 10, 5, 10) );
 
     }
 
@@ -115,7 +116,7 @@ public class ScriptEnvConfigDialog extends JDialog
 
         buttonPane = new JPanel();
         buttonPane.setLayout( new GridBagLayout() );
-        buttonPane.add(confirmBt, new GBC(0, 0).setInsets(5, 10, 5, 10));
+        buttonPane.add( confirmBt, new GBC(0, 0).setInsets(5, 10, 5, 10) );
         buttonPane.add( cancelBt, new GBC(1, 0).setInsets( 5, 10, 5, 10) );
 
     }

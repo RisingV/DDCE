@@ -1,9 +1,6 @@
 package com.bdcom.dce.sys.service;
 
-import com.bdcom.dce.biz.script.ScriptExecutor;
-import com.bdcom.dce.nio.exception.GlobalException;
-import com.bdcom.dce.view.util.MsgDialogUtil;
-import com.bdcom.dce.nio.exception.ResponseException;
+import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.nio.BDPacket;
 import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
@@ -18,6 +15,8 @@ import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
+import com.bdcom.dce.view.message.MessageRecorder;
+import com.bdcom.dce.view.util.MsgDialogUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,6 +107,8 @@ public class Dialect implements ApplicationConstants {
 
         localServerConfig.setDefaultIP( HOST );
         localServerConfig.setDefaultPort( PORT );
+        localServerConfig.setPort( PORT );
+        localServerConfig.writeToConfigFile( HOST, String.valueOf( PORT ) );
 
         app.addAttribute( CONFIG.LOCAL_SERVER_CONFIG, localServerConfig );
     }
@@ -116,28 +117,37 @@ public class Dialect implements ApplicationConstants {
         @Override
         public BDPacket handle(BDPacket bdPacket) {
             boolean isSuccess = true;
-            String msg = null;
-            int status = -1;
-            try {
-                status = BDPacketUtil.parseIntResponse(bdPacket,
-                        bdPacket.getRequestID());
-            } catch (ResponseException e) {
-                isSuccess = false;
-                msg = e.getMessage();
-                ErrorLogger.log(msg);
-            } catch (GlobalException e) {
-                //TODO needs to be properly handled
-                e.printStackTrace();
-            } finally {
-                if ( !isSuccess ) {
-                    MsgDialogUtil.showErrorDialog( msg );
-                }
-            }
+//            String msg = null;
+//            int status = -1;
+//            try {
+//                status = BDPacketUtil.parseIntResponse(bdPacket,
+//                        bdPacket.getRequestID());
+//            } catch (ResponseException e) {
+//                isSuccess = false;
+//                msg = e.getMessage();
+//                ErrorLogger.log(msg);
+//            } catch (GlobalException e) {
+//                //TODO needs to be properly handled
+//                e.printStackTrace();
+//            } finally {
+//                if ( !isSuccess ) {
+//                    MsgDialogUtil.showErrorDialog( msg );
+//                }
+//            }
 
             //temporary solution!!!!
-            ScriptExecutor scriptExecutor =  (ScriptExecutor)
-                   app.getAttribute(COMPONENT.SCRIPT_EXECUTOR);
-            scriptExecutor.setSendResult( true, String.valueOf( status) );
+//            ScriptExecutor scriptExecutor =  (ScriptExecutor)
+//                   app.getAttribute(COMPONENT.SCRIPT_EXECUTOR);
+//            scriptExecutor.setSendResult( true, String.valueOf( status) );
+
+            Map<String, Object> infoMap = DialectUtil.parseResponseFromCLI( bdPacket );
+            BaseTestRecord record = (BaseTestRecord) infoMap.get( DIALECT.BASE_RECORD );
+            Integer status = (Integer) infoMap.get( DIALECT.SEND_STATUS );
+            MessageRecorder recorder = (MessageRecorder)
+                    app.getAttribute( COMPONENT.MESSAGE_RECORDER );
+            if ( null != recorder ) {
+                recorder.addBaseTestRecord( record, status, "" );
+            }
 
             return BDPacketUtil.emptyResponse( bdPacket.getRequestID() );
         }
@@ -149,10 +159,14 @@ public class Dialect implements ApplicationConstants {
         public BDPacket handle(BDPacket bdPacket) {
 
             Map<String, Object> infomap = new HashMap<String, Object>();
+
             boolean isFC = app.getBoolAttr( TEST_ATTR.IS_FC );
             Integer testType = (Integer) app.getAttribute( TEST_ATTR.TEST_TYPE );
+            String testerNum = app.getStringAttr( USER.USER_NUM );
+
             infomap.put( TEST_ATTR.IS_FC, Boolean.valueOf( isFC ) );
             infomap.put( TEST_ATTR.TEST_TYPE, testType );
+            infomap.put( TEST_ATTR.TESTER_NUM, testerNum );
 
             byte[] data = null;
             try {

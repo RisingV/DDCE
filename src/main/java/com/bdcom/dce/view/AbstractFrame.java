@@ -13,7 +13,7 @@ public interface AbstractFrame {
 	
 	public void display();
 	
-	public void hideFrame();
+	public void close();
 	
 	public Component getSelfFrame();
 	

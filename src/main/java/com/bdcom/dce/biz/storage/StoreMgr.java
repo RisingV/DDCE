@@ -1,13 +1,18 @@
 package com.bdcom.dce.biz.storage;
 
+import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.util.SerializeUtil;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA. <br/>
@@ -65,7 +70,7 @@ public class StoreMgr implements StorableMgr {
 
     @Override
     public Set<Item> getBySerialMatching(String fullSerial) {
-        if ( null != fullSerialIndex && !fullSerialIndex.isEmpty() ) {
+        if ( null != fullSerialIndex && fullSerialIndex.isEmpty() ) {
             return null;
         }
         Set<Item> itemSet = new HashSet<Item>();
@@ -157,6 +162,9 @@ public class StoreMgr implements StorableMgr {
     @Override
     public void loadStorage() {
         File f = new File( getStorageFilePath() );
+        if ( !f.exists() ) {
+            return;
+        }
         Object serializedObj = SerializeUtil.deserializeFromFile( f );
         if ( serializedObj instanceof Map ) {
             Map<String, Storable> loadedMap = (Map<String, Storable>) serializedObj;
@@ -225,6 +233,46 @@ public class StoreMgr implements StorableMgr {
             dir.mkdirs();
         }
         return  dirPath;
+    }
+
+    @Override
+    public byte[] getMD5Bytes() {
+        String path = getStorageFilePath();
+        File f = new File( path );
+        if ( !f.exists() ) {
+            return new byte[16];
+        }
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+            InputStream is = Files.newInputStream( Paths.get( path ) );
+            DigestInputStream dis = new DigestInputStream( is, md );
+            while( dis.read() != -1 );
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return md.digest();
+    }
+
+    @Override
+    public String getMD5String() {
+        byte[] md5 = getMD5Bytes();
+        Formatter formatter = new Formatter();
+        for (byte b : md5) {
+            formatter.format("%02x", b);
+        }
+
+        return formatter.toString();
+    }
+
+    public static void main(String...s) {
+        PathConfig config = new PathConfig( ApplicationConstants.RUN_TIME.CURRENT_DIR );
+        StoreMgr mgr = new StoreMgr(config);
+        byte[] md5 = mgr.getMD5Bytes();
+        System.out.println( "length: " + md5.length );
+        System.out.println( mgr.getMD5String() );
     }
 
 }

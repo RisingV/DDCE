@@ -6,6 +6,7 @@ import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.itester.ITesterFrame;
 import com.bdcom.dce.view.resource.ResourceMgrFrame;
+import com.bdcom.dce.view.scripttest.ScriptTestFrame;
 import com.bdcom.dce.view.util.ViewUtil;
 
 import javax.swing.*;
@@ -23,21 +24,19 @@ import java.util.Enumeration;
 public class ViewManager implements ApplicationConstants {
 	
 	private static final String IMAGE_PATH = "/images/logo.png";
+    private static final String SCRIPT_TEST = "Script Test";
 
 	private LoginFrame loginFrame;
 	
 	private MainFrame mainFrame;
 	
-	private ScenarioMgrFrame smTab;
-	
-	private SubmitFrame submitTab;
-	
-	private ScriptMgrFrame scmTab;
-	
+	//private ScenarioMgrFrame smTab;
+	//private SubmitFrame submitTab;
+	//private ScriptMgrFrame scmTab;
 	//private ScriptList scriptListTab;
 
+    private ScriptTestFrame scriptTestFrameTab;
     private ResourceMgrFrame resourceMgrFrameTab;
-
     private ITesterFrame itesterTab;
 
     private final Applicable app;
@@ -60,60 +59,61 @@ public class ViewManager implements ApplicationConstants {
 		
 		mainFrame = (MainFrame) getCompo(COMPONENT.MAIN_FRAME);
 		loginFrame = (LoginFrame) getCompo(COMPONENT.LOGIN_FRAME);
-		smTab = (ScenarioMgrFrame) getCompo(COMPONENT.SCENARIO_MGR_FRAME);
-		submitTab = (SubmitFrame) getCompo(COMPONENT.SUBMIT_FRAME);
-		scmTab = (ScriptMgrFrame) getCompo(COMPONENT.SCRIPT_MGR_FRAME );
+//		smTab = (ScenarioMgrFrame) getCompo(COMPONENT.SCENARIO_MGR_FRAME);
+//		submitTab = (SubmitFrame) getCompo(COMPONENT.SUBMIT_FRAME);
+//		scmTab = (ScriptMgrFrame) getCompo(COMPONENT.SCRIPT_MGR_FRAME );
 		//scriptListTab = (ScriptList) getCompo(COMPONENT.SCRIPT_LIST);
+        scriptTestFrameTab = (ScriptTestFrame) getCompo(COMPONENT.SCRIPT_TEST_FRAME);
         resourceMgrFrameTab = (ResourceMgrFrame) getCompo(COMPONENT.RESOURCE_LIST);
         itesterTab = (ITesterFrame) getCompo(COMPONENT.ITESTER_FRAME);
 
 
-		smTab.setScenarioListRefreshHook(
-	    		submitTab.getScenarioListRefreshHook() 
-	    		);
-		smTab.setTabTitle(
-				getLocalName( SCE_MANAGEMENT )
-				);
-		smTab.setTabTip(
-				getLocalName( SCE_MANAGEMENT )
-				);
-		
-		submitTab.setTabTitle(
-				getLocalName( SUBMIT_REC )
-				);
-		submitTab.setTabTip( 
-				getLocalName( SUBMIT_REC )
-				);
-		
-		scmTab.setTabTitle(
-				getLocalName( SCRIPT_MANGEMENT )
-				);
-		scmTab.setTabTip( 
-				getLocalName(SCRIPT_MANGEMENT )
-				);
+//		smTab.setScenarioListRefreshHook(
+//	    		submitTab.getScenarioListRefreshHook()
+//	    		);
+//		smTab.setTabTitle(
+//				getLocalName( SCE_MANAGEMENT )
+//				);
+//		smTab.setTabTip(
+//				getLocalName( SCE_MANAGEMENT )
+//				);
+//
+//		submitTab.setTabTitle(
+//				getLocalName( SUBMIT_REC )
+//				);
+//		submitTab.setTabTip(
+//				getLocalName( SUBMIT_REC )
+//				);
+//
+//		scmTab.setTabTitle(
+//				getLocalName( SCRIPT_MANGEMENT )
+//				);
+//		scmTab.setTabTip(
+//				getLocalName(SCRIPT_MANGEMENT )
+//				);
 		
 //		scriptListTab.setTabTitle(
 //				getLocalName( SCRIPT_LIST )
 //				);
 
-        resourceMgrFrameTab.setTabTitle(
-                getLocalName( RESOURCE_LIST )
-        );
+        resourceMgrFrameTab.setTabTitle( getLocalName( RESOURCE_LIST ) );
+        scriptTestFrameTab.setTabTitle( getLocalName( SCRIPT_TEST ) );
 		
-		mainFrame.addViewTab(submitTab);
+//		mainFrame.addViewTab(submitTab);
+        mainFrame.addViewTab( scriptTestFrameTab );
         mainFrame.addViewTab(itesterTab);
-		mainFrame.addRootViewTab(smTab);
-		mainFrame.addRootViewTab(scmTab);
+//		mainFrame.addRootViewTab(smTab);
+//		mainFrame.addRootViewTab(scmTab);
 		//mainFrame.addRootViewTab(scriptListTab);
         mainFrame.addRootViewTab(resourceMgrFrameTab);
-		mainFrame.addRefresher(smTab.getScenarioListRefreshHook());
-		mainFrame.addRefresher(submitTab.getFcAddHook());
-		mainFrame.addRefresher(scmTab.getScriptListRefreshHook());
+//		mainFrame.addRefresher(smTab.getScenarioListRefreshHook());
+//		mainFrame.addRefresher(submitTab.getFcAddHook());
+//		mainFrame.addRefresher(scmTab.getScriptListRefreshHook());
 		
 		loginFrame.setImage(im);
 		mainFrame.setImage(im);
 		
-		submitTab.setMsgTable(mainFrame.getMsgTable());
+//      submitTab.setMsgTable(mainFrame.getMsgTable());
 //		mainFrame.init(); //can't add viewTab after int() called
 		ViewUtil.centerWindow(loginFrame);		
 		

@@ -3,16 +3,20 @@ package com.bdcom.dce.sys.cli;
 import com.bdcom.dce.biz.pojo.BaseTestRecord;
 import com.bdcom.dce.biz.pojo.TestTypeRecord;
 import com.bdcom.dce.nio.BDPacket;
+import com.bdcom.dce.nio.BDPacketUtil;
 import com.bdcom.dce.nio.DataType;
 import com.bdcom.dce.nio.RequestID;
 import com.bdcom.dce.nio.client.ClientPackChan;
 import com.bdcom.dce.nio.client.NIOClient;
+import com.bdcom.dce.nio.exception.GlobalException;
+import com.bdcom.dce.nio.exception.ResponseException;
 import com.bdcom.dce.sys.AppContentAdaptor;
 import com.bdcom.dce.sys.Applicable;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.sys.configure.PathConfig;
 import com.bdcom.dce.sys.configure.ServerConfig;
 import com.bdcom.dce.sys.service.Dialect;
+import com.bdcom.dce.sys.service.DialectUtil;
 import com.bdcom.dce.util.SerializeUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 
@@ -56,10 +60,24 @@ public class CLI extends AppContentAdaptor implements Applicable, ApplicationCon
 
                 BaseTestRecord record = parseCMD(args);
                 Boolean isFC = (Boolean) infomap.get(TEST_ATTR.IS_FC);
+                String userNum = (String) infomap.get( TEST_ATTR.TESTER_NUM );
                 record.setFC( null!=isFC && isFC.booleanValue() );
+                record.setTesterNum( userNum );
 
                 BDPacket sendStatus = sendBaseReord(record);
-                chan.sendPacket( sendStatus );
+
+                int status = 0;
+                try {
+                    status = BDPacketUtil.parseIntResponse(sendStatus,
+                            sendStatus.getRequestID());
+                } catch (ResponseException e) {
+                    //TODO
+                } catch (GlobalException e) {
+                    //TODO
+                }
+
+                BDPacket response = DialectUtil.generateResponseToUIClient( record, status );
+                chan.sendPacket( response );
 
                 startExitTimer();
                 try {
@@ -82,7 +100,8 @@ public class CLI extends AppContentAdaptor implements Applicable, ApplicationCon
     private boolean infoMapValidation(Map<String, Object> infomap) {
         return ( null != infomap ) &&
                ( infomap.containsKey( TEST_ATTR.IS_FC ) ) &&
-               ( infomap.containsKey( TEST_ATTR.TEST_TYPE ) );
+               ( infomap.containsKey( TEST_ATTR.TEST_TYPE ) ) &&
+               ( infomap.containsKey( TEST_ATTR.TESTER_NUM) );
     }
 
     private void initContent() {
@@ -101,6 +120,11 @@ public class CLI extends AppContentAdaptor implements Applicable, ApplicationCon
                 getAttribute( CONFIG.SERVER_CONFIG );
 
         client = new NIOClient(serverConfig);
+        try {
+            client.start();
+        } catch (IOException e) {
+            //TODO
+        }
     }
 
     private BaseTestRecord parseCMD(String[] args) {

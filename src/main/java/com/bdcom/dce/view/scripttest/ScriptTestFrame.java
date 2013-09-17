@@ -18,16 +18,14 @@ import com.bdcom.dce.util.LocaleUtil;
 import com.bdcom.dce.util.StringUtil;
 import com.bdcom.dce.util.logger.ErrorLogger;
 import com.bdcom.dce.view.ViewTab;
+import com.bdcom.dce.view.message.MessageRecorder;
 import com.bdcom.dce.view.util.GBC;
 import com.bdcom.dce.view.util.MsgDialogUtil;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -54,6 +52,9 @@ public class ScriptTestFrame extends JPanel
     private static final String EXECUTE_SESSIONS = "Execute Sessions";
     private static final String BLANK_SERIAL = "serial can't be blank!";
     private static final String NO_SESSION_SELECTED = "please select execute sessions!";
+    private static final String IF_FC = "is first component";
+    private static final String EXTRA_OPTION = "Extra Option";
+    private static final String INVALID_SERIAL = "Invalid Serial";
 
     private final AppContent app;
 
@@ -61,6 +62,7 @@ public class ScriptTestFrame extends JPanel
     private JLabel serialLabel;
     private JTextField serialField;
     private JCheckBox[] sessionCBoxes;
+    private JCheckBox isFcCheckBox;
 
     private JButton executeBt;
 
@@ -80,18 +82,31 @@ public class ScriptTestFrame extends JPanel
         initDialogs();
         initSerialPane();
         initCrtSessionPane();
+
+        setLayout( new GridBagLayout() );
+        add(serialPane, new GBC(0, 0));
+        add( crtSessionPane, new GBC(0, 1) );
+
+        initExtraPane();
+        add( extraPane, new GBC(0, 2) );
+//        if( app.getBoolAttr(USER.SUPERVISOR) ) {
+//            initExtraPane();
+//            add( extraPane, new GBC(0, 2) );
+//        }
     }
 
     private void initSerialPane() {
         String serialNum = LocaleUtil.getLocalName( SERIAL_NUM );
         String serialMatching = LocaleUtil.getLocalName( SERIAL_MATCHING );
         serialLabel = new JLabel( serialNum );
+        serialField = new JTextField();
         serialField.setPreferredSize( new Dimension( 350, 20 ));
 
         Border titledBorder = BorderFactory.createTitledBorder( serialMatching );
         serialPane = new JPanel();
         serialPane.setBorder( titledBorder );
-        serialPane.setLayout( new GridBagLayout() );
+        serialPane.setLayout(new GridBagLayout());
+        serialPane.setPreferredSize( new Dimension( 800, 180 ) );
         serialPane.add( serialLabel, new GBC(0, 0).setInsets(5, 10, 5, 10) );
         serialPane.add( serialField, new GBC(1, 0).setInsets(5, 10, 5, 10) );
         serialPane.add( executeBt, new GBC(2, 0).setInsets( 5, 10, 5, 10 ) );
@@ -107,13 +122,38 @@ public class ScriptTestFrame extends JPanel
         crtSessionPane = new JPanel();
         crtSessionPane.setBorder( titledBorder );
         crtSessionPane.setLayout( new GridBagLayout() );
-        for (int i = 0; i < crtSessions.length; i++ ) {
+        crtSessionPane.setPreferredSize( new Dimension(800, 180 ) );
+
+        int len = crtSessions.length;
+        sessionCBoxes = new JCheckBox[len];
+        for (int i = 0; i < len; i++ ) {
             String session = crtSessions[i];
             JCheckBox jcb = new JCheckBox( session );
             jcb.setName( session );
             sessionCBoxes[i] = jcb;
             crtSessionPane.add( jcb, new GBC(i,0).setInsets( 5, 10, 5, 10 ) );
         }
+    }
+
+    private void initExtraPane() {
+        String isFC = LocaleUtil.getLocalName( IS_FC );
+        String extraOption = LocaleUtil.getLocalName( EXTRA_OPTION );
+        isFcCheckBox = new JCheckBox( isFC );
+        isFcCheckBox.addItemListener( new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                app.addAttribute( TEST_ATTR.IS_FC,
+                    Boolean.valueOf( isFcCheckBox.isSelected() ) );
+            }
+        });
+
+        Border titledBorder = BorderFactory.createTitledBorder( extraOption );
+        extraPane = new JPanel();
+        extraPane.setLayout( new GridBagLayout() );
+        extraPane.setPreferredSize( new Dimension(800, 180));
+        extraPane.setBorder( titledBorder );
+        extraPane.add( isFcCheckBox, new GBC(0, 0).setInsets( 10 ) );
+
     }
 
     private void initDialogs() {
@@ -123,7 +163,7 @@ public class ScriptTestFrame extends JPanel
     private void initButtons() {
         String execute = LocaleUtil.getLocalName( EXECUTE );
         executeBt = new JButton( execute );
-        executeBt.setPreferredSize( new Dimension( 70, 20 ) );
+        executeBt.setPreferredSize( new Dimension( 80, 22 ) );
         executeBt.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -156,6 +196,11 @@ public class ScriptTestFrame extends JPanel
     private void doExecute0() {
         String serialToMatch = serialField.getText();
         Item i = matchingResource( serialToMatch );
+        if ( null == i ) {
+            String invalidSerial = LocaleUtil.getLocalName(INVALID_SERIAL);
+            MsgDialogUtil.showMsgDialog( invalidSerial );
+            return;
+        }
         if ( i instanceof Script ) {
             String[] sessions = getSelectedSessions();
             executeScript( (Script) i, sessions );
@@ -192,7 +237,9 @@ public class ScriptTestFrame extends JPanel
         List<String> sessionList = new ArrayList<String>();
         for ( int i = 0; i < sessionCBoxes.length; i++ ) {
             JCheckBox jcb = sessionCBoxes[i];
-            sessionList.add( jcb.getName() );
+            if ( jcb.isSelected() ) {
+                sessionList.add( jcb.getName() );
+            }
         }
 
         String[] sessions = new String[sessionList.size()];
@@ -202,11 +249,15 @@ public class ScriptTestFrame extends JPanel
 
     private Item matchingResource(String serial) {
         StorableMgr mgr = getStorableMgr(app);
+        if ( !mgr.isStorageLoaded() ) {
+            mgr.loadStorage();
+        }
         Set<Item> itemSet = mgr.getBySerialMatching( serial );
         if ( null == itemSet || itemSet.isEmpty() ) {
-            ClientProxy client = getClientProxy( app );
+            ClientProxy client = getClientProxy(app);
             try {
                 serial = client.getCompleteSerial( serial );
+                System.out.println("serial from server: " + serial);
             } catch (IOException e) {
                 e.printStackTrace(); //TODO
             } catch (GlobalException e) {
@@ -215,7 +266,8 @@ public class ScriptTestFrame extends JPanel
             itemSet = mgr.getBySerialMatching( serial );
         }
 
-        return ( null == itemSet) ? null : itemSet.iterator().next();
+        return ( null == itemSet || itemSet.isEmpty()) ?
+                null : itemSet.iterator().next();
     }
 
     private void executeScript(Script script, String[] sessions) {
@@ -228,6 +280,7 @@ public class ScriptTestFrame extends JPanel
             MsgDialogUtil.showMsgDialog( msg + path );
             return;
         }
+        System.out.println("executing file:" + path );
         executor.execute( path, sessions );
         boolean interrupted = false;
         try {
@@ -246,7 +299,8 @@ public class ScriptTestFrame extends JPanel
     }
 
     private void showScenarioDialog(Scenario scenario) {
-        scenarioDialog.display(scenario);
+        String userNum = getCurrentUser( app );
+        scenarioDialog.display(scenario, userNum);
         try {
             synchronized ( scenarioDialog ) {
                 while( scenarioDialog.isDisplaying() ) {
@@ -259,8 +313,8 @@ public class ScriptTestFrame extends JPanel
         }
     }
 
-    private boolean submitRecord(BaseTestRecord record) {
-        ClientProxy client = getClientProxy( app );
+    private int submitRecord(BaseTestRecord record) {
+        ClientProxy client = getClientProxy(app);
         int status = -1;
         try {
              status = client.sendBaseTestRecord( record );
@@ -274,7 +328,7 @@ public class ScriptTestFrame extends JPanel
             MsgDialogUtil.reportGlobalException( e );
         }
 
-        return status > 0;
+        return status;
     }
 
     private String getScriptPath(Script script, AppContent app) {
@@ -284,6 +338,10 @@ public class ScriptTestFrame extends JPanel
         } else {
             return script.getPath();
         }
+    }
+
+    private MessageRecorder getMessageRecorder(AppContent app) {
+        return (MessageRecorder) app.getAttribute( COMPONENT.MESSAGE_RECORDER );
     }
 
     private ScriptExecutor0 getScriptExecutor(AppContent app) {
@@ -302,39 +360,47 @@ public class ScriptTestFrame extends JPanel
         return (ClientProxy) app.getAttribute(  COMPONENT.NIO_CLIENT );
     }
 
+    private String getCurrentUser(AppContent app) {
+        return app.getStringAttr( USER.USER_NUM );
+    }
+
+    private String tabTitle;
+    private String tabTip;
+    private Icon tabIcon;
+
     @Override
     public void setTabTitle(String tabTitle) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.tabTitle = tabTitle;
     }
 
     @Override
     public String getTabTitle() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return tabTitle;
     }
 
     @Override
     public void setTabIcon(Icon tabIcon) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.tabIcon = tabIcon;
     }
 
     @Override
     public Icon getTabIcon() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return tabIcon;
     }
 
     @Override
     public Component getTabComponent() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return frame;
     }
 
     @Override
     public void setTabTip(String tabTip) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.tabTip = tabTip;
     }
 
     @Override
     public String getTabTip() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return tabTip;
     }
 
     class ScenarioDisplayDialog extends JDialog {
@@ -375,6 +441,7 @@ public class ScriptTestFrame extends JPanel
         private JPanel buttonPane;
 
         private Scenario matchedScenario;
+        private String currentUser;
         private boolean displaying = false;
 
         public ScenarioDisplayDialog(JComponent fatherFrame) {
@@ -477,18 +544,20 @@ public class ScriptTestFrame extends JPanel
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     submit( true );
+                    close();
                 }
             });
             notPassBt.addActionListener( new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     submit( false );
+                    close();
                 }
             });
 
             buttonPane = new JPanel();
             buttonPane.setLayout( new GridBagLayout() );
-            buttonPane.add(passBt, new GBC(0, 0).setInsets(10));
+            buttonPane.add( passBt, new GBC(0, 0).setInsets(10));
             buttonPane.add( notPassBt, new GBC(1, 0).setInsets( 10 ) );
 
         }
@@ -497,11 +566,10 @@ public class ScriptTestFrame extends JPanel
             BaseTestRecord record = ScenarioUtil.mergePreProvidedScenario(
                     new BaseTestRecord(), matchedScenario );
             record.setStatus(String.valueOf( isPass )); //TODO maybe needs fixing
-            if ( submitRecord( record ) ) {
-                //TODO report
-            } else {
-                //TODO report
-            }
+
+            int status = submitRecord( record );
+            MessageRecorder recorder = getMessageRecorder( app );
+            recorder.addBaseTestRecord( record, status, "" );
         }
 
         public boolean isDisplaying() {
@@ -515,9 +583,9 @@ public class ScriptTestFrame extends JPanel
             }
         }
 
-        public void display(Scenario scenario) {
-            matchedScenario = scenario;
-            update( scenario );
+        public void display(Scenario scenario, String user) {
+            //matchedScenario = scenario;
+            update( scenario, user );
             if ( null != fatherFrame ) {
                 fatherFrame.setEnabled( false );
             }
@@ -537,8 +605,9 @@ public class ScriptTestFrame extends JPanel
             setDisplaying( false );
         }
 
-        public void update(Scenario scenario) {
+        public void update(Scenario scenario, String user) {
             matchedScenario = scenario;
+            currentUser = user;
             updateBasicPane(scenario);
             updateContentPane( scenario );
         }

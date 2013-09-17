@@ -4,6 +4,8 @@ import com.bdcom.dce.biz.pojo.Scenario;
 import com.bdcom.dce.biz.pojo.Script;
 import com.bdcom.dce.biz.storage.Item;
 import com.bdcom.dce.biz.storage.StorableMgr;
+import com.bdcom.dce.nio.client.ClientProxy;
+import com.bdcom.dce.nio.exception.GlobalException;
 import com.bdcom.dce.sys.AppContent;
 import com.bdcom.dce.sys.ApplicationConstants;
 import com.bdcom.dce.util.LocaleUtil;
@@ -24,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -43,6 +46,8 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
     private static final String DELETE = "Delete";
     private static final String ADD_SCENARIO = "Add Scenario";
     private static final String ADD_SCRIPT = "Add Script";
+    private static final String UPLOAD = "Upload";
+    private static final String DOWNLOAD = "Download";
 
     private static final String SCENARIO_NAME_IS_BLANK = "scenario name is blank!";
     private static final String NO_ATTR_IN_SCENARIO = "no attribute added in scenario!";
@@ -53,6 +58,8 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
     private static final String SCRIPT_PATH_IS_BLANK = "script path is blank!";
     private static final String SCRIPT_FILE_NOT_EXIST = "script file is not exist!";
     private static final String CANT_FIND_FILE = "can't find file:";
+    private static final String FINISH_UPLOADING = "Finish Uploading!";
+    private static final String FINISH_DOWNLOADING = "Finish Downloading!";
 
     private JTable table;
     private ResourceTableModel model;
@@ -62,6 +69,8 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
     private JButton deleteBt;
     private JButton refreshBt;
     private JButton detailBt;
+    private JButton uploadBt;
+    private JButton downloadBt;
 
     private JScrollPane tablePane;
     private JPanel buttonPane;
@@ -291,6 +300,8 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
         String delete = LocaleUtil.getLocalName( DELETE );
         String addScenario = LocaleUtil.getLocalName( ADD_SCENARIO );
         String addScript = LocaleUtil.getLocalName( ADD_SCRIPT );
+        String upload = LocaleUtil.getLocalName( UPLOAD );
+        String download = LocaleUtil.getLocalName( DOWNLOAD );
 
         refreshBt = new JButton( refresh );
         detailBt = new JButton( detail );
@@ -298,6 +309,8 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
         deleteBt = new JButton( delete );
         addScenarioBt = new JButton( addScenario );
         addScriptBt = new JButton( addScript );
+        uploadBt = new JButton( upload );
+        downloadBt = new JButton( download);
 
         refreshBt.setPreferredSize( new Dimension(80, 25) );
         detailBt.setPreferredSize( new Dimension(80, 25) );
@@ -305,6 +318,8 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
         deleteBt.setPreferredSize( new Dimension(80, 25) );
         addScenarioBt.setPreferredSize( new Dimension(100, 25) );
         addScriptBt.setPreferredSize( new Dimension(80, 25) );
+        uploadBt.setPreferredSize(new Dimension(80, 25));
+        downloadBt.setPreferredSize(new Dimension(80, 25));
 
         detailBt.setEnabled( false );
         modifyBt.setEnabled(false);
@@ -373,7 +388,7 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
                 final int first = table.getSelectedRow();
 
                 Item[] items = new Item[selectedRowCount];
-                for ( int i = first; i < selectedRowCount; i++ ) {
+                for ( int i = first; i -first < selectedRowCount; i++ ) {
                     items[ i - first ] = model.getRow( i );
                 }
 
@@ -388,14 +403,66 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
             }
         });
 
+        uploadBt.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StorableMgr mgr = getStorableMgr( app );
+                ClientProxy client = getClientProxy( app );
+
+                try {
+                    uploadBt.setEnabled( false );
+                    if ( !mgr.isStorageLoaded() ) {
+                        mgr.loadStorage();
+                    }
+                    client.uploadResource( mgr );
+                } catch (IOException ex) {
+                    //TODO
+                } catch (GlobalException ex) {
+                    MsgDialogUtil.reportGlobalException( ex );
+                } finally {
+                    uploadBt.setEnabled( true );
+                    String msg = LocaleUtil.getLocalName( FINISH_UPLOADING );
+                    MsgDialogUtil.showMsgDialog( msg );
+                }
+            }
+        });
+
+        downloadBt.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StorableMgr mgr = getStorableMgr( app );
+                ClientProxy client = getClientProxy( app );
+
+                try {
+                    downloadBt.setEnabled( false );
+                    client.downloadResource( mgr );
+                } catch (IOException ex) {
+                    //TODO
+                } catch (GlobalException ex) {
+                    MsgDialogUtil.reportGlobalException( ex );
+                } finally {
+                    if ( !mgr.isStorageLoaded() ) {
+                        mgr.loadStorage();
+                    }
+                    mgr.saveToLocalStorage();
+
+                    downloadBt.setEnabled( true );
+                    String msg = LocaleUtil.getLocalName( FINISH_DOWNLOADING );
+                    MsgDialogUtil.showMsgDialog( msg );
+                }
+            }
+        });
+
         buttonPane = new JPanel();
         buttonPane.setLayout( new GridBagLayout() );
-        buttonPane.add(refreshBt, new GBC(0, 0).setInsets(10));
-        buttonPane.add(detailBt, new GBC(1, 0).setInsets(10));
-        buttonPane.add(addScenarioBt, new GBC(2, 0).setInsets(10) );
-        buttonPane.add(addScriptBt, new GBC(3, 0).setInsets(10) );
-        buttonPane.add(modifyBt, new GBC(4, 0).setInsets(10) );
-        buttonPane.add(deleteBt, new GBC(5, 0).setInsets(10) );
+        buttonPane.add(refreshBt, new GBC(0, 0).setInsets(8));
+        buttonPane.add(detailBt, new GBC(1, 0).setInsets(8));
+        buttonPane.add(addScenarioBt, new GBC(2, 0).setInsets(8) );
+        buttonPane.add(addScriptBt, new GBC(3, 0).setInsets(8) );
+        buttonPane.add(modifyBt, new GBC(4, 0).setInsets(8) );
+        buttonPane.add(deleteBt, new GBC(5, 0).setInsets(8) );
+        buttonPane.add(uploadBt, new GBC(6, 0).setInsets(8) );
+        buttonPane.add(downloadBt, new GBC(7, 0).setInsets(8) );
     }
 
     private void showScenarioModifyDialog(Scenario scenario) {
@@ -438,6 +505,10 @@ public class ResourceMgrFrame extends JPanel implements ViewTab, ApplicationCons
                     app.getAttribute( COMPONENT.STORABLE_MGR);
         }
         return storableMgr;
+    }
+
+    private ClientProxy getClientProxy(AppContent app) {
+        return (ClientProxy) app.getAttribute( COMPONENT.NIO_CLIENT );
     }
 
     private String tabTitle;
